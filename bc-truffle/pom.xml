@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ch.snipy</groupId>
+    <artifactId>bc-truffle</artifactId>
+    <version>0.1</version>
+    <dependencies>
+        <dependency>
+            <groupId>com.oracle.truffle</groupId>
+            <artifactId>truffle-api</artifactId>
+            <version>0.33</version> <!-- or any later version -->
+        </dependency>
+        <dependency>
+            <groupId>com.oracle.truffle</groupId>
+            <artifactId>truffle-dsl-processor</artifactId>
+            <version>0.33</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle.truffle</groupId>
+            <artifactId>truffle-tck</artifactId>
+            <version>0.33</version>
+        </dependency>
+    </dependencies>
+</project>
