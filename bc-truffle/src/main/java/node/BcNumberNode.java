@@ -1,12 +1,9 @@
 package node;
 
-import com.oracle.truffle.api.source.SourceSection;
-
-public class BcNumber extends BcExpressionNode {
+public class BcNumberNode extends BcExpressionNode {
     private final double value;
 
-    public BcNumber(SourceSection sourceSection, double value) {
-        super(sourceSection);
+    public BcNumberNode(double value) {
         this.value = value;
     }
 }
