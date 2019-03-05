@@ -7,6 +7,9 @@
     <groupId>ch.snipy</groupId>
     <artifactId>bc-truffle</artifactId>
     <version>0.1</version>
+    <properties>
+        <graalvm.version>1.0.0-rc12</graalvm.version>
+    </properties>
     <dependencies>
         <!--Scala-->
         <dependency>
@@ -24,20 +27,21 @@
 
         <!--Truffle-->
         <dependency>
-            <groupId>com.oracle.truffle</groupId>
+            <groupId>org.graalvm.truffle</groupId>
             <artifactId>truffle-api</artifactId>
-            <version>0.33</version> <!-- or any later version -->
+            <version>${graalvm.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.oracle.truffle</groupId>
+            <groupId>org.graalvm.truffle</groupId>
             <artifactId>truffle-dsl-processor</artifactId>
-            <version>0.33</version>
+            <version>${graalvm.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.oracle.truffle</groupId>
+            <groupId>org.graalvm.truffle</groupId>
             <artifactId>truffle-tck</artifactId>
-            <version>0.33</version>
+            <version>${graalvm.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

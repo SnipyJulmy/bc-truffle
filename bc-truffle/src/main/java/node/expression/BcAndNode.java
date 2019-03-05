@@ -1,6 +1,8 @@
 package node.expression;
 
-import node.BcStatementNode;
+import node.BcBinaryNode;
+import org.graalvm.compiler.nodeinfo.NodeInfo;
 
-public class BcAndNode extends BcStatementNode {
+@NodeInfo(shortName = "&&")
+public abstract class BcAndNode extends BcBinaryNode {
 }

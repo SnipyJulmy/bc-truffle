@@ -27,6 +27,7 @@ class BCParser(source: Source) extends RegexParsers with PackratParsers {
 
   /* Statements */
 
+  lazy val bcStatement: PackratParser[BcStatementNode] = ???
   lazy val bcIf: PackratParser[BcIfNode] = ???
   lazy val bcWhile: PackratParser[BcWhileNode] = ???
   lazy val bcFor: PackratParser[BcForNode] = ???
@@ -50,13 +51,24 @@ class BCParser(source: Source) extends RegexParsers with PackratParsers {
 
   lazy val constantExpr: PackratParser[BcExpressionNode] = bcLogicalOrExpr
 
-  lazy val bcLogicalOrExpr: PackratParser[BcExpressionNode] =
-    bcLogicalOrExpr ~ ("||" ~> bcLogicalAndExpr) ^^ { case l ~ r => new BcOrNode(l, r) } |
-      bcLogicalAndExpr
+  lazy val bcLogicalOrExpr: PackratParser[BcExpressionNode] = ???
+  /*
+  bcLogicalOrExpr ~ ("||" ~> bcLogicalAndExpr) ^^ { case l ~ r => new BcOrNode(l, r) } |
+    bcLogicalAndExpr
 
   lazy val bcLogicalAndExpr: PackratParser[BcExpressionNode] = ???
+  bcLogicalAndExpr ~ ("&&" ~> bcLogicalNotExpr) ^^ { case l ~ r => new BcAndNode(l, r) } |
+    bcLogicalNotExpr
+
   lazy val bcLogicalNotExpr: PackratParser[BcExpressionNode] = ???
+  bcLogicalEqExpr | "!" ~> bcLogicalNotExpr ^^ { expr => new BcNotNode(expr) }
+
   lazy val bcLogicalEqExpr: PackratParser[BcExpressionNode] = ???
+  bcLogicalEqExpr ~ ("==" ~> bcLogicalRelationalExpr) ^^ { case l ~ r => new BcLogicalEqNode(l, r) } |
+    bcLogicalEqExpr ~ ("!=" ~> bcLogicalRelationalExpr) ^^ { case l ~ r => new BcLogicalNotEqNode(l, r) } |
+    bcLogicalRelationalExpr
+    */
+
   lazy val bcLogicalRelationalExpr: PackratParser[BcExpressionNode] = ???
   lazy val bcLogicalAssignementOpExpr: PackratParser[BcExpressionNode] = ???
   lazy val bcLogicalAdditiveExpr: PackratParser[BcExpressionNode] = ???
