@@ -1,8 +1,10 @@
+package ch.snipy;
+
+import ch.snipy.runtime.BCContext;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.nodes.RootNode;
-import runtime.BCContext;
 
 public class BCLanguage extends TruffleLanguage<BCContext> {
 
@@ -20,7 +22,7 @@ public class BCLanguage extends TruffleLanguage<BCContext> {
 
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
-        RootNode root = BCParser$.MODULE$.parse(
+        RootNode root = ch.snipy.BCParser$.MODULE$.parse(
                 this,
                 request.getSource()
         );
