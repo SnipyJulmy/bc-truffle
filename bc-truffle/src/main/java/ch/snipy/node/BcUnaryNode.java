@@ -1,4 +1,4 @@
-package node;
+package ch.snipy.node;
 
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeChildren;
