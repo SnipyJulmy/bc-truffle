@@ -5,7 +5,7 @@ import ch.snipy.node.BcUnaryNode;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 
-public abstract class NcNegNode extends BcUnaryNode {
+public abstract class BcNegNode extends BcUnaryNode {
 
     @Specialization
     protected double doDouble(double value) {
