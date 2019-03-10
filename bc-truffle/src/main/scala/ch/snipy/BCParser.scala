@@ -96,10 +96,22 @@ class BCParser(source: Source) extends RegexParsers with PackratParsers {
       bcAdditiveExpr ~ ("-" ~> bcAdditiveExpr) ^^ { case l ~ r => BcSubNodeGen.create(l, r) } |
       bcMultiplicativeExpr
 
-  lazy val bcMultiplicativeExpr: PackratParser[BcExpressionNode] = ???
-  lazy val bcLogicalPowerExpr: PackratParser[BcExpressionNode] = ???
-  lazy val bcLogicalNegExpr: PackratParser[BcExpressionNode] = ???
-  lazy val bcIncDecExpr: PackratParser[BcExpressionNode] = ???
+  lazy val bcMultiplicativeExpr: PackratParser[BcExpressionNode] =
+    bcAdditiveExpr ~ ("*" ~> bcAdditiveExpr) ^^ { case l ~ r => BcMulNodeGen.create(l, r) } |
+      bcAdditiveExpr ~ ("/" ~> bcAdditiveExpr) ^^ { case l ~ r => BcDivNodeGen.create(l, r) } |
+      bcAdditiveExpr ~ ("%" ~> bcAdditiveExpr) ^^ { case l ~ r => BcModNodeGen.create(l, r) } |
+      bcPowerExpr
+
+  lazy val bcPowerExpr: PackratParser[BcExpressionNode] =
+    bcAdditiveExpr ~ ("^" ~> bcAdditiveExpr) ^^ { case l ~ r => BcPowNodeGen.create(l, r) } |
+      bcNegExpr
+
+  lazy val bcNegExpr: PackratParser[BcExpressionNode] =
+    "-" ~> bcNegExpr ^^ { expr => BcNegNodeGen.create(expr) } |
+      bcIncDecExpr
+
+  lazy val bcIncDecExpr: PackratParser[BcExpressionNode] =
+    "++" ~> bcIncDecExpr ^^ { expr => ??? }
 
   lazy val doubleLiteral: PackratParser[BcDoubleLiteralNode] =
     "[+-]?([1-9][0-9]*)|([0-9]+\\.[0-9]+?)".r ^^ { value => new BcDoubleLiteralNode(value.toDouble) }
