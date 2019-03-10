@@ -140,14 +140,14 @@ class BCParser(source: Source) extends RegexParsers with PackratParsers {
       index.orNull,
       FrameSlotKind.Illegal
     )
-    lexicalScope.locals += (name -> slot)
+    lexicalScope.locals += (identifier -> slot)
     BcLocalVariableWriteNodeGen.create(value, slot)
   }
 }
 
 class LexicalScope(val parent: Option[LexicalScope]) {
   val locals: mutable.Map[String, FrameSlot] = parent match {
-    case None => Map[String, FrameSlot]()
-    case Some(outerScope) => Map[String, FrameSlot]() ++= outerScope
+    case None => mutable.Map[String, FrameSlot]()
+    case Some(outerScope) => mutable.Map[String, FrameSlot]() ++= outerScope.locals
   }
 }
