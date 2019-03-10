@@ -11,21 +11,21 @@
         <graalvm.version>1.0.0-rc12</graalvm.version>
     </properties>
     <dependencies>
-        <!--Scala-->
+        <!-- Scala -->
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>2.12.7</version>
         </dependency>
 
-        <!--Parser-combinator-->
+        <!-- Parser-combinator -->
         <dependency>
             <groupId>org.scala-lang.modules</groupId>
             <artifactId>scala-parser-combinators_2.12</artifactId>
             <version>1.1.1</version>
         </dependency>
 
-        <!--Truffle-->
+        <!-- Truffle -->
         <dependency>
             <groupId>org.graalvm.truffle</groupId>
             <artifactId>truffle-api</artifactId>
@@ -42,6 +42,20 @@
             <artifactId>truffle-tck</artifactId>
             <version>${graalvm.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.scalacheck</groupId>
+            <artifactId>scalacheck_2.12</artifactId>
+            <version>1.14.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_2.12</artifactId>
+            <version>3.0.6</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
