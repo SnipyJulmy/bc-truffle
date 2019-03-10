@@ -91,8 +91,12 @@ class BCParser(source: Source) extends RegexParsers with PackratParsers {
       bcAssignementOpExpr ~ ("^=" ~> bcAssignementOpExpr) ^^ { case l ~ r => mkAssignementNode(l, BcPowNodeGen.create(l, r)) } |
       bcAdditiveExpr
 
-  lazy val bcAdditiveExpr: PackratParser[BcExpressionNode] = ???
-  lazy val bcLogicalMultiplicativeExpr: PackratParser[BcExpressionNode] = ???
+  lazy val bcAdditiveExpr: PackratParser[BcExpressionNode] =
+    bcAdditiveExpr ~ ("+" ~> bcAdditiveExpr) ^^ { case l ~ r => BcAddNodeGen.create(l, r) } |
+      bcAdditiveExpr ~ ("-" ~> bcAdditiveExpr) ^^ { case l ~ r => BcSubNodeGen.create(l, r) } |
+      bcMultiplicativeExpr
+
+  lazy val bcMultiplicativeExpr: PackratParser[BcExpressionNode] = ???
   lazy val bcLogicalPowerExpr: PackratParser[BcExpressionNode] = ???
   lazy val bcLogicalNegExpr: PackratParser[BcExpressionNode] = ???
   lazy val bcIncDecExpr: PackratParser[BcExpressionNode] = ???
