@@ -6,18 +6,12 @@ import ch.snipy.node.expression.literal.{BcDoubleLiteralNode, BcStringLiteralNod
 import ch.snipy.node.local.BcLocalVariableWriteNodeGen
 import ch.snipy.node.statement._
 import com.oracle.truffle.api.frame.{FrameDescriptor, FrameSlot, FrameSlotKind}
-import com.oracle.truffle.api.nodes.RootNode
-import com.oracle.truffle.api.source.Source
 
 import scala.collection.mutable
 import scala.util.matching.Regex
 import scala.util.parsing.combinator.{PackratParsers, RegexParsers}
 
-object BCParser {
-  def parse(language: BCLanguage, source: Source): RootNode = ???
-}
-
-class BCParser(source: Source) extends RegexParsers with PackratParsers {
+class BCParser extends RegexParsers with PackratParsers {
 
   private var lexicalScope: LexicalScope = new LexicalScope(None)
   private val frameDescriptor: FrameDescriptor = new FrameDescriptor()
@@ -27,9 +21,24 @@ class BCParser(source: Source) extends RegexParsers with PackratParsers {
 
   override def skipWhitespace: Boolean = true
 
-  lazy val statement: PackratParser[BcStatementNode] = {
-    // TODO bcScale <~ EOS
-    ???
+  /**
+    * a bc program is just a sequence of statement
+    * the parser return a BcRootNode which is the starting point of the program
+    */
+  lazy val program: PackratParser[BcRootNode] = {
+    rep(bcStatement) ^^ { statements =>
+      new BcBlockNode(statements.toArray)
+    }
+  }
+
+  lazy val bcStatement: PackratParser[BcStatementNode] = {
+    bcStatementCase <~ EOS
+  }
+
+  lazy val bcStatementCase: PackratParser[BcStatementNode] = {
+    bcIf | bcWhile | bcFor | bcPrint | bcBreak | bcContinue | bcReturn |
+      bcFunctionDefinition | bcVoidFunctionDefinition |
+      bcBlock | bcAutoDefinition | bcVarDefinition | bcArrayDefinition
   }
 
   // Todo : special variables
@@ -37,27 +46,38 @@ class BCParser(source: Source) extends RegexParsers with PackratParsers {
 
   /* Statements */
 
-  lazy val bcStatement: PackratParser[BcStatementNode] = ???
-  lazy val bcIf: PackratParser[BcIfNode] = ???
-  lazy val bcWhile: PackratParser[BcWhileNode] = ???
+  lazy val bcIf: PackratParser[BcIfNode] = {
+    "if" ~ lp ~> ((bcExpr ~ (rp ~> bcStatement)) ~ ("else" ~> bcStatement).?) ^^ {
+      case cond ~ trueBranch ~ falseBranch => new BcIfNode(
+        cond,
+        trueBranch,
+        falseBranch.orNull // node is null is case of no else branch
+      )
+    }
+  }
+
+  lazy val bcWhile: PackratParser[BcWhileNode] = {
+    "while" ~ lp ~> bcExpr ~ (rp ~> bcStatement) ^^ { case cond ~ statement =>
+
+    }
+  }
   lazy val bcFor: PackratParser[BcForNode] = ???
   lazy val bcPrint: PackratParser[BcPrintNode] = ???
   lazy val bcBreak: PackratParser[BcBreakNode] = ???
   lazy val bcContinue: PackratParser[BcContinueNode] = ???
   lazy val bcHalt: PackratParser[BcHaltNode] = ???
   lazy val bcReturn: PackratParser[BcReturnNode] = ???
-  lazy val bcLimits: PackratParser[BcLimitsNode] = ???
-  lazy val bcQuit: PackratParser[BcLimitsNode] = ???
-  lazy val bcWarranty: PackratParser[BcLimitsNode] = ???
   lazy val bcFunctionDefinition: PackratParser[BcFunctionDefNode] = ???
   lazy val bcVoidFunctionDefinition: PackratParser[BcVoidFunctionDefNode] = ???
-  lazy val bcFunctionCall: PackratParser[BcFunctionCallNode] = ???
+  lazy val bcFunctionCall: PackratParser[BcExpressionNode] = ???
   lazy val bcBlock: PackratParser[BcBlockNode] = ???
   lazy val bcAutoDefinition: PackratParser[BcAutoDefNode] = ???
-  lazy val varDefinition: PackratParser[BcVarDefNode] = ???
-  lazy val arrayDefinition: PackratParser[BcArrayDefNode] = ???
+  lazy val bcVarDefinition: PackratParser[BcVarDefNode] = ???
+  lazy val bcArrayDefinition: PackratParser[BcArrayDefNode] = ???
 
   /* Expression */
+
+  lazy val bcExpr: PackratParser[BcExpressionNode] = ???
 
   lazy val constantExpr: PackratParser[BcExpressionNode] = bcLogicalOrExpr
 
@@ -70,7 +90,8 @@ class BCParser(source: Source) extends RegexParsers with PackratParsers {
       bcLogicalNotExpr
 
   lazy val bcLogicalNotExpr: PackratParser[BcExpressionNode] =
-    bcRelationalOpExpr | "!" ~> bcLogicalNotExpr ^^ { expr => BcNotNodeGen.create(expr) }
+    bcRelationalOpExpr | "!" ~> bcLogicalNotExpr ^^ { expr => BcNotNodeGen.create(expr) } |
+      bcRelationalOpExpr
 
   lazy val bcRelationalOpExpr: PackratParser[BcExpressionNode] =
     bcRelationalOpExpr ~ ("==" ~> bcRelationalOpExpr) ^^ { case l ~ r => BcLogicalEqNodeGen.create(l, r) } |
@@ -111,30 +132,24 @@ class BCParser(source: Source) extends RegexParsers with PackratParsers {
       bcIncDecExpr
 
   lazy val bcIncDecExpr: PackratParser[BcExpressionNode] =
-    "++" ~> bcIncDecExpr ^^ { expr => ??? }
+    "++" ~> bcIncDecExpr ^^ { expr => ??? } |
+      "--" ~> bcIncDecExpr ^^ { expr => ??? } |
+      bcIncDecExpr ~> "++" ^^ { expr => ??? } |
+      bcIncDecExpr ~> "--" ^^ { expr => ??? } |
+      bcPostFixExpr
+
+  lazy val bcPostFixExpr: PackratParser[BcExpressionNode] =
+    doubleLiteral | bcFunctionCall
+
+  lazy val bcParExpr: PackratParser[BcRootNode] = ???
 
   lazy val doubleLiteral: PackratParser[BcDoubleLiteralNode] =
     "[+-]?([1-9][0-9]*)|([0-9]+\\.[0-9]+?)".r ^^ { value => new BcDoubleLiteralNode(value.toDouble) }
   lazy val bcAssignement: PackratParser[BcAssignementNode] = ???
-  lazy val bcAdd: PackratParser[BcAddNode] = ???
-  lazy val bcSub: PackratParser[BcSubNode] = ???
-  lazy val bcMul: PackratParser[BcMulNode] = ???
-  lazy val bcDiv: PackratParser[BcDivNode] = ???
-  lazy val bcNeg: PackratParser[BcNegNode] = ???
-  lazy val bcPostInc: PackratParser[BcExpressionNode] = ???
-  lazy val bcPreInc: PackratParser[BcExpressionNode] = ???
-  lazy val bcPostDec: PackratParser[BcExpressionNode] = ???
-  lazy val bcPreDec: PackratParser[BcExpressionNode] = ???
-  lazy val bcMod: PackratParser[BcModNode] = ???
-  lazy val bcPow: PackratParser[BcPowNode] = ???
-  lazy val bcParExpr: PackratParser[BcRootNode] = ???
-
 
   lazy val string: PackratParser[BcStringLiteralNode] = ??? //"""(\\.|[^\\"])*""".r ^^ { str => new BcStringNode(str) }
 
-
   /* Utils regex and string */
-
   lazy val integer: PackratParser[Int] = "[0-9]+".r ^^ { str => str.toInt }
   lazy val EOS: PackratParser[String] = sc | nl
   lazy val nl = "\n"
