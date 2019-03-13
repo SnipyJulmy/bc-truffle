@@ -29,14 +29,13 @@ public final class BcForRepeatingNode extends Node implements RepeatingNode {
         this.bodyNode = bodyNode;
     }
 
-
     @Override
     public boolean executeRepeating(VirtualFrame frame) {
         if (!evaluateCondition(frame))
             return false;
         try {
             bodyNode.executeVoid(frame);
-            endLoopNode.executeVoid(frame);
+            if (endLoopNode != null) endLoopNode.executeVoid(frame);
             return true;
         } catch (BcContinueException e) {
             continueTaken.enter();
@@ -49,7 +48,7 @@ public final class BcForRepeatingNode extends Node implements RepeatingNode {
 
     private boolean evaluateCondition(VirtualFrame frame) {
         try {
-            return conditionNode.executeBoolean(frame);
+            return conditionNode == null || conditionNode.executeBoolean(frame);
         } catch (UnexpectedResultException e) {
             throw new UnsupportedSpecializationException(this, new Node[]{conditionNode}, e.getResult());
         }

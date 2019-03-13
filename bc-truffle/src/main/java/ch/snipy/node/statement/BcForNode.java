@@ -26,7 +26,7 @@ public final class BcForNode extends BcStatementNode {
 
     @Override
     public void executeVoid(VirtualFrame frame) {
-        initNode.executeVoid(frame);
+        if (initNode != null) initNode.executeVoid(frame);
         loopNode.executeLoop(frame);
     }
 }
