@@ -1,4 +1,4 @@
-package ch.snipy.node.statement;
+package ch.snipy.node.controlflow;
 
 import ch.snipy.node.BcExpressionNode;
 import ch.snipy.node.BcStatementNode;
@@ -11,15 +11,21 @@ import com.oracle.truffle.api.nodes.RepeatingNode;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import com.oracle.truffle.api.profiles.BranchProfile;
 
-public final class BcWhileRepeatingNode extends Node implements RepeatingNode {
+public final class BcForRepeatingNode extends Node implements RepeatingNode {
 
     private final BranchProfile continueTaken = BranchProfile.create();
     private final BranchProfile breakTaken = BranchProfile.create();
+
     @Child private BcExpressionNode conditionNode;
+    @Child private BcExpressionNode endLoopNode;
     @Child private BcStatementNode bodyNode;
 
-    public BcWhileRepeatingNode(BcExpressionNode conditionNode, BcStatementNode bodyNode) {
+
+    public BcForRepeatingNode(BcExpressionNode conditionNode,
+                              BcExpressionNode endLoopNode,
+                              BcStatementNode bodyNode) {
         this.conditionNode = conditionNode;
+        this.endLoopNode = endLoopNode;
         this.bodyNode = bodyNode;
     }
 
@@ -27,9 +33,9 @@ public final class BcWhileRepeatingNode extends Node implements RepeatingNode {
     public boolean executeRepeating(VirtualFrame frame) {
         if (!evaluateCondition(frame))
             return false;
-
         try {
             bodyNode.executeVoid(frame);
+            if (endLoopNode != null) endLoopNode.executeVoid(frame);
             return true;
         } catch (BcContinueException e) {
             continueTaken.enter();
@@ -42,7 +48,7 @@ public final class BcWhileRepeatingNode extends Node implements RepeatingNode {
 
     private boolean evaluateCondition(VirtualFrame frame) {
         try {
-            return conditionNode.executeBoolean(frame);
+            return conditionNode == null || conditionNode.executeBoolean(frame);
         } catch (UnexpectedResultException e) {
             throw new UnsupportedSpecializationException(this, new Node[]{conditionNode}, e.getResult());
         }

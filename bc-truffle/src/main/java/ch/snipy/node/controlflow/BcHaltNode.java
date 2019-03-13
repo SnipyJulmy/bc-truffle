@@ -1,4 +1,4 @@
-package ch.snipy.node.statement;
+package ch.snipy.node.controlflow;
 
 import ch.snipy.node.BcStatementNode;
 import ch.snipy.node.controlflow.BcHaltException;

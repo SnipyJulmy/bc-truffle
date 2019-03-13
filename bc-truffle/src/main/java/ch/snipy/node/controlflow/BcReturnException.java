@@ -1,4 +1,4 @@
-package ch.snipy.node.statement;
+package ch.snipy.node.controlflow;
 
 import com.oracle.truffle.api.nodes.ControlFlowException;
 

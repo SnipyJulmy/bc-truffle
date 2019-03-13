@@ -1,6 +1,7 @@
 package ch.snipy
 
 import ch.snipy.node._
+import ch.snipy.node.controlflow._
 import ch.snipy.node.expression._
 import ch.snipy.node.expression.literal.{BcDoubleLiteralNode, BcStringLiteralNode}
 import ch.snipy.node.local.BcLocalVariableWriteNodeGen

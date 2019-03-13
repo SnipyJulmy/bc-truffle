@@ -1,4 +1,4 @@
-package ch.snipy.node.statement;
+package ch.snipy.node.controlflow;
 
 import ch.snipy.BcException;
 import ch.snipy.node.BcExpressionNode;
