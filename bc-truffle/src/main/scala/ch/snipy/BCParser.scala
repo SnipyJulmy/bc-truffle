@@ -77,10 +77,13 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     new BcReturnNode(expr.orNull)
   }
 
+  lazy val bcBlock: PackratParser[BcBlockNode] = lb ~> rep(bcStatement) <~ rb ^^ { statements =>
+    new BcBlockNode(statements.toArray)
+  }
+
   lazy val bcFunctionDefinition: PackratParser[BcFunctionDefNode] = ???
   lazy val bcVoidFunctionDefinition: PackratParser[BcVoidFunctionDefNode] = ???
   lazy val bcFunctionCall: PackratParser[BcExpressionNode] = ???
-  lazy val bcBlock: PackratParser[BcBlockNode] = ???
   lazy val bcAutoDefinition: PackratParser[BcAutoDefNode] = ???
   lazy val bcVarDefinition: PackratParser[BcVarDefNode] = ???
   lazy val bcArrayDefinition: PackratParser[BcArrayDefNode] = ???
