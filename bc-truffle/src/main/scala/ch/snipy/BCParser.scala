@@ -58,10 +58,17 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
 
   lazy val bcWhile: PackratParser[BcWhileNode] = {
     "while" ~ lp ~> bcExpr ~ (rp ~> bcStatement) ^^ { case conditionNode ~ bodyNode =>
-        new BcWhileNode(conditionNode,bodyNode)
+      new BcWhileNode(conditionNode, bodyNode)
     }
   }
-  lazy val bcFor: PackratParser[BcForNode] = ???
+
+  lazy val bcFor: PackratParser[BcForNode] = {
+    "for" ~ lp ~> (bcExpr.? <~ ";") ~ (bcExpr.? <~ ";") ~ bcExpr.? ~ (rp ~> bcStatement) ^^ {
+      case initNode ~ conditionNode ~ endLoopNode ~ bodyNode =>
+        new BcForNode(initNode, conditionNode, endLoopNode, bodyNode)
+    }
+  }
+
   lazy val bcPrint: PackratParser[BcPrintNode] = ???
   lazy val bcBreak: PackratParser[BcBreakNode] = ???
   lazy val bcContinue: PackratParser[BcContinueNode] = ???
