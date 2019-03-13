@@ -11,7 +11,7 @@ import scala.collection.mutable
 import scala.util.matching.Regex
 import scala.util.parsing.combinator.{PackratParsers, RegexParsers}
 
-class BCParser extends RegexParsers with PackratParsers {
+class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers {
 
   private var lexicalScope: LexicalScope = new LexicalScope(None)
   private val frameDescriptor: FrameDescriptor = new FrameDescriptor()
@@ -27,7 +27,7 @@ class BCParser extends RegexParsers with PackratParsers {
     */
   lazy val program: PackratParser[BcRootNode] = {
     rep(bcStatement) ^^ { statements =>
-      new BcBlockNode(statements.toArray)
+      new BcRootNode(bcLanguage, frameDescriptor, new BcBlockNode(statements.toArray))
     }
   }
 
@@ -48,17 +48,17 @@ class BCParser extends RegexParsers with PackratParsers {
 
   lazy val bcIf: PackratParser[BcIfNode] = {
     "if" ~ lp ~> ((bcExpr ~ (rp ~> bcStatement)) ~ ("else" ~> bcStatement).?) ^^ {
-      case cond ~ trueBranch ~ falseBranch => new BcIfNode(
-        cond,
-        trueBranch,
-        falseBranch.orNull // node is null is case of no else branch
+      case conditionNode ~ thenNode ~ elseNode => new BcIfNode(
+        conditionNode,
+        thenNode,
+        elseNode.orNull // node is null is case of no else branch
       )
     }
   }
 
   lazy val bcWhile: PackratParser[BcWhileNode] = {
-    "while" ~ lp ~> bcExpr ~ (rp ~> bcStatement) ^^ { case cond ~ statement =>
-
+    "while" ~ lp ~> bcExpr ~ (rp ~> bcStatement) ^^ { case conditionNode ~ bodyNode =>
+        new BcWhileNode(conditionNode,bodyNode)
     }
   }
   lazy val bcFor: PackratParser[BcForNode] = ???

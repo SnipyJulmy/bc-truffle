@@ -17,7 +17,7 @@ public class BcRootNode extends RootNode {
     // - a function body which is also a list of statement
     @Child private BcStatementNode bodyNode;
 
-    public BcRootNode(BcLanguage language, FrameDescriptor frameDescriptor, BcExpressionNode bodyNode) {
+    public BcRootNode(BcLanguage language, FrameDescriptor frameDescriptor, BcStatementNode bodyNode) {
         super(language, frameDescriptor);
         this.bodyNode = bodyNode;
     }
