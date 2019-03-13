@@ -1,5 +1,7 @@
-package ch.snipy.node;
+package ch.snipy.node.statement;
 
+import ch.snipy.node.BcStatementNode;
+import com.oracle.truffle.api.CompilerAsserts;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.NodeInfo;
@@ -8,9 +10,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-@NodeInfo(shortName = "block", description = "sequence of statement")
-public abstract class BcBlockNode extends BcStatementNode {
-
+@NodeInfo(shortName = "block", description = "node implementing a block, i.e. a list of statements")
+public final class BcBlockNode extends BcStatementNode {
     @Children private final BcStatementNode[] nodes;
 
     public BcBlockNode(BcStatementNode[] nodes) {
@@ -20,13 +21,14 @@ public abstract class BcBlockNode extends BcStatementNode {
     @Override
     @ExplodeLoop
     public void executeVoid(VirtualFrame frame) {
-        for (BcStatementNode node : nodes) {
-            node.executeVoid(frame);
+        CompilerAsserts.compilationConstant(nodes.length);
+        for (BcStatementNode statement : nodes) {
+            statement.executeVoid(frame);
         }
     }
 
+    // return immutable list of statement
     public List<BcStatementNode> statements() {
-        // return immutable list
         return Collections.unmodifiableList(Arrays.asList(nodes));
     }
 }
