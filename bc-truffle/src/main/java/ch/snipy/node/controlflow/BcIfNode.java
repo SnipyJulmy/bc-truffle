@@ -8,7 +8,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import com.oracle.truffle.api.profiles.ConditionProfile;
 
 public final class BcIfNode extends BcStatementNode {
-    final ConditionProfile conditionProfile = ConditionProfile.createCountingProfile();
+    private final ConditionProfile conditionProfile = ConditionProfile.createCountingProfile();
     @Child private BcExpressionNode conditionNode;
     @Child private BcStatementNode trueNode;
     @Child private BcStatementNode falseNode;
