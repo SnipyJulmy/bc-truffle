@@ -6,14 +6,41 @@ import ch.snipy.node.expression._
 import ch.snipy.node.expression.literal.{BcDoubleLiteralNode, BcStringLiteralNode}
 import ch.snipy.node.local.BcLocalVariableWriteNodeGen
 import ch.snipy.node.statement._
+import com.oracle.truffle.api.RootCallTarget
 import com.oracle.truffle.api.frame.{FrameDescriptor, FrameSlot, FrameSlotKind}
+import com.oracle.truffle.api.source.Source
 
 import scala.collection.mutable
 import scala.util.matching.Regex
 import scala.util.parsing.combinator.{PackratParsers, RegexParsers}
+import scala.util.parsing.input.CharSequenceReader
+
+object BCParser {
+  def parse(language: BcLanguage, source: Source): BcRootNode = {
+    val string = source.getCharacters.toString
+    val parser = new BCParser(language)
+    import parser._
+
+    parser.parse(
+      parser.bcAdditiveExpr,
+      new PackratReader[Char](new CharSequenceReader(source.getCharacters))
+    ) match {
+      case e: NoSuccess =>
+        println(e.msg)
+        throw new IllegalArgumentException(s"can't parse ${source.getCharacters.toString}")
+      case Success(r, _) =>
+        new BcRootNode(
+          language,
+          frameDescriptor,
+          new BcBlockNode(Array(r))
+        )
+    }
+  }
+}
 
 class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers {
 
+  private var functions: mutable.Map[String, RootCallTarget] = mutable.Map()
   private var lexicalScope: LexicalScope = new LexicalScope(None)
   private val frameDescriptor: FrameDescriptor = new FrameDescriptor()
 
@@ -37,8 +64,8 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
   }
 
   lazy val bcStatementCase: PackratParser[BcStatementNode] = {
-    bcIf | bcWhile | bcFor | bcPrint | bcBreak | bcContinue | bcReturn |
-      bcFunctionDefinition | bcVoidFunctionDefinition |
+    bcIf | bcWhile | bcFor | bcBreak | bcContinue | bcReturn |
+      // bcFunctionDefinition | bcVoidFunctionDefinition | fixme
       bcBlock | bcAutoDefinition | bcVarDefinition | bcArrayDefinition
   }
 
@@ -49,11 +76,12 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
 
   lazy val bcIf: PackratParser[BcIfNode] = {
     "if" ~ lp ~> ((bcExpr ~ (rp ~> bcStatement)) ~ ("else" ~> bcStatement).?) ^^ {
-      case conditionNode ~ thenNode ~ elseNode => new BcIfNode(
-        conditionNode,
-        thenNode,
-        elseNode.orNull // node is null is case of no else branch
-      )
+      case conditionNode ~ thenNode ~ elseNode =>
+        new BcIfNode(
+          conditionNode,
+          thenNode,
+          elseNode.getOrElse(null) // node is null is case of no else branch
+        )
     }
   }
 
@@ -66,7 +94,11 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
   lazy val bcFor: PackratParser[BcForNode] = {
     "for" ~ lp ~> (bcExpr.? <~ ";") ~ (bcExpr.? <~ ";") ~ bcExpr.? ~ (rp ~> bcStatement) ^^ {
       case initNode ~ conditionNode ~ endLoopNode ~ bodyNode =>
-        new BcForNode(initNode, conditionNode, endLoopNode, bodyNode)
+        new BcForNode(
+          initNode.orNull,
+          conditionNode.orNull,
+          endLoopNode.orNull,
+          bodyNode)
     }
   }
 
@@ -81,8 +113,17 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     new BcBlockNode(statements.toArray)
   }
 
-  lazy val bcFunctionDefinition: PackratParser[BcFunctionDefNode] = ???
-  lazy val bcVoidFunctionDefinition: PackratParser[BcVoidFunctionDefNode] = ???
+  lazy val bcFunctionDefinition: PackratParser[Unit] = {
+    "define" ~> bcIdentifier ~ (lp ~> parameters <~ rb ~ nl) ~ bcAutoList ~ rep(bcStatement) <~ lb ^^ {
+      case id ~ params ~ autolist ~ statements =>
+    }
+  }
+
+  lazy val parameters: PackratParser[List[String]] = ???
+  lazy val bcAutoList: PackratParser[List[String]] = ???
+
+  lazy val bcVoidFunctionDefinition: PackratParser[Unit] = ???
+
   lazy val bcFunctionCall: PackratParser[BcExpressionNode] = ???
   lazy val bcAutoDefinition: PackratParser[BcAutoDefNode] = ???
   lazy val bcVarDefinition: PackratParser[BcVarDefNode] = ???
@@ -144,11 +185,23 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     "-" ~> bcNegExpr ^^ { expr => BcNegNodeGen.create(expr) } |
       bcIncDecExpr
 
+  // Pre increment
+  // this case is easy since we modify the value directly
+  // a = (2 + ++i); <-> i = i + 1; a = 2 + i;
+
+  /*  Post increment
+   *  here it is harder since we increment the value only after the expression is used
+   *  but we don't know the "other" expression..
+   *  like we could have something like
+   *  a = (2 + i++) + (3 + i++)
+   */
+
+
   lazy val bcIncDecExpr: PackratParser[BcExpressionNode] =
-    "++" ~> bcIncDecExpr ^^ { expr => ??? } |
-      "--" ~> bcIncDecExpr ^^ { expr => ??? } |
-      bcIncDecExpr ~> "++" ^^ { expr => ??? } |
-      bcIncDecExpr ~> "--" ^^ { expr => ??? } |
+    "++" ~> bcIncDecExpr ^^ { expr => mkPreIncrementNode(expr, 1.0) } |
+      "--" ~> bcIncDecExpr ^^ { expr => mkPreIncrementNode(expr, -1.0) } |
+      bcIncDecExpr <~ "++" ^^ { expr => mkPostIncrementNode(expr, 1.0) } |
+      bcIncDecExpr <~ "--" ^^ { expr => mkPostIncrementNode(expr, -1.0) } |
       bcPostFixExpr
 
   lazy val bcPostFixExpr: PackratParser[BcExpressionNode] =
@@ -159,6 +212,8 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
   lazy val doubleLiteral: PackratParser[BcDoubleLiteralNode] =
     "[+-]?([1-9][0-9]*)|([0-9]+\\.[0-9]+?)".r ^^ { value => new BcDoubleLiteralNode(value.toDouble) }
   lazy val bcAssignement: PackratParser[BcAssignementNode] = ???
+
+  lazy val bcIdentifier: PackratParser[String] = "[a-z]+".r ^^ { str => str } // POSIX bc
 
   lazy val string: PackratParser[BcStringLiteralNode] = ??? //"""(\\.|[^\\"])*""".r ^^ { str => new BcStringNode(str) }
 
@@ -187,6 +242,38 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     lexicalScope.locals += (identifier -> slot)
     BcLocalVariableWriteNodeGen.create(value, slot)
   }
+
+  def mkCall: BcExpressionNode = ???
+  def mkPreIncrementNode(name: BcExpressionNode, modifier: Double): BcPreIncrementNode =
+    mkPreIncrementNode(name, modifier, None)
+  def mkPreIncrementNode(name: BcExpressionNode, modifier: Double, index: Option[Int]): BcPreIncrementNode = {
+    val identifier = name.asInstanceOf[BcStringLiteralNode].executeGeneric(null)
+
+    val slot: FrameSlot = frameDescriptor.findOrAddFrameSlot(
+      identifier,
+      index.orNull,
+      FrameSlotKind.Illegal
+    )
+
+    lexicalScope.locals += (identifier -> slot)
+    BcPreIncrementNodeGen.create(slot, modifier)
+  }
+
+  def mkPostIncrementNode(name: BcExpressionNode, modifier: Double): BcPostIncrementNode =
+    mkPostIncrementNode(name, modifier, None)
+  def mkPostIncrementNode(name: BcExpressionNode, modifier: Double, index: Option[Int]): BcPostIncrementNode = {
+    val identifier = name.asInstanceOf[BcStringLiteralNode].executeGeneric(null)
+
+    val slot: FrameSlot = frameDescriptor.findOrAddFrameSlot(
+      identifier,
+      index.orNull,
+      FrameSlotKind.Illegal
+    )
+
+    lexicalScope.locals += (identifier -> slot)
+    BcPostIncrementNodeGen.create(slot, modifier)
+  }
+
 }
 
 class LexicalScope(val parent: Option[LexicalScope]) {
