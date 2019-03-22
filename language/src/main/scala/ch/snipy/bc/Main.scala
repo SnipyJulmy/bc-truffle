@@ -5,13 +5,13 @@ import org.graalvm.polyglot.{Context, Source}
 object Main extends App {
   val program =
     """
-       a + b
+       1 + 2
     """.stripMargin
 
 
-  val source: Source = Source.newBuilder(BcLanguage.ID, program, "program")
+  val source: Source = Source.newBuilder("bc", program, "program")
     .build()
-  val context = Context.newBuilder(BcLanguage.ID)
+  val context = Context.newBuilder("bc")
     .in(System.in)
     .out(System.out)
     .build()

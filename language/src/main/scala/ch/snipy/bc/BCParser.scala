@@ -21,16 +21,16 @@ object BCParser {
     import parser._
 
     parser.parse(
-      parser.bcAdditiveExpr,
-      new PackratReader[Char](new CharSequenceReader(source.getCharacters))
+      bcAdditiveExpr,
+      new PackratReader[Char](new CharSequenceReader(source.getCharacters.toString))
     ) match {
       case e: NoSuccess =>
         println(e.msg)
         throw new IllegalArgumentException(s"can't parse ${source.getCharacters.toString}")
-      case Success(r, _) =>
+      case Success(r: BcExpressionNode, _) =>
         new BcRootNode(
           language,
-          frameDescriptor,
+          parser.frameDescriptor,
           new BcBlockNode(Array(r))
         )
     }
@@ -53,9 +53,18 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     * the parser return a BcRootNode which is the starting point of the program
     */
   lazy val program: PackratParser[BcRootNode] = {
+    bcAdditiveExpr ^^ { expr =>
+      new BcRootNode(
+        bcLanguage,
+        frameDescriptor,
+        new BcBlockNode(Array(expr))
+      )
+    }
+    /*
     rep(bcStatement) ^^ { statements =>
       new BcRootNode(bcLanguage, frameDescriptor, new BcBlockNode(statements.toArray))
     }
+    */
   }
 
   lazy val bcStatement: PackratParser[BcStatementNode] = {

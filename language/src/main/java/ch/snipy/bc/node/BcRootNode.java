@@ -1,7 +1,5 @@
 package ch.snipy.bc.node;
 
-
-import ch.snipy.bc.BcLanguage;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -17,7 +15,7 @@ public class BcRootNode extends RootNode {
     // - a function body which is also a list of statement
     @Child private BcStatementNode bodyNode;
 
-    public BcRootNode(BcLanguage language, FrameDescriptor frameDescriptor, BcStatementNode bodyNode) {
+    public BcRootNode(TruffleLanguage<?> language, FrameDescriptor frameDescriptor, BcStatementNode bodyNode) {
         super(language, frameDescriptor);
         this.bodyNode = bodyNode;
     }
