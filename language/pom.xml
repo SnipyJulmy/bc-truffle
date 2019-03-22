@@ -8,7 +8,7 @@
     <artifactId>bc-truffle</artifactId>
     <version>0.1</version>
     <properties>
-        <graalvm.version>1.0.0-rc13</graalvm.version>
+        <graalvm.version>1.0.0-rc14</graalvm.version>
     </properties>
     <dependencies>
         <!-- Scala -->
