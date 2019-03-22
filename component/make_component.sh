@@ -9,7 +9,7 @@ fi
 rm -rf COMPONENT_DIR
 
 mkdir -p "$LANGUAGE_PATH"
-cp ../target/bc-truffle-0.1.jar "$LANGUAGE_PATH"
+cp ../language/target/bc-truffle-0.1.jar "$LANGUAGE_PATH"
 
 mkdir -p "$LANGUAGE_PATH/launcher"
 cp ../launcher/target/bc-launcher.jar "$LANGUAGE_PATH/launcher/"
