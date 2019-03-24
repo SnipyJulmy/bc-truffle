@@ -7,6 +7,9 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.source.Source;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 @TruffleLanguage.Registration(
         id = "bc",
         name = "bc",
@@ -17,7 +20,7 @@ public class BcLanguage extends TruffleLanguage<BCContext> {
 
     @Override
     protected BCContext createContext(Env env) {
-        return new BCContext();
+        return new BCContext(this, env, Collections.synchronizedList(new ArrayList<>()));
     }
 
     @Override
@@ -28,7 +31,7 @@ public class BcLanguage extends TruffleLanguage<BCContext> {
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
         Source source = request.getSource();
-        RootNode root = BCParser$.MODULE$.parseAdd(this,source);
+        RootNode root = BCParser$.MODULE$.parseAdd(this, source);
         return Truffle.getRuntime().createCallTarget(root);
     }
 }
