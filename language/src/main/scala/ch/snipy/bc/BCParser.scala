@@ -19,19 +19,21 @@ object BCParser {
   def parseAdd(language: BcLanguage, source: Source): BcRootNode = {
     val parser = new BCParser(language)
     import parser._
-
     parser.parse(
       bcAdditiveExpr,
-      new PackratReader[Char](new CharSequenceReader(source.getCharacters.toString))
+      new PackratReader[Char](new CharSequenceReader(
+        source.getCharacters
+      ))
     ) match {
       case e: NoSuccess =>
         println(e.msg)
         throw new IllegalArgumentException(s"can't parse ${source.getCharacters.toString}")
       case Success(r: BcExpressionNode, _) =>
+        val expr = r
         new BcRootNode(
           language,
           parser.frameDescriptor,
-          new BcBlockNode(Array(r))
+          expr
         )
     }
   }
@@ -53,11 +55,12 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     * the parser return a BcRootNode which is the starting point of the program
     */
   lazy val program: PackratParser[BcRootNode] = {
-    bcAdditiveExpr ^^ { expr =>
+    bcAdditiveExpr ^^ { expr => // fixme
       new BcRootNode(
         bcLanguage,
         frameDescriptor,
-        new BcBlockNode(Array(expr))
+        expr
+        // fixme new BcBlockNode(Array(expr))
       )
     }
     /*
@@ -174,19 +177,20 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
       bcAssignmentOpExpr ~ ("^=" ~> bcAssignmentOpExpr) ^^ { case l ~ r => mkAssignementNode(l, BcPowNodeGen.create(l, r)) } |
       bcAdditiveExpr
 
-  lazy val bcAdditiveExpr: PackratParser[BcExpressionNode] =
-    bcAdditiveExpr ~ ("+" ~> bcAdditiveExpr) ^^ { case l ~ r => BcAddNodeGen.create(l, r) } |
-      bcAdditiveExpr ~ ("-" ~> bcAdditiveExpr) ^^ { case l ~ r => BcSubNodeGen.create(l, r) } |
-      bcMultiplicativeExpr
+  lazy val bcAdditiveExpr: PackratParser[BcAddNode] =
+    doubleLiteral ~ ("+" ~> doubleLiteral) ^^ { case l ~ r => BcAddNodeGen.create(l, r) }
+  /*|
+      bcAdditiveExpr ~ ("-" ~> bcMultiplicativeExpr) ^^ { case l ~ r => BcSubNodeGen.create(l, r) } |
+      bcMultiplicativeExpr*/
 
   lazy val bcMultiplicativeExpr: PackratParser[BcExpressionNode] =
-    bcAdditiveExpr ~ ("*" ~> bcAdditiveExpr) ^^ { case l ~ r => BcMulNodeGen.create(l, r) } |
-      bcAdditiveExpr ~ ("/" ~> bcAdditiveExpr) ^^ { case l ~ r => BcDivNodeGen.create(l, r) } |
-      bcAdditiveExpr ~ ("%" ~> bcAdditiveExpr) ^^ { case l ~ r => BcModNodeGen.create(l, r) } |
-      bcPowerExpr
+    bcMultiplicativeExpr ~ ("*" ~> doubleLiteral) ^^ { case l ~ r => BcMulNodeGen.create(l, r) } |
+      bcMultiplicativeExpr ~ ("/" ~> doubleLiteral) ^^ { case l ~ r => BcDivNodeGen.create(l, r) } |
+      bcMultiplicativeExpr ~ ("%" ~> doubleLiteral) ^^ { case l ~ r => BcModNodeGen.create(l, r) } |
+      doubleLiteral
 
   lazy val bcPowerExpr: PackratParser[BcExpressionNode] =
-    bcAdditiveExpr ~ ("^" ~> bcAdditiveExpr) ^^ { case l ~ r => BcPowNodeGen.create(l, r) } |
+    bcPowerExpr ~ ("^" ~> bcNegExpr) ^^ { case l ~ r => BcPowNodeGen.create(l, r) } |
       bcNegExpr
 
   lazy val bcNegExpr: PackratParser[BcExpressionNode] =
@@ -201,7 +205,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
       bcPostFixExpr
 
   lazy val bcPostFixExpr: PackratParser[BcExpressionNode] =
-    doubleLiteral | bcFunctionCall
+    doubleLiteral // | bcFunctionCall
 
   lazy val bcParExpr: PackratParser[BcRootNode] = ???
 
