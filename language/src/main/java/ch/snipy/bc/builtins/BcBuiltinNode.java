@@ -4,12 +4,14 @@ import ch.snipy.bc.BcException;
 import ch.snipy.bc.BcLanguage;
 import ch.snipy.bc.node.BcExpressionNode;
 import ch.snipy.bc.runtime.BCContext;
+import com.oracle.truffle.api.dsl.GenerateNodeFactory;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.UnsupportedSpecializationException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 @NodeChild(value = "arg", type = BcExpressionNode[].class)
+@GenerateNodeFactory
 public abstract class BcBuiltinNode extends BcExpressionNode {
 
     public final BCContext getContext() {
