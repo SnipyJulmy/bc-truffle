@@ -13,25 +13,16 @@ public class BcRootNode extends RootNode {
     // the statement to execute, body is either :
     // - a list block statement, which is a list of statement
     // - a function body which is also a list of statement
-    @Child private BcStatementNode bodyNode;
+    @Child private BcExpressionNode bodyNode;
 
-    public BcRootNode(TruffleLanguage<?> language, FrameDescriptor frameDescriptor, BcStatementNode bodyNode) {
+    public BcRootNode(TruffleLanguage<?> language, FrameDescriptor frameDescriptor, BcExpressionNode bodyNode) {
         super(language, frameDescriptor);
         this.bodyNode = bodyNode;
     }
 
-    protected BcRootNode(TruffleLanguage<?> language) {
-        super(language);
-    }
-
-    protected BcRootNode(TruffleLanguage<?> language, FrameDescriptor frameDescriptor) {
-        super(language, frameDescriptor);
-    }
-
     @Override
     public Object execute(VirtualFrame frame) {
-        bodyNode.executeVoid(frame);
-        return null;
+        return bodyNode.executeGeneric(frame);
     }
 
 }
