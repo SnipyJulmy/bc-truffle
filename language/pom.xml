@@ -7,6 +7,7 @@
     <groupId>ch.snipy</groupId>
     <artifactId>bc-truffle</artifactId>
     <version>0.1</version>
+    <packaging>jar</packaging>
     <properties>
         <graalvm.version>1.0.0-rc14</graalvm.version>
     </properties>
@@ -82,13 +83,15 @@
                 <executions>
                     <execution>
                         <id>add-source</id>
-                        <phase>validate</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>add-source</goal>
                         </goals>
                         <configuration>
                             <sources>
+                                <source>src/main/java</source>
                                 <source>src/main/scala</source>
+                                <source>${basedir}/target/generated-sources/annotations</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -101,6 +104,7 @@
                         <configuration>
                             <sources>
                                 <source>src/test/scala</source>
+                                <source>src/test/java</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -111,9 +115,11 @@
                 <artifactId>scala-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>scala-compile-first</id>
+                        <phase>compile</phase>
                         <goals>
+                            <goal>add-source</goal>
                             <goal>compile</goal>
-                            <goal>testCompile</goal>
                         </goals>
                     </execution>
                     <execution>

@@ -4,7 +4,7 @@ import org.graalvm.polyglot.{Context, Source}
 
 object Main extends App {
   val program =
-    """8 + 12""".stripMargin
+    """-1 + 3 + 4 * 4""".stripMargin
 
   val source: Source = Source.newBuilder("bc", program, "program")
     .build()
