@@ -4,6 +4,6 @@ if [[ $BC_BUILD_NATIVE == "false" ]]; then
     exit 0
 fi
 "$JAVA_HOME"/bin/native-image --tool:truffle -H:MaxRuntimeCompileMethods=1200 \
-    -cp ../language/target/bc-truffle-0.1.jar:../launcher/target/launcher-0.1.jar \
+    -cp ../language/target/bc-truffle-0.1-jar-with-dependencies.jar:../launcher/target/launcher-0.1.jar \
     com.oracle.truffle.bc.launcher.BcMain \
     bcnative
