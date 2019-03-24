@@ -26,7 +26,6 @@ object BCParser {
       ))
     ) match {
       case e: NoSuccess =>
-        println(e.msg)
         throw new IllegalArgumentException(s"can't parse ${source.getCharacters.toString}")
       case Success(r: BcExpressionNode, _) =>
         val expr = r
@@ -183,10 +182,10 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
       bcMultiplicativeExpr
 
   lazy val bcMultiplicativeExpr: PackratParser[BcExpressionNode] =
-    bcMultiplicativeExpr ~ ("*" ~> doubleLiteral) ^^ { case l ~ r => BcMulNodeGen.create(l, r) } |
-      bcMultiplicativeExpr ~ ("/" ~> doubleLiteral) ^^ { case l ~ r => BcDivNodeGen.create(l, r) } |
-      bcMultiplicativeExpr ~ ("%" ~> doubleLiteral) ^^ { case l ~ r => BcModNodeGen.create(l, r) } |
-      doubleLiteral
+    bcMultiplicativeExpr ~ ("*" ~> bcPowerExpr) ^^ { case l ~ r => BcMulNodeGen.create(l, r) } |
+      bcMultiplicativeExpr ~ ("/" ~> bcPowerExpr) ^^ { case l ~ r => BcDivNodeGen.create(l, r) } |
+      bcMultiplicativeExpr ~ ("%" ~> bcPowerExpr) ^^ { case l ~ r => BcModNodeGen.create(l, r) } |
+      bcPowerExpr
 
   lazy val bcPowerExpr: PackratParser[BcExpressionNode] =
     bcPowerExpr ~ ("^" ~> bcNegExpr) ^^ { case l ~ r => BcPowNodeGen.create(l, r) } |
@@ -209,7 +208,8 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
   lazy val bcParExpr: PackratParser[BcRootNode] = ???
 
   lazy val doubleLiteral: PackratParser[BcDoubleLiteralNode] =
-    "[+-]?([1-9][0-9]*)|([0-9]+\\.[0-9]+?)".r ^^ { value => new BcDoubleLiteralNode(value.toDouble) }
+    "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)(E[0-9]+)?".r ^^ { value => new BcDoubleLiteralNode(value.toDouble) }
+
   lazy val bcAssignement: PackratParser[BcAssignementNode] = ???
 
   lazy val bcIdentifier: PackratParser[String] = "[a-z]+".r ^^ { str => str } // POSIX bc
