@@ -208,7 +208,10 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
   lazy val bcFunctionCall: PackratParser[BcExpressionNode] =
     stringLiteral ~ (lp ~> bcArgs <~ rp) ^^ { case id ~ args => mkCall(id, args) }
 
-  lazy val bcArgs: PackratParser[Array[BcExpressionNode]] = ???
+  lazy val bcArgs: PackratParser[List[BcExpressionNode]] =
+    bcArg ~ rep("," ~> bcArg) ^^ { case x ~ xs => x :: xs }
+
+  lazy val bcArg: PackratParser[BcExpressionNode] = bcExpr
 
   lazy val bcPrimaryExpr: PackratParser[BcExpressionNode] =
     doubleLiteral | stringLiteral | lp ~> bcExpr <~ rp
@@ -260,8 +263,8 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     BcLocalVariableReadNodeGen.create(slot)
   }
 
-  private def mkCall(name: BcExpressionNode, args: Array[BcExpressionNode]): BcExpressionNode =
-    new BcInvokeNode(name, args)
+  private def mkCall(name: BcExpressionNode, args: List[BcExpressionNode]): BcExpressionNode =
+    new BcInvokeNode(name, args.toArray)
 
   private def mkPreIncrementNode(name: BcExpressionNode, modifier: Double, index: Option[Int] = None): BcPreIncrementNode = {
     val identifier = name.asInstanceOf[BcStringLiteralNode].executeGeneric(null)
