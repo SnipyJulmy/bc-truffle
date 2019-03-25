@@ -1,5 +1,6 @@
 package ch.snipy.bc
 
+import ch.snipy.bc.node.call.BcInvokeNode
 import ch.snipy.bc.node.controlflow._
 import ch.snipy.bc.node.expression._
 import ch.snipy.bc.node.local._
@@ -259,7 +260,8 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     BcLocalVariableReadNodeGen.create(slot)
   }
 
-  def mkCall(name: BcExpressionNode, args: Array[BcExpressionNode]): BcExpressionNode = ???
+  private def mkCall(name: BcExpressionNode, args: Array[BcExpressionNode]): BcExpressionNode =
+    new BcInvokeNode(name, args)
 
   private def mkPreIncrementNode(name: BcExpressionNode, modifier: Double, index: Option[Int] = None): BcPreIncrementNode = {
     val identifier = name.asInstanceOf[BcStringLiteralNode].executeGeneric(null)
