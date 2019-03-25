@@ -1,20 +1,6 @@
-import org.graalvm.polyglot.{Context, Source}
-import org.scalatest.{FlatSpec, Matchers}
+class ParserTest extends BcTestSpec {
 
-class BcExpressionTest extends FlatSpec with Matchers {
-
-  private val context: Context = Context.newBuilder("bc")
-    .in(System.in)
-    .out(System.out)
-    .build()
-
-  private def mkSource(source: String, name: String = "???"): Source =
-    Source.newBuilder("bc", source, name).build()
-
-  private def assertDouble(source: String)(res: Double): org.scalatest.Assertion =
-    context.eval(mkSource(source)).asDouble().shouldBe(res)
-
-  behavior of "bc language"
+  behavior of "bc parser"
 
   it should "correctly parse and evaluate double literals" in {
     context.eval(mkSource("1.0")).asDouble() shouldBe 1.0
