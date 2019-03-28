@@ -4,7 +4,7 @@ import ch.snipy.bc.node.BcExpressionNode;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
-public abstract class BcParExpressionNode extends BcExpressionNode {
+public class BcParExpressionNode extends BcExpressionNode {
 
     @Child private BcExpressionNode expression;
 
