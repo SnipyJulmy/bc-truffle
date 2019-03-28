@@ -98,9 +98,6 @@
                 <executions>
                     <execution>
                         <id>test</id>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -170,6 +167,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <useIncrementalCompilation>false</useIncrementalCompilation>
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
