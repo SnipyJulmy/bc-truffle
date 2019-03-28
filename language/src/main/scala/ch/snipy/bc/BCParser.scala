@@ -214,12 +214,13 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
   lazy val bcArg: PackratParser[BcExpressionNode] = bcExpr
 
   lazy val bcPrimaryExpr: PackratParser[BcExpressionNode] =
-    doubleLiteral | stringLiteral | lp ~> bcExpr <~ rp
+    doubleLiteral | stringLiteral | bcParExpr
 
-  lazy val bcParExpr: PackratParser[BcRootNode] = ???
+  lazy val bcParExpr: PackratParser[BcParExpressionNode] =
+    lp ~> bcExpr <~ rp ^^ { expr => new BcParExpressionNode(expr) }
 
   lazy val stringLiteral: PackratParser[BcStringLiteralNode] =
-    identifier ^^ { id => new BcStringLiteralNode(id) }
+    "\"" ~> """(?:[^"\\]|\\.)*""".r <~ "\"" ^^ { str => new BcStringLiteralNode(str) }
 
   lazy val doubleLiteral: PackratParser[BcDoubleLiteralNode] =
     "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)(E[0-9]+)?".r ^^ { value => new BcDoubleLiteralNode(value.toDouble) }
