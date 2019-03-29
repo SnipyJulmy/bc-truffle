@@ -17,11 +17,11 @@ import scala.util.parsing.combinator.{PackratParsers, RegexParsers}
 import scala.util.parsing.input.CharSequenceReader
 
 object BCParser {
-  def parseAdd(language: BcLanguage, source: Source): BcRootNode = {
+  def parseExpr(language: BcLanguage, source: Source): BcRootNode = {
     val parser = new BCParser(language)
     import parser._
     parser.parse(
-      bcAdditiveExpr,
+      bcExpr,
       new PackratReader[Char](new CharSequenceReader(
         source.getCharacters
       ))
@@ -154,26 +154,26 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
       bcLogicalNotExpr
 
   lazy val bcLogicalNotExpr: PackratParser[BcExpressionNode] =
-    bcRelationalOpExpr | "!" ~> bcLogicalNotExpr ^^ { expr => BcNotNodeGen.create(expr) } |
+    bcLogicalNotExpr | "!" ~> bcRelationalOpExpr ^^ { expr => BcNotNodeGen.create(expr) } |
       bcRelationalOpExpr
 
   lazy val bcRelationalOpExpr: PackratParser[BcExpressionNode] =
-    bcRelationalOpExpr ~ ("==" ~> bcRelationalOpExpr) ^^ { case l ~ r => BcLogicalEqNodeGen.create(l, r) } |
-      bcRelationalOpExpr ~ ("!=" ~> bcRelationalOpExpr) ^^ { case l ~ r => BcNotNodeGen.create(BcLogicalEqNodeGen.create(l, r)) } |
-      bcRelationalOpExpr ~ ("<=" ~> bcRelationalOpExpr) ^^ { case l ~ r => BcLogicalLessOrEqualNodeGen.create(l, r) } |
-      bcRelationalOpExpr ~ (">=" ~> bcRelationalOpExpr) ^^ { case l ~ r => BcNotNodeGen.create(BcLogicalLessThanNodeGen.create(l, r)) } |
-      bcRelationalOpExpr ~ ("<" ~> bcRelationalOpExpr) ^^ { case l ~ r => BcLogicalLessThanNodeGen.create(l, r) } |
-      bcRelationalOpExpr ~ (">" ~> bcRelationalOpExpr) ^^ { case l ~ r => BcNotNodeGen.create(BcLogicalLessOrEqualNodeGen.create(l, r)) } |
+    bcRelationalOpExpr ~ ("==" ~> bcAssignmentOpExpr) ^^ { case l ~ r => BcLogicalEqNodeGen.create(l, r) } |
+      bcRelationalOpExpr ~ ("!=" ~> bcAssignmentOpExpr) ^^ { case l ~ r => BcNotNodeGen.create(BcLogicalEqNodeGen.create(l, r)) } |
+      bcRelationalOpExpr ~ ("<=" ~> bcAssignmentOpExpr) ^^ { case l ~ r => BcLogicalLessOrEqualNodeGen.create(l, r) } |
+      bcRelationalOpExpr ~ (">=" ~> bcAssignmentOpExpr) ^^ { case l ~ r => BcNotNodeGen.create(BcLogicalLessThanNodeGen.create(l, r)) } |
+      bcRelationalOpExpr ~ ("<" ~> bcAssignmentOpExpr) ^^ { case l ~ r => BcLogicalLessThanNodeGen.create(l, r) } |
+      bcRelationalOpExpr ~ (">" ~> bcAssignmentOpExpr) ^^ { case l ~ r => BcNotNodeGen.create(BcLogicalLessOrEqualNodeGen.create(l, r)) } |
       bcAssignmentOpExpr
 
   lazy val bcAssignmentOpExpr: PackratParser[BcExpressionNode] =
-    bcAssignmentOpExpr ~ ("=" ~> bcAssignmentOpExpr) ^^ { case l ~ r => mkAssignementNode(l, r) } |
-      bcAssignmentOpExpr ~ ("+=" ~> bcAssignmentOpExpr) ^^ { case l ~ r => mkAssignementNode(l, BcAddNodeGen.create(l, r)) } |
-      bcAssignmentOpExpr ~ ("-=" ~> bcAssignmentOpExpr) ^^ { case l ~ r => mkAssignementNode(l, BcSubNodeGen.create(l, r)) } |
-      bcAssignmentOpExpr ~ ("/=" ~> bcAssignmentOpExpr) ^^ { case l ~ r => mkAssignementNode(l, BcDivNodeGen.create(l, r)) } |
-      bcAssignmentOpExpr ~ ("*=" ~> bcAssignmentOpExpr) ^^ { case l ~ r => mkAssignementNode(l, BcMulNodeGen.create(l, r)) } |
-      bcAssignmentOpExpr ~ ("%=" ~> bcAssignmentOpExpr) ^^ { case l ~ r => mkAssignementNode(l, BcModNodeGen.create(l, r)) } |
-      bcAssignmentOpExpr ~ ("^=" ~> bcAssignmentOpExpr) ^^ { case l ~ r => mkAssignementNode(l, BcPowNodeGen.create(l, r)) } |
+    bcAssignmentOpExpr ~ ("=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignementNode(l, r) } |
+      bcAssignmentOpExpr ~ ("+=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignementNode(l, BcAddNodeGen.create(l, r)) } |
+      bcAssignmentOpExpr ~ ("-=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignementNode(l, BcSubNodeGen.create(l, r)) } |
+      bcAssignmentOpExpr ~ ("/=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignementNode(l, BcDivNodeGen.create(l, r)) } |
+      bcAssignmentOpExpr ~ ("*=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignementNode(l, BcMulNodeGen.create(l, r)) } |
+      bcAssignmentOpExpr ~ ("%=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignementNode(l, BcModNodeGen.create(l, r)) } |
+      bcAssignmentOpExpr ~ ("^=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignementNode(l, BcPowNodeGen.create(l, r)) } |
       bcAdditiveExpr
 
   lazy val bcAdditiveExpr: PackratParser[BcExpressionNode] =
