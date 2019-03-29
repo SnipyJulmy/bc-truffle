@@ -1,6 +1,6 @@
+import org.graalvm.polyglot.{Context, Source}
 import org.scalatest.{FlatSpec, Matchers}
 import org.scalatestplus.scalacheck.Checkers
-import org.graalvm.polyglot.{Context, Source}
 
 trait BcTestSpec extends FlatSpec with Checkers with Matchers {
 
