@@ -6,12 +6,14 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+import java.math.BigDecimal;
+
 @NodeInfo(shortName = "%", description = "modulo operator")
 public abstract class BcModNode extends BcBinaryNode {
 
     @Specialization
-    protected double doDouble(double left, double right) {
-        return left % right;
+    protected BigDecimal doDouble(BigDecimal left, BigDecimal right) {
+        return left.remainder(right);
     }
 
     @Fallback

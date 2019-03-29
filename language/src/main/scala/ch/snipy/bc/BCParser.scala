@@ -3,9 +3,9 @@ package ch.snipy.bc
 import ch.snipy.bc.node.call.BcInvokeNode
 import ch.snipy.bc.node.controlflow._
 import ch.snipy.bc.node.expression._
+import ch.snipy.bc.node.expression.literal.{BcDoubleLiteralNode, BcStringLiteralNode}
 import ch.snipy.bc.node.local._
 import ch.snipy.bc.node.statement._
-import ch.snipy.bc.node.expression.literal.{BcDoubleLiteralNode, BcStringLiteralNode}
 import ch.snipy.bc.node.{BcExpressionNode, BcRootNode, BcStatementNode}
 import com.oracle.truffle.api.RootCallTarget
 import com.oracle.truffle.api.frame.{FrameDescriptor, FrameSlot, FrameSlotKind}
@@ -223,7 +223,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     "\"" ~> """(?:[^"\\]|\\.)*""".r <~ "\"" ^^ { str => new BcStringLiteralNode(str) }
 
   lazy val doubleLiteral: PackratParser[BcDoubleLiteralNode] =
-    "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)(E[0-9]+)?".r ^^ { value => new BcDoubleLiteralNode(value.toDouble) }
+    "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)(E[0-9]+)?".r ^^ { value => new BcDoubleLiteralNode(new java.math.BigDecimal(value)) }
 
   lazy val bcAssignement: PackratParser[BcAssignementNode] = ???
 

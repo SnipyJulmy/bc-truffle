@@ -10,6 +10,8 @@ import com.oracle.truffle.api.dsl.UnsupportedSpecializationException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
+import java.math.BigDecimal;
+
 @NodeChild(value = "arg", type = BcExpressionNode[].class)
 @GenerateNodeFactory
 public abstract class BcBuiltinNode extends BcExpressionNode {
@@ -33,13 +35,8 @@ public abstract class BcBuiltinNode extends BcExpressionNode {
     }
 
     @Override
-    public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException {
-        return super.executeBoolean(frame);
-    }
-
-    @Override
-    public double executeDouble(VirtualFrame frame) throws UnexpectedResultException {
-        return super.executeDouble(frame);
+    public BigDecimal executeBigDecimal(VirtualFrame frame) throws UnexpectedResultException {
+        return super.executeBigDecimal(frame);
     }
 
     protected abstract Object execute(VirtualFrame frame);

@@ -7,6 +7,8 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameUtil;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+import java.math.BigDecimal;
+
 @NodeField(name = "slot", type = FrameSlot.class)
 @NodeField(name = "modifier", type = double.class)
 public abstract class BcPostIncrementNode extends BcExpressionNode {
@@ -15,11 +17,12 @@ public abstract class BcPostIncrementNode extends BcExpressionNode {
 
     protected abstract double getModifier();
 
+    @SuppressWarnings("Duplicates")
     @Specialization
-    public double doDouble(VirtualFrame frame) {
-        double value = FrameUtil.getDoubleSafe(frame, getSlot());
-        double newValue = value + getModifier();
-        frame.setDouble(getSlot(), newValue);
+    public BigDecimal doBigDecimal(VirtualFrame frame) {
+        BigDecimal value = (BigDecimal) FrameUtil.getObjectSafe(frame, getSlot());
+        BigDecimal newValue = value.add(getModifier() > 0.0 ? BigDecimal.ONE : BigDecimal.ONE.negate());
+        frame.setObject(getSlot(), newValue);
         return value;
     }
 }

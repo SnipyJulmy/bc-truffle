@@ -5,13 +5,14 @@ import ch.snipy.bc.node.BcBinaryNode;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 
+import java.math.BigDecimal;
+
 public abstract class BcMulNode extends BcBinaryNode {
 
     @Specialization
-    protected double doDouble(double left, double right) {
-        return left * right;
+    protected BigDecimal doDouble(BigDecimal left, BigDecimal right) {
+        return left.multiply(right);
     }
-
 
     @Fallback
     protected Object typeError(Object left, Object right) {

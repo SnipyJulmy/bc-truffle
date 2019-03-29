@@ -6,12 +6,14 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+import java.math.BigDecimal;
+
 @NodeInfo(shortName = "!")
 public abstract class BcNotNode extends BcUnaryNode {
 
     @Specialization
-    protected boolean not(boolean value) {
-        return !value;
+    protected BigDecimal not(BigDecimal value) {
+        return value.equals(FALSE) ? TRUE : FALSE;
     }
 
     @Fallback

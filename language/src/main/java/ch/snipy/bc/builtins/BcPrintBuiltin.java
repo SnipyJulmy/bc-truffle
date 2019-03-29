@@ -5,6 +5,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 
 @NodeInfo(shortName = "print")
 public abstract class BcPrintBuiltin extends BcBuiltinNode {
@@ -16,8 +17,8 @@ public abstract class BcPrintBuiltin extends BcBuiltinNode {
     }
 
     @Specialization
-    public long print(long value) {
-        doPrint(getContext().getOutput(), value);
+    public BigDecimal print(BigDecimal value) {
+        doPrint(getContext().getOutput(), value.toString());
         return value;
     }
 
@@ -33,7 +34,7 @@ public abstract class BcPrintBuiltin extends BcBuiltinNode {
     }
 
     @TruffleBoundary
-    private static void doPrint(PrintWriter out, double value) {
+    private static void doPrint(PrintWriter out, BigDecimal value) {
         out.println(value);
     }
 

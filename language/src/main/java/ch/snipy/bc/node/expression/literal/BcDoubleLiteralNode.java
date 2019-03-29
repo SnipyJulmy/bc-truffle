@@ -6,27 +6,24 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
+import java.math.BigDecimal;
+
 @NodeInfo(shortName = "const")
 public class BcDoubleLiteralNode extends BcExpressionNode {
-    private final double value;
+    private final BigDecimal value;
 
-    public BcDoubleLiteralNode(double value) {
+    public BcDoubleLiteralNode(BigDecimal value) {
         this.value = value;
+    }
+
+    @Override
+    public BigDecimal executeBigDecimal(VirtualFrame frame) throws UnexpectedResultException {
+        return value;
     }
 
     @Override
     public String executeString(VirtualFrame frame) throws UnexpectedResultException {
         return "" + value;
-    }
-
-    @Override
-    public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException {
-        return value != 0;
-    }
-
-    @Override
-    public double executeDouble(VirtualFrame frame) throws UnexpectedResultException {
-        return value;
     }
 
     @Override

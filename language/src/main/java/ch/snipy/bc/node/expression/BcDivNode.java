@@ -5,11 +5,13 @@ import ch.snipy.bc.node.BcBinaryNode;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 
+import java.math.BigDecimal;
+
 public abstract class BcDivNode extends BcBinaryNode {
 
     @Specialization
-    protected double doDouble(double left, double right) {
-        return left / right;
+    protected BigDecimal doBigDecimal(BigDecimal left, BigDecimal right) {
+        return left.divide(right, BigDecimal.ROUND_FLOOR); // fixme check posix
     }
 
     @Fallback

@@ -6,22 +6,19 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+import java.math.BigDecimal;
+
 @NodeInfo(shortName = "==")
 public abstract class BcLogicalEqNode extends BcBinaryNode {
 
     @Specialization
-    protected boolean equal(double left, double right) {
-        return left == right;
+    protected BigDecimal equal(BigDecimal left, BigDecimal right) {
+        return left.equals(right) ? BigDecimal.ONE : BigDecimal.ZERO;
     }
 
     @Specialization
-    protected boolean equal(boolean left, boolean right) {
-       return left == right;
-    }
-
-    @Specialization
-    protected boolean equal(String left, String right) {
-        return left.equals(right);
+    protected BigDecimal equal(String left, String right) {
+        return left.equals(right) ? BigDecimal.ONE : BigDecimal.ZERO;
     }
 
     @Fallback

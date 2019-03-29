@@ -25,7 +25,7 @@ public final class BcIfNode extends BcStatementNode {
     @Override
     public void executeVoid(VirtualFrame frame) {
         try {
-            if (conditionProfile.profile(conditionNode.executeBoolean(frame)))
+            if (conditionProfile.profile(conditionNode.executeBigDecimal(frame).equals(BcExpressionNode.TRUE)))
                 trueNode.executeVoid(frame);
             else
                 falseNode.executeVoid(frame);

@@ -4,6 +4,8 @@ import ch.snipy.bc.node.BcExpressionNode;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
+import java.math.BigDecimal;
+
 public class BcParExpressionNode extends BcExpressionNode {
 
     @Child private BcExpressionNode expression;
@@ -18,18 +20,13 @@ public class BcParExpressionNode extends BcExpressionNode {
     }
 
     @Override
-    public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException {
-        return expression.executeBoolean(frame);
+    public BigDecimal executeBigDecimal(VirtualFrame frame) throws UnexpectedResultException {
+        return expression.executeBigDecimal(frame);
     }
 
     @Override
     public String executeString(VirtualFrame frame) throws UnexpectedResultException {
         return expression.executeString(frame);
-    }
-
-    @Override
-    public double executeDouble(VirtualFrame frame) throws UnexpectedResultException {
-        return expression.executeDouble(frame);
     }
 
     @Override

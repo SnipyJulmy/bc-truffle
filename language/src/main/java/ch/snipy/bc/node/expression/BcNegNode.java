@@ -5,11 +5,13 @@ import ch.snipy.bc.node.BcUnaryNode;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 
+import java.math.BigDecimal;
+
 public abstract class BcNegNode extends BcUnaryNode {
 
     @Specialization
-    protected double doDouble(double value) {
-        return -value;
+    protected BigDecimal doDouble(BigDecimal value) {
+        return value.negate();
     }
 
 

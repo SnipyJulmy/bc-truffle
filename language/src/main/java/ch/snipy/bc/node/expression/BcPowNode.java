@@ -8,12 +8,15 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+import java.math.BigDecimal;
+
 @NodeInfo(shortName = "^", description = "power operator")
 public abstract class BcPowNode extends BcBinaryNode {
 
     @Specialization
-    protected double doDouble(double left, double right) {
-        return Math.pow(left, right);
+    protected BigDecimal doDouble(BigDecimal left, BigDecimal right) {
+        int exponent = right.intValue(); // fixme is this correct ?
+        return left.pow(exponent);
     }
 
     @Fallback
