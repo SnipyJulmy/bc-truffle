@@ -31,7 +31,7 @@ public class BcLanguage extends TruffleLanguage<BCContext> {
     @Override
     protected CallTarget parse(ParsingRequest request) throws Exception {
         Source source = request.getSource();
-        RootNode root = BCParser$.MODULE$.parseExpr(this, source);
+        RootNode root = null; //BCParser$.MODULE$.parseExpr(this, source);
         return Truffle.getRuntime().createCallTarget(root);
     }
 }
