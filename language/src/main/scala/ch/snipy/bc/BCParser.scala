@@ -34,7 +34,8 @@ object BCParser {
         new BcRootNode(
           language,
           parser.frameDescriptor,
-          expr
+          expr,
+          "main"
         )
     }
   }
@@ -60,8 +61,8 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
       new BcRootNode(
         bcLanguage,
         frameDescriptor,
-        expr
-        // fixme new BcBlockNode(Array(expr))
+        expr, // fixme list of statements
+        "main"
       )
     }
     /*
