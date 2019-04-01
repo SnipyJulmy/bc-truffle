@@ -12,6 +12,9 @@ import java.math.BigDecimal;
 @MessageResolution(receiverType = BcBigNumber.class)
 public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber> {
 
+    public static final BcBigNumber FALSE = new BcBigNumber(BigDecimal.ZERO);
+    public static final BcBigNumber TRUE = new BcBigNumber(BigDecimal.ONE);
+
     private final BigDecimal value;
 
     public BcBigNumber(BigDecimal value) {
