@@ -2,15 +2,14 @@ package ch.snipy.bc.node.expression;
 
 import ch.snipy.bc.BcException;
 import ch.snipy.bc.node.BcUnaryNode;
+import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
-
-import java.math.BigDecimal;
 
 public abstract class BcNegNode extends BcUnaryNode {
 
     @Specialization
-    protected BigDecimal doDouble(BigDecimal value) {
+    protected BcBigNumber doDouble(BcBigNumber value) {
         return value.negate();
     }
 

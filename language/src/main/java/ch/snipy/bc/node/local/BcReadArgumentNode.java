@@ -20,7 +20,7 @@ public class BcReadArgumentNode extends BcExpressionNode {
             return args[index];
         else {
             outOfBoundsTaken.enter();
-            return 0; // fixme is 0 the null value for bc ???
+            return 0; // fixme is 0 the null getValue for bc ???
         }
     }
 }

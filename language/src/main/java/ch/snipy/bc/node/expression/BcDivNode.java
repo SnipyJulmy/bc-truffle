@@ -2,16 +2,15 @@ package ch.snipy.bc.node.expression;
 
 import ch.snipy.bc.BcException;
 import ch.snipy.bc.node.BcBinaryNode;
+import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
-
-import java.math.BigDecimal;
 
 public abstract class BcDivNode extends BcBinaryNode {
 
     @Specialization
-    protected BigDecimal doBigDecimal(BigDecimal left, BigDecimal right) {
-        return left.divide(right, BigDecimal.ROUND_FLOOR); // fixme check posix
+    protected BcBigNumber doBigNumber(BcBigNumber left, BcBigNumber right) {
+        return left.divide(right); // fixme check posix
     }
 
     @Fallback

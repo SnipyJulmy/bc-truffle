@@ -4,6 +4,7 @@ import ch.snipy.bc.BcException;
 import ch.snipy.bc.BcLanguage;
 import ch.snipy.bc.node.BcExpressionNode;
 import ch.snipy.bc.runtime.BCContext;
+import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.dsl.GenerateNodeFactory;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.UnsupportedSpecializationException;
@@ -35,8 +36,8 @@ public abstract class BcBuiltinNode extends BcExpressionNode {
     }
 
     @Override
-    public BigDecimal executeBigDecimal(VirtualFrame frame) throws UnexpectedResultException {
-        return super.executeBigDecimal(frame);
+    public BcBigNumber executeBigNumber(VirtualFrame frame) throws UnexpectedResultException {
+        return super.executeBigNumber(frame);
     }
 
     protected abstract Object execute(VirtualFrame frame);

@@ -7,6 +7,7 @@ import ch.snipy.bc.node.expression.literal.{BcDoubleLiteralNode, BcStringLiteral
 import ch.snipy.bc.node.local._
 import ch.snipy.bc.node.statement._
 import ch.snipy.bc.node.{BcExpressionNode, BcRootNode, BcStatementNode}
+import ch.snipy.bc.runtime.BcBigNumber
 import com.oracle.truffle.api.RootCallTarget
 import com.oracle.truffle.api.frame.{FrameDescriptor, FrameSlot, FrameSlotKind}
 import com.oracle.truffle.api.source.Source
@@ -81,7 +82,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
   }
 
   // Todo : special variables
-  // lazy val bcScale: PackratParser[BcScaleNode] = "scale" ~> integer ^^ { value => new BcScaleNode(value) }
+  // lazy val bcScale: PackratParser[BcScaleNode] = "scale" ~> integer ^^ { getValue => new BcScaleNode(getValue) }
 
   /* Statements */
 
@@ -223,7 +224,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     "\"" ~> """(?:[^"\\]|\\.)*""".r <~ "\"" ^^ { str => new BcStringLiteralNode(str) }
 
   lazy val doubleLiteral: PackratParser[BcDoubleLiteralNode] =
-    "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)(E[0-9]+)?".r ^^ { value => new BcDoubleLiteralNode(new java.math.BigDecimal(value)) }
+    "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)(E[0-9]+)?".r ^^ { value => new BcDoubleLiteralNode(new BcBigNumber(value)) }
 
   lazy val bcAssignement: PackratParser[BcAssignementNode] = ???
 

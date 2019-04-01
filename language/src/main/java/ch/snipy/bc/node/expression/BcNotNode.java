@@ -2,17 +2,19 @@ package ch.snipy.bc.node.expression;
 
 import ch.snipy.bc.BcException;
 import ch.snipy.bc.node.BcUnaryNode;
+import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
-import java.math.BigDecimal;
+import static ch.snipy.bc.runtime.BcBigNumber.FALSE;
+import static ch.snipy.bc.runtime.BcBigNumber.TRUE;
 
 @NodeInfo(shortName = "!")
 public abstract class BcNotNode extends BcUnaryNode {
 
     @Specialization
-    protected BigDecimal not(BigDecimal value) {
+    protected BcBigNumber not(BcBigNumber value) {
         return value.equals(FALSE) ? TRUE : FALSE;
     }
 

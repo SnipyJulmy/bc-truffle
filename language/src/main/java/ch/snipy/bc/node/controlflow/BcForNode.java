@@ -2,8 +2,6 @@ package ch.snipy.bc.node.controlflow;
 
 import ch.snipy.bc.node.BcExpressionNode;
 import ch.snipy.bc.node.BcStatementNode;
-import ch.snipy.bc.node.BcExpressionNode;
-import ch.snipy.bc.node.BcStatementNode;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.LoopNode;

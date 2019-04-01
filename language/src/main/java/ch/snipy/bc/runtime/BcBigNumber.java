@@ -12,8 +12,10 @@ import java.math.BigDecimal;
 @MessageResolution(receiverType = BcBigNumber.class)
 public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber> {
 
-    public static final BcBigNumber FALSE = new BcBigNumber(BigDecimal.ZERO);
-    public static final BcBigNumber TRUE = new BcBigNumber(BigDecimal.ONE);
+    public static final BcBigNumber ZERO = new BcBigNumber(BigDecimal.ZERO);
+    public static final BcBigNumber ONE = new BcBigNumber(BigDecimal.ONE);
+    public static final BcBigNumber FALSE = ZERO;
+    public static final BcBigNumber TRUE = ONE;
 
     private final BigDecimal value;
 
@@ -21,17 +23,29 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
         this.value = value;
     }
 
-    static boolean isInstance(TruffleObject obj) {
+    public BcBigNumber(String value) {
+        this.value = new BigDecimal(value);
+    }
+
+    public static boolean isInstance(TruffleObject obj) {
         return obj instanceof BcBigNumber;
     }
 
-    public BigDecimal value() {
+    public static BcBigNumber valueOf(boolean value) {
+        return value ? TRUE : FALSE;
+    }
+
+    public static BcBigNumber valueOf(BigDecimal value) {
+        return new BcBigNumber(value);
+    }
+
+    public BigDecimal getValue() {
         return value;
     }
 
     @TruffleBoundary
     public int compareTo(BcBigNumber o) {
-        return value.compareTo(o.value());
+        return value.compareTo(o.getValue());
     }
 
     @Override
@@ -48,13 +62,47 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof BcBigNumber)
-            return value.equals(((BcBigNumber) obj).value());
+            return value.equals(((BcBigNumber) obj).getValue());
         return false;
     }
 
     @Override
     public int hashCode() {
         return value.hashCode();
+    }
+
+    public boolean asBoolean() {
+        return !(this.value.equals(BigDecimal.ZERO));
+    }
+
+    public BcBigNumber add(BcBigNumber that) {
+        return valueOf(value.add(that.value));
+    }
+
+    public BcBigNumber divide(BcBigNumber right) {
+        return valueOf(this.value.divide(right.value, BigDecimal.ROUND_FLOOR));
+    }
+
+    public BcBigNumber subtract(BcBigNumber right) {
+        return valueOf(this.value.subtract(right.value));
+    }
+
+    public BcBigNumber multiply(BcBigNumber right) {
+        return valueOf(this.value.multiply(right.value));
+    }
+
+    public BcBigNumber remainder(BcBigNumber right) {
+        return valueOf(this.value.remainder(right.value));
+    }
+
+    public BcBigNumber negate() {
+        return valueOf(this.value.negate());
+    }
+
+    // fixme : int value verification
+    public BcBigNumber pow(BcBigNumber right) {
+        int exponent = right.value.intValue();
+        return valueOf(this.value.pow(exponent));
     }
 
     @Resolve(message = "UNBOX")
@@ -64,6 +112,8 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
         }
     }
 
+    // Math
+
     @Resolve(message = "IS_BOXED")
     abstract static class IsBoxedBigNode extends Node {
         @SuppressWarnings("unused")
@@ -71,5 +121,4 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
             return true;
         }
     }
-
 }

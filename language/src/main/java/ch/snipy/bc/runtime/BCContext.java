@@ -2,7 +2,6 @@ package ch.snipy.bc.runtime;
 
 import ch.snipy.bc.BcLanguage;
 import ch.snipy.bc.builtins.BcBuiltinNode;
-import ch.snipy.bc.builtins.BcPrintBuiltin;
 import ch.snipy.bc.builtins.BcPrintBuiltinFactory;
 import ch.snipy.bc.node.BcExpressionNode;
 import ch.snipy.bc.node.BcRootNode;
@@ -45,7 +44,7 @@ public final class BCContext {
             args[i] = new BcReadArgumentNode(i);
         }
         BcBuiltinNode builtinNode = factory.createNode((Object) args);
-        BcRootNode rootNode = new BcRootNode(language, new FrameDescriptor(),builtinNode);
+        BcRootNode rootNode = new BcRootNode(language, new FrameDescriptor(), builtinNode);
         // todo register the builtin inside the registry
     }
 

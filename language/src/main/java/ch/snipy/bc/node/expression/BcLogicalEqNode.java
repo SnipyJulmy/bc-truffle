@@ -2,23 +2,22 @@ package ch.snipy.bc.node.expression;
 
 import ch.snipy.bc.BcException;
 import ch.snipy.bc.node.BcBinaryNode;
+import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
-
-import java.math.BigDecimal;
 
 @NodeInfo(shortName = "==")
 public abstract class BcLogicalEqNode extends BcBinaryNode {
 
     @Specialization
-    protected BigDecimal equal(BigDecimal left, BigDecimal right) {
-        return left.equals(right) ? BigDecimal.ONE : BigDecimal.ZERO;
+    protected BcBigNumber equal(BcBigNumber left, BcBigNumber right) {
+        return left.equals(right) ? BcBigNumber.TRUE : BcBigNumber.FALSE;
     }
 
     @Specialization
-    protected BigDecimal equal(String left, String right) {
-        return left.equals(right) ? BigDecimal.ONE : BigDecimal.ZERO;
+    protected BcBigNumber equal(String left, String right) {
+        return left.equals(right) ? BcBigNumber.TRUE : BcBigNumber.FALSE;
     }
 
     @Fallback

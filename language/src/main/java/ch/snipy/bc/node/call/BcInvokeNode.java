@@ -1,9 +1,7 @@
 package ch.snipy.bc.node.call;
 
 import ch.snipy.bc.node.BcExpressionNode;
-import com.oracle.truffle.api.CompilerAsserts;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.ExplodeLoop;
 
 public final class BcInvokeNode extends BcExpressionNode {
 

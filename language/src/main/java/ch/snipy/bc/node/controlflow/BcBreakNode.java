@@ -1,8 +1,6 @@
 package ch.snipy.bc.node.controlflow;
 
 import ch.snipy.bc.node.BcStatementNode;
-import ch.snipy.bc.node.BcStatementNode;
-import ch.snipy.bc.node.controlflow.BcBreakException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 

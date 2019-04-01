@@ -10,6 +10,21 @@ import java.math.BigDecimal;
 @NodeInfo(shortName = "print")
 public abstract class BcPrintBuiltin extends BcBuiltinNode {
 
+    @TruffleBoundary
+    private static void doPrint(PrintWriter out, Object value) {
+        out.println(value);
+    }
+
+    @TruffleBoundary
+    private static void doPrint(PrintWriter out, BigDecimal value) {
+        out.println(value);
+    }
+
+    @TruffleBoundary
+    private static void doPrint(PrintWriter out, String value) {
+        out.println(value);
+    }
+
     @Specialization
     public String print(String value) {
         doPrint(getContext().getOutput(), value);
@@ -26,21 +41,6 @@ public abstract class BcPrintBuiltin extends BcBuiltinNode {
     public Object print(Object value) {
         doPrint(getContext().getOutput(), value);
         return value;
-    }
-
-    @TruffleBoundary
-    private static void doPrint(PrintWriter out, Object value) {
-        out.println(value);
-    }
-
-    @TruffleBoundary
-    private static void doPrint(PrintWriter out, BigDecimal value) {
-        out.println(value);
-    }
-
-    @TruffleBoundary
-    private static void doPrint(PrintWriter out, String value) {
-        out.println(value);
     }
 
 }

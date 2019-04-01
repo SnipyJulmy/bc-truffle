@@ -2,17 +2,16 @@ package ch.snipy.bc.node.expression;
 
 import ch.snipy.bc.BcException;
 import ch.snipy.bc.node.BcBinaryNode;
+import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
-
-import java.math.BigDecimal;
 
 @NodeInfo(shortName = "%", description = "modulo operator")
 public abstract class BcModNode extends BcBinaryNode {
 
     @Specialization
-    protected BigDecimal doDouble(BigDecimal left, BigDecimal right) {
+    protected BcBigNumber doDouble(BcBigNumber left, BcBigNumber right) {
         return left.remainder(right);
     }
 

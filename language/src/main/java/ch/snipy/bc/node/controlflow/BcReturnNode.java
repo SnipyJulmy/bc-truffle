@@ -2,8 +2,6 @@ package ch.snipy.bc.node.controlflow;
 
 import ch.snipy.bc.node.BcExpressionNode;
 import ch.snipy.bc.node.BcStatementNode;
-import ch.snipy.bc.node.BcExpressionNode;
-import ch.snipy.bc.node.BcStatementNode;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 public final class BcReturnNode extends BcStatementNode {
@@ -19,7 +17,7 @@ public final class BcReturnNode extends BcStatementNode {
         if (valueNode != null) {
             result = valueNode.executeGeneric(frame);
         } else {
-            // bc specify that if no return value is provide, the return value is 0
+            // bc specify that if no return getValue is provide, the return getValue is 0
             result = (double) 0;
         }
         throw new BcReturnException(result);

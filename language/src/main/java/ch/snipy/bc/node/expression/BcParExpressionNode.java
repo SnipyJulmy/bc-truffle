@@ -1,10 +1,9 @@
 package ch.snipy.bc.node.expression;
 
 import ch.snipy.bc.node.BcExpressionNode;
+import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
-
-import java.math.BigDecimal;
 
 public class BcParExpressionNode extends BcExpressionNode {
 
@@ -20,8 +19,8 @@ public class BcParExpressionNode extends BcExpressionNode {
     }
 
     @Override
-    public BigDecimal executeBigDecimal(VirtualFrame frame) throws UnexpectedResultException {
-        return expression.executeBigDecimal(frame);
+    public BcBigNumber executeBigNumber(VirtualFrame frame) throws UnexpectedResultException {
+        return expression.executeBigNumber(frame);
     }
 
     @Override
