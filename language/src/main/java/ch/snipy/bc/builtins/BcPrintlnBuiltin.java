@@ -8,7 +8,7 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 
 @NodeInfo(shortName = "print")
-public abstract class BcPrintBuiltin extends BcBuiltinNode {
+public abstract class BcPrintlnBuiltin extends BcBuiltinNode {
 
     @TruffleBoundary
     private static void doPrint(PrintWriter out, Object value) {
