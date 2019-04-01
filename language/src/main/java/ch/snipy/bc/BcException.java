@@ -1,5 +1,6 @@
 package ch.snipy.bc;
 
+import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.TruffleException;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.source.SourceSection;
@@ -7,9 +8,20 @@ import com.oracle.truffle.api.source.SourceSection;
 // TODO
 public class BcException extends RuntimeException implements TruffleException {
 
-    // TODO
+    private static final long serial = 31415L;
+
+    private final Node location;
+
+    @TruffleBoundary
+    public BcException(String msg, Node location) {
+        super(msg);
+        this.location = location;
+    }
+
     public static BcException typeError(Node op, Object... values) {
-        return new BcException();
+        StringBuilder builder = new StringBuilder();
+        // TODO
+        return new BcException(builder.toString(), op);
     }
 
     @Override
