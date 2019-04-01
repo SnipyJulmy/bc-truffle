@@ -8,6 +8,7 @@ import ch.snipy.bc.node.BcRootNode;
 import ch.snipy.bc.node.local.BcReadArgumentNode;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
+import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.TruffleLanguage.Env;
 import com.oracle.truffle.api.dsl.NodeFactory;
@@ -25,6 +26,7 @@ public final class BCContext {
     private final PrintWriter output;
     private final Env env;
     private final TruffleLanguage language;
+    private final BcFunctionRegistry functionRegistry;
     // private final BcFunctionRegistry; TODO
 
     public BCContext(BcLanguage language,
@@ -34,6 +36,7 @@ public final class BCContext {
         this.input = new BufferedReader(new InputStreamReader(env.in()));
         this.output = new PrintWriter(env.out(), true);
         this.language = language;
+        this.functionRegistry = new BcFunctionRegistry(language);
         installBuiltins();
     }
 
@@ -79,7 +82,7 @@ public final class BCContext {
         BcBuiltinNode builtinNode = factory.createNode((Object) args);
         String name = lookupNodeInfo(builtinNode.getClass()).shortName();
         BcRootNode rootNode = new BcRootNode(language, new FrameDescriptor(), builtinNode, name);
-        // TODO register the builtin inside the registry
+        functionRegistry.register(name, Truffle.getRuntime().createCallTarget(rootNode));
     }
 
     public BufferedReader getInput() {
