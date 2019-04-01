@@ -27,6 +27,10 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
         this.value = new BigDecimal(value);
     }
 
+    public BcBigNumber(double value) {
+        this.value = new BigDecimal(value);
+    }
+
     public static boolean isInstance(TruffleObject obj) {
         return obj instanceof BcBigNumber;
     }
