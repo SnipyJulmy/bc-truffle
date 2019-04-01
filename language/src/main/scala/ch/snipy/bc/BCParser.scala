@@ -44,7 +44,7 @@ object BCParser {
 class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers {
 
   private var functions: mutable.Map[String, RootCallTarget] = mutable.Map()
-  private var lexicalScope: LexicalScope = new LexicalScope(None)
+  private val lexicalScope: LexicalScope = new LexicalScope(None)
   private val frameDescriptor: FrameDescriptor = new FrameDescriptor()
 
   // Note : "\n" represent the end of a statement, like ";"
@@ -129,14 +129,13 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
   lazy val bcFunctionDefinition: PackratParser[Unit] = {
     "define" ~> identifier ~ (lp ~> parameters <~ rb ~ nl) ~ bcAutoList ~ rep(bcStatement) <~ lb ^^ {
       case id ~ params ~ autolist ~ statements =>
+        ???
     }
   }
 
   lazy val parameters: PackratParser[List[String]] = ???
   lazy val bcAutoList: PackratParser[List[String]] = ???
-
   lazy val bcVoidFunctionDefinition: PackratParser[Unit] = ???
-
   lazy val bcAutoDefinition: PackratParser[BcAutoDefNode] = ???
   lazy val bcVarDefinition: PackratParser[BcVarDefNode] = ???
   lazy val bcArrayDefinition: PackratParser[BcArrayDefNode] = ???
@@ -232,8 +231,6 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
 
   lazy val identifier: PackratParser[String] = "[a-z]+".r ^^ { str => str } // POSIX bc
 
-  lazy val string: PackratParser[BcStringLiteralNode] = ??? //"""(\\.|[^\\"])*""".r ^^ { str => new BcStringNode(str) }
-
   /* Utils regex and string */
   lazy val integer: PackratParser[Int] = "[0-9]+".r ^^ { str => str.toInt }
   lazy val EOS: PackratParser[String] = sc | nl
@@ -267,8 +264,9 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     BcLocalVariableReadNodeGen.create(slot)
   }
 
-  private def mkCall(name: BcExpressionNode, args: List[BcExpressionNode]): BcExpressionNode =
+  private def mkCall(name: BcExpressionNode, args: List[BcExpressionNode]): BcExpressionNode = {
     new BcInvokeNode(name, args.toArray)
+  }
 
   private def mkPreIncrementNode(name: BcExpressionNode, modifier: Double, index: Option[Int] = None): BcPreIncrementNode = {
     val identifier = name.asInstanceOf[BcStringLiteralNode].executeGeneric(null)
