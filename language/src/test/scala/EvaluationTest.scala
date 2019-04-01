@@ -47,6 +47,31 @@ class EvaluationTest extends BcTestSpec {
     context.eval(mkSource("2.2^4.9")).asDouble() shouldBe B(2.2).pow(4)
   }
 
+  it should "correctly evaluate parenthesized expression" in {
+    context.eval(mkSource("(2)")).asDouble() shouldBe 2
+    context.eval(mkSource("(-2)")).asDouble() shouldBe -2
+    context.eval(mkSource("(-2) + (-2)")).asDouble() shouldBe -4
+    context.eval(mkSource("(-2) + (-2) + (2)")).asDouble() shouldBe -2
+    context.eval(mkSource("(-4 * 3) + (3 * 4 - 1 + (3 ^ 0)) + (1 + (1 + (1)) - 3) + (0)")).asDouble() shouldBe 0
+    context.eval(mkSource("(4 ^ 1) + (-2 ^ 1) + (-2 ^ 2)")).asDouble() shouldBe 6
+    context.eval(mkSource("(4 ^ 1) + (-2 ^ 1) + (-2 ^ 3)")).asDouble() shouldBe -6
+    context.eval(mkSource("(8 ^ 3) + (-8 ^ 3)")).asDouble() shouldBe 0
+    context.eval(mkSource("(8 ^ 3) + (-8 ^ 3) + 1")).asDouble() shouldBe 1
+    context.eval(mkSource("(8 ^ 3) + (-8 ^ 3) + (1)")).asDouble() shouldBe 1
+    context.eval(mkSource("(8 ^ 3) + (-8 ^ 3) + (1 ^ 1)")).asDouble() shouldBe 1
+    context.eval(mkSource("(8 ^ 3) + (-8 ^ 3) + (1 ^ 0)")).asDouble() shouldBe 1
+    context.eval(mkSource("(8 ^ 3) + (-8 ^ 3) + (8 ^ 0)")).asDouble() shouldBe 1
+    context.eval(mkSource("(8 ^ 3) + (-8 ^ 3) + (-8 ^ 0)")).asDouble() shouldBe 1
+    context.eval(mkSource("(8 ^ 3) + (-8 ^ 3) + (-8 ^ 1)")).asDouble() shouldBe -8
+    context.eval(mkSource("(8 ^ 3) + (-8 ^ 3) + (-8 ^ 2)")).asDouble() shouldBe 64
+    context.eval(mkSource("(8 ^ 3) + (-8 ^ 3) + (-8 ^ 3)")).asDouble() shouldBe -512
+    context.eval(mkSource("(8 ^ 3) + (-8 ^ 3) + (3 ^ 0)")).asDouble() shouldBe 1
+    context.eval(mkSource("(8 ^ 3) + (-8 ^ 3) + (-3 ^ 0)")).asDouble() shouldBe 1
+    context.eval(mkSource("(8 ^ 3) + (-8 ^ 3) + (-2 ^ 0)")).asDouble() shouldBe 1
+    context.eval(mkSource("(8 ^ 3) + (-8 ^ 3) + (-2 ^ 3)")).asDouble() shouldBe -8
+    context.eval(mkSource("(8866128975287528 ^ 3) + (-8778405442862239 ^ 3) + (-2736111468807040 ^ 3)")).asInt() shouldBe 33
+  }
+
   it should "correctly evaluate string concatenation and expression" in {
 
   }
