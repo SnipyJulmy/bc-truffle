@@ -15,9 +15,12 @@ public class BcRootNode extends RootNode {
     // - a function body which is also a list of statement
     @Child private BcExpressionNode bodyNode;
 
-    public BcRootNode(TruffleLanguage<?> language, FrameDescriptor frameDescriptor, BcExpressionNode bodyNode) {
+    private final String name;
+
+    public BcRootNode(TruffleLanguage<?> language, FrameDescriptor frameDescriptor, BcExpressionNode bodyNode, String name) {
         super(language, frameDescriptor);
         this.bodyNode = bodyNode;
+        this.name = name;
     }
 
     @Override
