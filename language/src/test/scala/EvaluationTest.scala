@@ -27,8 +27,8 @@ class EvaluationTest extends BcTestSpec {
     context.eval(mkSource("3 * 2")).asDouble() shouldBe 6.0
     context.eval(mkSource("1 * -2")).asDouble() shouldBe -2.0
     context.eval(mkSource("56 * 72 + 1")).asDouble() shouldBe (56 * 72 + 1).toDouble
-    context.eval(mkSource("3 * 4 * 5 * 6 * 7")).asDouble() shouldBe (3 * 4 * 5 * 6 * 7).toDouble
-    context.eval(mkSource("12.3 * -56.7")).asDouble() shouldBe (12.3 * -56.7)
+    context.eval(mkSource("3 * 4 * 5 * 6 * 7")).asDouble() shouldBe (B(3) * B(4) * B(5) * B(6) * B(7))
+    context.eval(mkSource("12.3 * -56.7")).asDouble() shouldBe B(12.3) * B(-56.7)
     context.eval(mkSource("3 + 4 * 6 + 1 * 45 * 3 * -9 + 1 - 123 * 21")).asDouble() shouldBe 3 + 4 * 6 + 1 * 45 * 3 * -9 + 1 - 123 * 21
   }
 
@@ -40,10 +40,14 @@ class EvaluationTest extends BcTestSpec {
   }
 
   it should "correctly parse and evaluate power expression " in {
-    context.eval(mkSource("2^4")).asDouble() shouldBe Math.pow(2.0, 4.0)
-    context.eval(mkSource("2^5")).asDouble() shouldBe Math.pow(2.0, 5.0)
-    context.eval(mkSource("2^6")).asDouble() shouldBe Math.pow(2.0, 6.0)
-    context.eval(mkSource("3^4")).asDouble() shouldBe Math.pow(3.0, 4.0)
-    context.eval(mkSource("2.2^4.9")).asDouble() shouldBe Math.pow(2.2, 4.9)
+    context.eval(mkSource("2^4")).asDouble() shouldBe B(2).pow(4)
+    context.eval(mkSource("2^5")).asDouble() shouldBe B(2).pow(5)
+    context.eval(mkSource("2^6")).asDouble() shouldBe B(2).pow(6)
+    context.eval(mkSource("3^4")).asDouble() shouldBe B(3).pow(4)
+    context.eval(mkSource("2.2^4.9")).asDouble() shouldBe B(2.2).pow(4)
+  }
+
+  it should "correctly evaluate string concatenation and expression" in {
+
   }
 }

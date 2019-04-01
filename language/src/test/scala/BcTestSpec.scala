@@ -11,4 +11,7 @@ trait BcTestSpec extends FlatSpec with Checkers with Matchers {
 
   protected def mkSource(source: String, name: String = "???"): Source =
     Source.newBuilder("bc", source, name).build()
+
+  protected def B(value : Double) : BigDecimal = BigDecimal(value)
+  protected def B(value : Int) : BigDecimal = BigDecimal(value)
 }
