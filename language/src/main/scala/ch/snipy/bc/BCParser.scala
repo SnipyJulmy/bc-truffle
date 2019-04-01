@@ -22,7 +22,7 @@ object BCParser {
     val parser = new BCParser(language)
     import parser._
     parser.parse(
-      bcExpr,
+      bcFunctionCall,
       new PackratReader[Char](new CharSequenceReader(
         source.getCharacters
       ))
@@ -129,7 +129,9 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
   lazy val bcFunctionDefinition: PackratParser[Unit] = {
     "define" ~> identifier ~ (lp ~> parameters <~ rb ~ nl) ~ bcAutoList ~ rep(bcStatement) <~ lb ^^ {
       case id ~ params ~ autolist ~ statements =>
-        ???
+        val frameDescriptor = new FrameDescriptor()
+        val body : BcFunctionBodyNode = ???
+        val rootNode = new BcRootNode(bcLanguage,frameDescriptor,body,id);
     }
   }
 
@@ -207,7 +209,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     bcFunctionCall | bcPrimaryExpr
 
   lazy val bcFunctionCall: PackratParser[BcExpressionNode] =
-    stringLiteral ~ (lp ~> bcArgs <~ rp) ^^ { case id ~ args => mkCall(id, args) }
+    identifier ~ (lp ~> bcArgs <~ rp) ^^ { case id ~ args => mkCall(new BcStringLiteralNode(id), args) }
 
   lazy val bcArgs: PackratParser[List[BcExpressionNode]] =
     bcArg ~ rep("," ~> bcArg) ^^ { case x ~ xs => x :: xs }
