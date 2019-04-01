@@ -168,13 +168,13 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
       bcAssignmentOpExpr
 
   lazy val bcAssignmentOpExpr: PackratParser[BcExpressionNode] =
-    bcAssignmentOpExpr ~ ("=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignementNode(l, r) } |
-      bcAssignmentOpExpr ~ ("+=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignementNode(l, BcAddNodeGen.create(l, r)) } |
-      bcAssignmentOpExpr ~ ("-=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignementNode(l, BcSubNodeGen.create(l, r)) } |
-      bcAssignmentOpExpr ~ ("/=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignementNode(l, BcDivNodeGen.create(l, r)) } |
-      bcAssignmentOpExpr ~ ("*=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignementNode(l, BcMulNodeGen.create(l, r)) } |
-      bcAssignmentOpExpr ~ ("%=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignementNode(l, BcModNodeGen.create(l, r)) } |
-      bcAssignmentOpExpr ~ ("^=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignementNode(l, BcPowNodeGen.create(l, r)) } |
+    bcAssignmentOpExpr ~ ("=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignmentNode(l, r) } |
+      bcAssignmentOpExpr ~ ("+=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignmentNode(l, BcAddNodeGen.create(l, r)) } |
+      bcAssignmentOpExpr ~ ("-=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignmentNode(l, BcSubNodeGen.create(l, r)) } |
+      bcAssignmentOpExpr ~ ("/=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignmentNode(l, BcDivNodeGen.create(l, r)) } |
+      bcAssignmentOpExpr ~ ("*=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignmentNode(l, BcMulNodeGen.create(l, r)) } |
+      bcAssignmentOpExpr ~ ("%=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignmentNode(l, BcModNodeGen.create(l, r)) } |
+      bcAssignmentOpExpr ~ ("^=" ~> bcAdditiveExpr) ^^ { case l ~ r => mkAssignmentNode(l, BcPowNodeGen.create(l, r)) } |
       bcAdditiveExpr
 
   lazy val bcAdditiveExpr: PackratParser[BcExpressionNode] =
@@ -223,10 +223,11 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
   lazy val stringLiteral: PackratParser[BcStringLiteralNode] =
     "\"" ~> """(?:[^"\\]|\\.)*""".r <~ "\"" ^^ { str => new BcStringLiteralNode(str) }
 
-  lazy val doubleLiteral: PackratParser[BcDoubleLiteralNode] =
+  lazy val doubleLiteral: PackratParser[BcDoubleLiteralNode] = {
     "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)(E[0-9]+)?".r ^^ { value => new BcDoubleLiteralNode(new BcBigNumber(value)) }
+  }
 
-  lazy val bcAssignement: PackratParser[BcAssignementNode] = ???
+  lazy val bcAssignment: PackratParser[BcAssignementNode] = ???
 
   lazy val identifier: PackratParser[String] = "[a-z]+".r ^^ { str => str } // POSIX bc
 
@@ -242,7 +243,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
   lazy val rb = "}"
   lazy val sc = ";"
 
-  private def mkAssignementNode(name: BcExpressionNode, value: BcExpressionNode, index: Option[Int] = None): BcExpressionNode = {
+  private def mkAssignmentNode(name: BcExpressionNode, value: BcExpressionNode, index: Option[Int] = None): BcExpressionNode = {
     val identifier = name.asInstanceOf[BcStringLiteralNode].executeGeneric(null)
 
     val slot: FrameSlot = frameDescriptor.findOrAddFrameSlot(
