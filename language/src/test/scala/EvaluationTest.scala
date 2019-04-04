@@ -71,6 +71,7 @@ class EvaluationTest extends BcTestSpec {
     context.eval(mkSource("(8 ^ 3) + (-8 ^ 3) + (-2 ^ 3)")).asDouble() shouldBe -8
     // thank you, number theory
     context.eval(mkSource("(8866128975287528 ^ 3) + (-8778405442862239 ^ 3) + (-2736111468807040 ^ 3)")).asInt() shouldBe 33
+    context.eval(mkSource("(8866128975287528 ^ 3) + (8778405442862239 ^ 3)")).toString shouldBe "1373418274408761713072539992376076290046598779871"
   }
 
   it should "correctly evaluate string concatenation and expression" in {
