@@ -21,15 +21,18 @@ object BCParser {
   def parseExpr(language: BcLanguage, source: Source): BcRootNode = {
     val parser = new BCParser(language)
     import parser._
+    assert(parser.skipWhitespace)
     parser.parse(
       bcExpr,
       new PackratReader[Char](new CharSequenceReader(
-        source.getCharacters
+        sanizite(source.getCharacters.toString)
       ))
     ) match {
       case e: NoSuccess =>
         throw new IllegalArgumentException(s"can't parse ${source.getCharacters.toString}")
-      case Success(r: BcExpressionNode, _) =>
+      case Success(r: BcExpressionNode, next) =>
+        if (!next.atEnd)
+          throw BcParserException(s"can't parse the whole string, input : ${source.getCharacters.toString}, rest : ${next.source.toString}")
         val expr = r
         new BcRootNode(
           language,
@@ -39,6 +42,12 @@ object BCParser {
         )
     }
   }
+
+  private def sanizite(input: String): String = {
+    input.replaceAll("\n", ";") // replace all \n by ;
+      .replaceAll("\\s+", "") // strip consequent whitespaces
+      .trim
+  }
 }
 
 class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers {
@@ -47,9 +56,8 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
   private val lexicalScope: LexicalScope = new LexicalScope(None)
   private val frameDescriptor: FrameDescriptor = new FrameDescriptor()
 
-  // Note : "\n" represent the end of a statement, like ";"
+  // Note : in bc, "\n" represent the end of a statement, like ";"
   override protected val whiteSpace: Regex = "[ \t\f\r]+".r
-
   override def skipWhitespace: Boolean = true
 
   /**
