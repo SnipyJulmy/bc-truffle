@@ -16,7 +16,10 @@ import com.oracle.truffle.api.nodes.Node;
 @ReportPolymorphism
 @TypeSystemReference(BcTypes.class)
 public abstract class BcDispatchNode extends Node {
+
     public static final int INLINE_CACHE_SIZE = 2;
+
+    public abstract Object executeDispatch(Object function, Object[] args);
 
     @Specialization(
             limit = "INLINE_CACHE_SIZE",
@@ -37,19 +40,7 @@ public abstract class BcDispatchNode extends Node {
         return callNode.call(function.getCallTarget(), args);
     }
 
-    protected static boolean isForeignFunction(TruffleObject function) {
-        return !(function instanceof BcFunction);
-    }
 
-    protected static Node createCrossLanguageCallNode() {
-        return Message.EXECUTE.createNode();
-    }
-
-    protected static BcForeignToBcTypeNode createToSLTypeNode() {
-        return BcForeignToBcTypeNodeGen.create();
-    }
-
-    public abstract Object executeDispatch(Object function, Object[] args);
 
     @Fallback
     protected Object unknownFunction(Object function, @SuppressWarnings("unused") Object[] arguments) {
@@ -73,5 +64,17 @@ public abstract class BcDispatchNode extends Node {
             /* Foreign access was not successful. */
             throw BcUndefinedNameException.undefinedFunction(this, function);
         }
+    }
+
+    protected static boolean isForeignFunction(TruffleObject function) {
+        return !(function instanceof BcFunction);
+    }
+
+    protected static Node createCrossLanguageCallNode() {
+        return Message.EXECUTE.createNode();
+    }
+
+    protected static BcForeignToBcTypeNode createToSLTypeNode() {
+        return BcForeignToBcTypeNodeGen.create();
     }
 }
