@@ -13,11 +13,11 @@ public class BcRootNode extends RootNode {
     // the statement to execute, body is either :
     // - a list block statement, which is a list of statement
     // - a function body which is also a list of statement
-    @Child private BcExpressionNode bodyNode;
+    @Child private BcStatementNode bodyNode;
 
     private final String name;
 
-    public BcRootNode(TruffleLanguage<?> language, FrameDescriptor frameDescriptor, BcExpressionNode bodyNode, String name) {
+    public BcRootNode(TruffleLanguage<?> language, FrameDescriptor frameDescriptor, BcStatementNode bodyNode, String name) {
         super(language, frameDescriptor);
         this.bodyNode = bodyNode;
         this.name = name;
@@ -25,7 +25,8 @@ public class BcRootNode extends RootNode {
 
     @Override
     public Object execute(VirtualFrame frame) {
-        return bodyNode.executeGeneric(frame);
+        bodyNode.executeVoid(frame);
+        return true; // fixme what to return when we just have statement ???
     }
 
 }
