@@ -1,4 +1,8 @@
+import java.io.File
+
 import org.graalvm.polyglot.PolyglotException
+
+import scala.io.Source
 
 class EvaluationTest extends BcTestSpec {
 
@@ -179,5 +183,11 @@ class EvaluationTest extends BcTestSpec {
     assertThrows[PolyglotException](context.eval(mkSource("print(2")))
     assertThrows[PolyglotException](context.eval(mkSource("fib 2)")))
     assertThrows[PolyglotException](context.eval(mkSource("fib (2")))
+  }
+
+  it should "output the correct values in test.out" in {
+    val correctOutput = Source.fromURL(getClass.getResource("/test_correct.out")).getLines().mkString("\n");
+    val output = Source.fromFile(outputFile).getLines().mkString("\n")
+    output shouldBe correctOutput
   }
 }
