@@ -4,8 +4,8 @@ import ch.snipy.bc.BcLanguage;
 import ch.snipy.bc.runtime.BcUndefinedNameException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
-public class BcUnderfinedFunctionRootNode extends BcRootNode {
-    public BcUnderfinedFunctionRootNode(BcLanguage language, String name) {
+public class BcUndefinedFunctionRootNode extends BcRootNode {
+    public BcUndefinedFunctionRootNode(BcLanguage language, String name) {
         super(language, null, null, name);
     }
 
