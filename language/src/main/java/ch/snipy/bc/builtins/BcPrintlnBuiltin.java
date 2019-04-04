@@ -1,5 +1,6 @@
 package ch.snipy.bc.builtins;
 
+import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
@@ -16,7 +17,7 @@ public abstract class BcPrintlnBuiltin extends BcBuiltinNode {
     }
 
     @TruffleBoundary
-    private static void doPrint(PrintWriter out, BigDecimal value) {
+    private static void doPrint(PrintWriter out, BcBigNumber value) {
         out.println(value);
     }
 
@@ -32,8 +33,8 @@ public abstract class BcPrintlnBuiltin extends BcBuiltinNode {
     }
 
     @Specialization
-    public BigDecimal print(BigDecimal value) {
-        doPrint(getContext().getOutput(), value.toString());
+    public BcBigNumber print(BcBigNumber value) {
+        doPrint(getContext().getOutput(), value);
         return value;
     }
 
