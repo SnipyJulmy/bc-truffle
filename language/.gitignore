@@ -1,3 +1,4 @@
 .idea
 bc-truffle.iml
 /target/
+/test.out
