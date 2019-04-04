@@ -1,7 +1,7 @@
 package ch.snipy.bc.runtime;
 
 import ch.snipy.bc.BcLanguage;
-import ch.snipy.bc.node.BcUnderfinedFunctionRootNode;
+import ch.snipy.bc.node.BcUndefinedFunctionRootNode;
 import com.oracle.truffle.api.Assumption;
 import com.oracle.truffle.api.RootCallTarget;
 import com.oracle.truffle.api.Truffle;
@@ -18,7 +18,7 @@ public final class BcFunction implements TruffleObject {
 
     protected BcFunction(BcLanguage language, String name) {
         this.name = name;
-        this.callTarget = Truffle.getRuntime().createCallTarget(new BcUnderfinedFunctionRootNode(language, name));
+        this.callTarget = Truffle.getRuntime().createCallTarget(new BcUndefinedFunctionRootNode(language, name));
         this.callTargetStable = new CyclicAssumption(name);
     }
 
