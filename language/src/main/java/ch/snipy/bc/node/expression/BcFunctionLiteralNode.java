@@ -32,4 +32,8 @@ public final class BcFunctionLiteralNode extends BcExpressionNode {
         }
         return cachedFunction;
     }
+
+    public String getIdentifier() {
+        return identifier;
+    }
 }

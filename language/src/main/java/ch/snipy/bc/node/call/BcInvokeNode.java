@@ -30,4 +30,8 @@ public final class BcInvokeNode extends BcExpressionNode {
                 Arrays.stream(argumentNodes).map(n -> n.executeGeneric(frame)).toArray()
         );
     }
+
+    public String getIdentifier() {
+        return functionNode.getIdentifier();
+    }
 }
