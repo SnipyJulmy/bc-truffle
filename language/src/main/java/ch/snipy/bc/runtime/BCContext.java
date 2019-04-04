@@ -27,7 +27,6 @@ public final class BCContext {
     private final Env env;
     private final TruffleLanguage language;
     private final BcFunctionRegistry functionRegistry;
-    // private final BcFunctionRegistry; TODO
 
     public BCContext(BcLanguage language,
                      Env env,
@@ -91,5 +90,9 @@ public final class BCContext {
 
     public PrintWriter getOutput() {
         return output;
+    }
+
+    public BcFunctionRegistry getFunctionRegistry() {
+        return functionRegistry;
     }
 }
