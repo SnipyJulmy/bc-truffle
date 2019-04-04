@@ -6,7 +6,7 @@ import com.oracle.truffle.api.dsl.TypeSystem;
 @TypeSystem({
         BcBigNumber.class,   // standard posix bc number
         String.class,       // support for string
-        Object[].class      // only used to pass arguments for function call
+        Object[].class     // only used to pass arguments for function call
 })
 public abstract class BcTypes {
 
