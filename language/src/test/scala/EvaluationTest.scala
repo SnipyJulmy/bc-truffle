@@ -1,4 +1,10 @@
+import ch.snipy.bc.BcParserException
+import org.graalvm.polyglot.PolyglotException
+
 class EvaluationTest extends BcTestSpec {
+
+  val maxInt: String = s"${Integer.MAX_VALUE}"
+  val minInt: String = s"${Integer.MIN_VALUE}"
 
   behavior of "bc parser and evaluator"
 
@@ -45,6 +51,7 @@ class EvaluationTest extends BcTestSpec {
     context.eval(mkSource("2^6")).asDouble() shouldBe B(2).pow(6)
     context.eval(mkSource("3^4")).asDouble() shouldBe B(3).pow(4)
     context.eval(mkSource("2.2^4.9")).asDouble() shouldBe B(2.2).pow(4)
+    context.eval(mkSource("821372187321321398731 ^ 3")).fitsInInt() shouldBe false
   }
 
   it should "correctly evaluate parenthesized expression" in {
@@ -84,4 +91,90 @@ class EvaluationTest extends BcTestSpec {
     context.eval(mkSource(""" "a" + "1" + "b" """)).asString() shouldBe "a1b"
     context.eval(mkSource(""" 1 + 2 + 3 + 4 + 5 + "6" + 7 + 8 + 9 """)).asString() shouldBe "156789"
   }
+
+  it should "correctly evaluate simple or expression" in {
+    context.eval(mkSource("0 || 0")).asInt() shouldBe 0
+    context.eval(mkSource("0 || 1")).asInt() shouldBe 1
+    context.eval(mkSource("1 || 0")).asInt() shouldBe 1
+    context.eval(mkSource("1 || 1")).asInt() shouldBe 1
+  }
+
+  it should "correctly evaluate simple and expression" in {
+    context.eval(mkSource("0 && 0")).asInt() shouldBe 0
+    context.eval(mkSource("0 && 1")).asInt() shouldBe 0
+    context.eval(mkSource("1 && 0")).asInt() shouldBe 0
+    context.eval(mkSource("1 && 1")).asInt() shouldBe 1
+  }
+
+  it should "correctly evaluate simple negationed expression" in {
+    context.eval(mkSource("!1")).asInt() shouldBe 0
+    context.eval(mkSource("!0")).asInt() shouldBe 1
+    context.eval(mkSource("!4")).asInt() shouldBe 0
+    context.eval(mkSource("!213213")).asInt() shouldBe 0
+    context.eval(mkSource("!2132132132138213621383871387163213213")).asInt() shouldBe 0
+    context.eval(mkSource("!9999999999999999999999999999999999999999999999999999999999")).asInt() shouldBe 0
+    context.eval(mkSource("!10")).asInt() shouldBe 0
+  }
+
+  it should "correctly evaluate simple comparison expression" in {
+    val bigNumber = "999999999999999999999999999999999999999999"
+    val veryBigNumber = s"$bigNumber ^ 2"
+
+    context.eval(mkSource("1 == 1")).asInt() shouldBe 1
+    context.eval(mkSource("0 == 1")).asInt() shouldBe 0
+    context.eval(mkSource("13 == 23")).asInt() shouldBe 0
+    context.eval(mkSource("321 == 123")).asInt() shouldBe 0
+    context.eval(mkSource("99 == 99")).asInt() shouldBe 1
+    context.eval(mkSource("132 > 131")).asInt() shouldBe 1
+    context.eval(mkSource("132 >= 131")).asInt() shouldBe 1
+    context.eval(mkSource("132 < 131")).asInt() shouldBe 0
+    context.eval(mkSource("132 <= 131")).asInt() shouldBe 0
+    context.eval(mkSource("132 <= 132")).asInt() shouldBe 1
+    context.eval(mkSource("132 >= 132")).asInt() shouldBe 1
+
+    context.eval(mkSource(s"$maxInt >= $minInt")).asInt() shouldBe 1
+    context.eval(mkSource(s"$maxInt > $minInt")).asInt() shouldBe 1
+    context.eval(mkSource(s"$maxInt >= 0")).asInt() shouldBe 1
+    context.eval(mkSource(s"$maxInt > 0")).asInt() shouldBe 1
+    context.eval(mkSource(s"$minInt <= 0")).asInt() shouldBe 1
+    context.eval(mkSource(s"$minInt < 0")).asInt() shouldBe 1
+    context.eval(mkSource(s"$minInt >= 0")).asInt() shouldBe 0
+    context.eval(mkSource(s"$minInt > 0")).asInt() shouldBe 0
+    context.eval(mkSource(s"$minInt > $maxInt")).asInt() shouldBe 0
+    context.eval(mkSource(s"$minInt >= $maxInt")).asInt() shouldBe 0
+    context.eval(mkSource(s"$maxInt < $minInt")).asInt() shouldBe 0
+    context.eval(mkSource(s"$maxInt <= $minInt")).asInt() shouldBe 0
+    context.eval(mkSource(s"$maxInt + 1 > $maxInt")).asInt() shouldBe 1
+    context.eval(mkSource(s"$maxInt + 1 >= $maxInt")).asInt() shouldBe 1
+    context.eval(mkSource(s"$minInt - 1 < $minInt")).asInt() shouldBe 1
+    context.eval(mkSource(s"$maxInt - 1 <= $maxInt")).asInt() shouldBe 1
+
+    context.eval(mkSource(s"$veryBigNumber >= $bigNumber")).asInt() shouldBe 1
+    context.eval(mkSource(s"$veryBigNumber > $bigNumber")).asInt() shouldBe 1
+
+    context.eval(mkSource(s"$maxInt == $maxInt")).asInt() shouldBe 1
+    context.eval(mkSource(s"$minInt == $minInt")).asInt() shouldBe 1
+    context.eval(mkSource(s"$bigNumber == $bigNumber")).asInt() shouldBe 1
+    context.eval(mkSource(s"$veryBigNumber == $veryBigNumber")).asInt() shouldBe 1
+
+    context.eval(mkSource(s"$maxInt != $maxInt")).asInt() shouldBe 0
+    context.eval(mkSource(s"$minInt != $minInt")).asInt() shouldBe 0
+    context.eval(mkSource(s"$bigNumber != $bigNumber")).asInt() shouldBe 0
+    context.eval(mkSource(s"$veryBigNumber != $veryBigNumber")).asInt() shouldBe 0
+  }
+
+  it should "correctly evaluate simple negated expression" in {
+    context.eval(mkSource(s"- 1")).asInt() shouldBe -1
+    context.eval(mkSource(s"-(-1)")).asInt() shouldBe 1
+    context.eval(mkSource(s"-(-(-(-(-(-((((-(-(-(-((-(-9)))))))))))))))")).asInt() shouldBe 9
+  }
+
+  it should "failed to parse incorrect expression" in {
+    assertThrows[PolyglotException](context.eval(mkSource("1 - (2")))
+    assertThrows[PolyglotException](context.eval(mkSource("1 - 2)")))
+    assertThrows[PolyglotException](context.eval(mkSource("print(2")))
+    assertThrows[PolyglotException](context.eval(mkSource("fib 2)")))
+    assertThrows[PolyglotException](context.eval(mkSource("fib (2")))
+  }
+
 }
