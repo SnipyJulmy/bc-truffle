@@ -11,9 +11,7 @@ import com.oracle.truffle.api.dsl.UnsupportedSpecializationException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
-import java.math.BigDecimal;
-
-@NodeChild(value = "arg", type = BcExpressionNode[].class)
+@NodeChild(value = "args", type = BcExpressionNode[].class)
 @GenerateNodeFactory
 public abstract class BcBuiltinNode extends BcExpressionNode {
 
