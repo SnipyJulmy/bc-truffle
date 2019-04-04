@@ -1,3 +1,4 @@
 .idea
 bc-truffle.iml
 /target/
+/src/main/scala/ch/snipy/bc/sanitize.sc
