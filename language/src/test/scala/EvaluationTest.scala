@@ -1,4 +1,3 @@
-import ch.snipy.bc.BcParserException
 import org.graalvm.polyglot.PolyglotException
 
 class EvaluationTest extends BcTestSpec {
@@ -169,6 +168,11 @@ class EvaluationTest extends BcTestSpec {
     context.eval(mkSource(s"-(-(-(-(-(-((((-(-(-(-((-(-9)))))))))))))))")).asInt() shouldBe 9
   }
 
+  it should "correctly parse and evaluate function call to print" in {
+    context.eval(mkSource(s"print(3.2)")).asDouble() shouldBe 3.2
+    context.eval(mkSource(s"print(3)")).asInt() shouldBe 3
+  }
+
   it should "failed to parse incorrect expression" in {
     assertThrows[PolyglotException](context.eval(mkSource("1 - (2")))
     assertThrows[PolyglotException](context.eval(mkSource("1 - 2)")))
@@ -176,5 +180,4 @@ class EvaluationTest extends BcTestSpec {
     assertThrows[PolyglotException](context.eval(mkSource("fib 2)")))
     assertThrows[PolyglotException](context.eval(mkSource("fib (2")))
   }
-
 }
