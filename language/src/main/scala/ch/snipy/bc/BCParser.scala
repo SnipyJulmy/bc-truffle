@@ -44,7 +44,6 @@ object BCParser {
         throw new IllegalArgumentException(s"can't parse ${source.getCharacters.toString}... error : ${e.msg}")
       case Success(root: BcRootNode, next) =>
         if (!dropWs(next).atEnd) {
-          println(next)
           throw BcParserException(s"can't parse the whole string, input : ${source.getCharacters.toString}, rest : ${next.rest.source.toString}")
         }
         root
