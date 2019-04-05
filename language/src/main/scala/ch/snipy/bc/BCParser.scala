@@ -22,6 +22,18 @@ object BCParser {
     val parser = new BCParser(language)
     import parser._
     assert(parser.skipWhitespace)
+
+    def dropWs(input: parser.Input): parser.Input = {
+      if (input.atEnd)
+        input
+      else {
+        if (parser.whiteSpace.pattern.matcher(input.first.toString).matches())
+          dropWs(input.rest)
+        else
+          input
+      }
+    }
+
     parser.parse(
       program,
       new PackratReader[Char](new CharSequenceReader(
@@ -31,21 +43,16 @@ object BCParser {
       case e: NoSuccess =>
         throw new IllegalArgumentException(s"can't parse ${source.getCharacters.toString}... error : ${e.msg}")
       case Success(root: BcRootNode, next) =>
-        if (!next.atEnd)
-          throw BcParserException(s"can't parse the whole string, input : ${source.getCharacters.toString}, rest : ${next.source.toString}")
+        if (!dropWs(next).atEnd) {
+          println(next)
+          throw BcParserException(s"can't parse the whole string, input : ${source.getCharacters.toString}, rest : ${next.rest.source.toString}")
+        }
         root
     }
   }
 
-  // fixme
-  // well, we can certainly do better here... maybe build a scanner and tokenize the source ?
   private def sanitize(input: String): String = {
     input
-      .replaceAll("^(?:[\\t ]*(?:\\r?\\n|\\r))+", "")
-      .replaceAll("\n", ";")
-      .replaceAll(";+", ";")
-      .replaceAll("\\s+", "")
-      .trim
   }
 }
 
@@ -56,14 +63,14 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
   private val frameDescriptor: FrameDescriptor = new FrameDescriptor()
 
   // Note : in bc, "\n" represent the end of a statement, like ";"
-  override protected val whiteSpace: Regex = "[ \t\f\r]+".r
+  override protected val whiteSpace: Regex = "[ \t\f\r\n]+".r
   override def skipWhitespace: Boolean = true
 
   /**
     * a bc program is just a sequence of statement
     * the parser return a BcRootNode which is the starting point of the program
     */
-  lazy val program: PackratParser[BcRootNode] = rep(bcStatement) ^^ { statements =>
+  lazy val program: PackratParser[BcRootNode] = rep1(bcStatement) ^^ { statements =>
     new BcRootNode(
       bcLanguage,
       frameDescriptor,
@@ -75,15 +82,17 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
   }
 
   lazy val bcStatement: PackratParser[BcStatementNode] = {
-    bcStatementCase <~ EOS
+    bcStatementCase
   }
 
   lazy val bcStatementCase: PackratParser[BcStatementNode] = {
     // just expression as statement for the moment
-    bcExpr ^^ {
-      case expr@(node: BcInvokeNode) if node.getIdentifier == "print" => expr
-      case expr => mkCall("print", List(expr))
-    }
+    bcIf | bcWhile | bcFor | bcBlock |
+      bcBreak | bcContinue | bcReturn | bcHalt |
+      bcExpr ^^ {
+        case expr@(node: BcInvokeNode) if node.getIdentifier == "print" => expr
+        case expr => mkCall("print", List(expr))
+      }
     /*
     bcIf | bcWhile | bcFor | bcBreak | bcContinue | bcReturn |
       // bcFunctionDefinition | bcVoidFunctionDefinition | fixme
@@ -239,7 +248,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
 
   /* Utils regex and string */
   lazy val integer: PackratParser[Int] = "[0-9]+".r ^^ { str => str.toInt }
-  lazy val EOS = sc
+  lazy val EOS = sc | nl
   lazy val nl = "\n"
   lazy val sc = ";"
 
