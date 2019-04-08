@@ -216,11 +216,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
       bcPowerExpr
 
   lazy val bcPowerExpr: PackratParser[BcExpressionNode] =
-    bcPowerExpr ~ ("^" ~> bcNegExpr) ^^ { case l ~ r => BcPowNodeGen.create(l, r) } |
-      bcNegExpr
-
-  lazy val bcNegExpr: PackratParser[BcExpressionNode] =
-    "-" ~> bcNegExpr ^^ { expr => BcNegNodeGen.create(expr) } |
+    bcPowerExpr ~ ("^" ~> bcIncDecExpr) ^^ { case l ~ r => BcPowNodeGen.create(l, r) } |
       bcIncDecExpr
 
   lazy val bcIncDecExpr: PackratParser[BcExpressionNode] =
@@ -228,6 +224,10 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
       "--" ~> bcIdentifier ^^ { expr => mkPreIncrementNode(expr, -1.0) } |
       bcIdentifier <~ "++" ^^ { expr => mkPostIncrementNode(expr, 1.0) } |
       bcIdentifier <~ "--" ^^ { expr => mkPostIncrementNode(expr, -1.0) } |
+      bcNegExpr
+
+  lazy val bcNegExpr: PackratParser[BcExpressionNode] =
+    "-" ~> bcNegExpr ^^ { expr => BcNegNodeGen.create(expr) } |
       bcPostFixExpr
 
   lazy val bcPostFixExpr: PackratParser[BcExpressionNode] =
