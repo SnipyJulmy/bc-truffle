@@ -8,6 +8,8 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameUtil;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+import static ch.snipy.bc.runtime.BcBigNumber.*;
+
 @NodeField(name = "slot", type = FrameSlot.class)
 @NodeField(name = "modifier", type = double.class)
 public abstract class BcPostIncrementNode extends BcExpressionNode {
@@ -20,7 +22,7 @@ public abstract class BcPostIncrementNode extends BcExpressionNode {
     @Specialization
     public BcBigNumber doBcBigNumber(VirtualFrame frame) {
         BcBigNumber value = (BcBigNumber) FrameUtil.getObjectSafe(frame, getSlot());
-        BcBigNumber newValue = value.add(getModifier() > 0.0 ? BcBigNumber.ONE : BcBigNumber.ONE.negate());
+        BcBigNumber newValue = value.add(getModifier() > 0.0 ? ONE : ONE.negate());
         frame.setObject(getSlot(), newValue);
         return value;
     }
