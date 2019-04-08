@@ -5,9 +5,8 @@ import org.graalvm.polyglot.{Context, Source}
 object Main extends App {
   val program =
     """
-       a = 2
-       a += 3
-       print(a)
+       a = 20 ; while(--a > 0) print(a)
+       a = 20 ; while(a-- > 0) print(a)
     """.stripMargin
 
   val source: Source = Source.newBuilder("bc", program, "program")
