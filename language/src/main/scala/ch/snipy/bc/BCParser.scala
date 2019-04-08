@@ -222,10 +222,10 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
       bcIncDecExpr
 
   lazy val bcIncDecExpr: PackratParser[BcExpressionNode] =
-    "++" ~> bcIncDecExpr ^^ { expr => mkPreIncrementNode(expr, 1.0) } |
-      "--" ~> bcIncDecExpr ^^ { expr => mkPreIncrementNode(expr, -1.0) } |
-      bcIncDecExpr <~ "++" ^^ { expr => mkPostIncrementNode(expr, 1.0) } |
-      bcIncDecExpr <~ "--" ^^ { expr => mkPostIncrementNode(expr, -1.0) } |
+    "++" ~> bcIdentifier ^^ { expr => mkPreIncrementNode(expr, 1.0) } |
+      "--" ~> bcIdentifier ^^ { expr => mkPreIncrementNode(expr, -1.0) } |
+      bcIdentifier <~ "++" ^^ { expr => mkPostIncrementNode(expr, 1.0) } |
+      bcIdentifier <~ "--" ^^ { expr => mkPostIncrementNode(expr, -1.0) } |
       bcPostFixExpr
 
   lazy val bcPostFixExpr: PackratParser[BcExpressionNode] =
@@ -299,28 +299,22 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     )
   }
 
-  private def mkPreIncrementNode(name: BcExpressionNode, modifier: Double, index: Option[Int] = None): BcPreIncrementNode = {
-    val identifier = name.asInstanceOf[BcStringLiteralNode].executeGeneric(null)
-
+  private def mkPreIncrementNode(identifier: String, modifier: Double, index: Option[Int] = None): BcPreIncrementNode = {
     val slot: FrameSlot = frameDescriptor.findOrAddFrameSlot(
       identifier,
       index.orNull,
       FrameSlotKind.Illegal
     )
-
     lexicalScope.locals += (identifier -> slot)
     BcPreIncrementNodeGen.create(slot, modifier)
   }
 
-  private def mkPostIncrementNode(name: BcExpressionNode, modifier: Double, index: Option[Int] = None): BcPostIncrementNode = {
-    val identifier = name.asInstanceOf[BcStringLiteralNode].executeGeneric(null)
-
+  private def mkPostIncrementNode(identifier: String, modifier: Double, index: Option[Int] = None): BcPostIncrementNode = {
     val slot: FrameSlot = frameDescriptor.findOrAddFrameSlot(
       identifier,
       index.orNull,
       FrameSlotKind.Illegal
     )
-
     lexicalScope.locals += (identifier -> slot)
     BcPostIncrementNodeGen.create(slot, modifier)
   }
