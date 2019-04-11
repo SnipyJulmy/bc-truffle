@@ -8,7 +8,7 @@ object Main extends App {
        define id(x) {
          return x
        }
-       print(id(2))
+       id(1)
     """.stripMargin
 
   val source: Source = Source.newBuilder("bc", program, "program")
