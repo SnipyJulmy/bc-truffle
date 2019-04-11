@@ -14,7 +14,7 @@ public abstract class BcOrNode extends BcBinaryNode {
 
     @Specialization
     protected BcBigNumber or(BcBigNumber left, BcBigNumber right) {
-        return valueOf(left.asBoolean() || right.asBoolean());
+        return valueOf(left.booleanValue() || right.booleanValue());
     }
 
     @Fallback

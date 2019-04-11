@@ -12,7 +12,7 @@ public abstract class BcAndNode extends BcBinaryNode {
 
     @Specialization
     protected BcBigNumber doBigNumber(BcBigNumber left, BcBigNumber right) {
-        return BcBigNumber.valueOf(left.asBoolean() && right.asBoolean());
+        return BcBigNumber.valueOf(left.booleanValue() && right.booleanValue());
     }
 
     @Fallback

@@ -1,16 +1,16 @@
 package ch.snipy.bc.runtime;
 
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
-import com.oracle.truffle.api.interop.ForeignAccess;
-import com.oracle.truffle.api.interop.MessageResolution;
-import com.oracle.truffle.api.interop.Resolve;
+import com.oracle.truffle.api.interop.InteropLibrary;
 import com.oracle.truffle.api.interop.TruffleObject;
-import com.oracle.truffle.api.nodes.Node;
+import com.oracle.truffle.api.interop.UnsupportedMessageException;
+import com.oracle.truffle.api.library.ExportLibrary;
+import com.oracle.truffle.api.library.ExportMessage;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-@MessageResolution(receiverType = BcBigNumber.class)
+@ExportLibrary(InteropLibrary.class)
 public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber> {
 
     public static final BcBigNumber ZERO = new BcBigNumber(BigDecimal.ZERO);
@@ -63,11 +63,6 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
     }
 
     @Override
-    public ForeignAccess getForeignAccess() {
-        return BcBigNumberForeign.ACCESS;
-    }
-
-    @Override
     @TruffleBoundary
     public String toString() {
         return value.toString();
@@ -85,7 +80,7 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
         return value.hashCode();
     }
 
-    public boolean asBoolean() {
+    public boolean booleanValue() {
         return !(this.value.equals(BigDecimal.ZERO));
     }
 
@@ -119,20 +114,104 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
         return valueOf(this.value.pow(exponent));
     }
 
-    @Resolve(message = "UNBOX")
-    abstract static class UnboxBigNode extends Node {
-        Object access(BcBigNumber obj) {
-            return obj.value.doubleValue();
+    @ExportMessage
+    boolean isNumber() {
+        return fitsInLong();
+    }
+
+    @ExportMessage
+    @TruffleBoundary
+    boolean fitsInByte() {
+        return value.unscaledValue().bitLength() - value.scale() < 8;
+    }
+
+    @ExportMessage
+    @TruffleBoundary
+    boolean fitsInShort() {
+        return value.unscaledValue().bitLength() - value.scale() < 16;
+    }
+
+    @ExportMessage
+    @TruffleBoundary
+    boolean fitsInInt() {
+        return value.unscaledValue().bitLength() - value.scale() < 32;
+    }
+
+    @ExportMessage
+    @TruffleBoundary
+    boolean fitsInLong() {
+        return value.unscaledValue().bitLength() - value.scale() < 64;
+    }
+
+    @ExportMessage
+    @TruffleBoundary
+    boolean fitsInFloat() {
+        return fitsInInt(); // fixme check safe float range
+    }
+
+    @ExportMessage
+    @TruffleBoundary
+    boolean fitsInDouble() {
+        return fitsInLong(); // fixme check safe double range
+    }
+
+    @ExportMessage
+    @TruffleBoundary
+    double asDouble() throws UnsupportedMessageException {
+        if (fitsInDouble()) {
+            return value.doubleValue();
+        } else {
+            throw UnsupportedMessageException.create();
         }
     }
 
-    // Math
+    @ExportMessage
+    @TruffleBoundary
+    long asLong() throws UnsupportedMessageException {
+        if (fitsInLong()) {
+            return value.longValue();
+        } else {
+            throw UnsupportedMessageException.create();
+        }
+    }
 
-    @Resolve(message = "IS_BOXED")
-    abstract static class IsBoxedBigNode extends Node {
-        @SuppressWarnings("unused")
-        Object access(BcBigNumber obj) {
-            return true;
+    @ExportMessage
+    @TruffleBoundary
+    byte asByte() throws UnsupportedMessageException {
+        if (fitsInByte()) {
+            return value.byteValue();
+        } else {
+            throw UnsupportedMessageException.create();
+        }
+    }
+
+    @ExportMessage
+    @TruffleBoundary
+    int asInt() throws UnsupportedMessageException {
+        if (fitsInInt()) {
+            return value.intValue();
+        } else {
+            throw UnsupportedMessageException.create();
+        }
+    }
+
+    @ExportMessage
+    @TruffleBoundary
+    float asFloat() throws UnsupportedMessageException {
+        if (fitsInFloat()) {
+            return value.floatValue();
+        } else {
+            throw UnsupportedMessageException.create();
+        }
+    }
+
+    @ExportMessage
+    @TruffleBoundary
+    short asShort() throws UnsupportedMessageException {
+        if (fitsInShort()) {
+            return value.shortValue();
+        } else {
+            throw UnsupportedMessageException.create();
         }
     }
 }
