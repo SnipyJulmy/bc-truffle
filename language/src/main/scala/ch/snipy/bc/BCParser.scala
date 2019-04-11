@@ -144,7 +144,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     "define" ~> "void".? ~ bcIdentifier ~
       (lp ~> parameters.? <~ rp) ~
       (lb ~> bcAutoList.? ~ rep(bcStatement) <~ rb) ^^ {
-      case isVoid ~ id ~ params ~ (autoList ~ statements) =>
+      case isVoid ~ id ~ params ~ (autoList ~ statements) => // fixme void function
         val frameDescriptor = new FrameDescriptor()
         val vars : List[String] = params.getOrElse(Nil) ++ autoList.getOrElse(Nil)
         for (elem <- vars) {
