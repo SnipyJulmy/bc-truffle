@@ -144,16 +144,25 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     "define" ~> "void".? ~ bcIdentifier ~
       (lp ~> parameters.? <~ rp) ~
       (lb ~> bcAutoList.? ~ rep(bcStatement) <~ rb) ^^ {
-      case isVoid ~ id ~ params ~ (autoList ~ statements) => // fixme void function
+      case isVoid ~ id ~ params ~ (autoList ~ body) => // fixme void function
         val frameDescriptor = new FrameDescriptor()
-        val vars : List[String] = params.getOrElse(Nil) ++ autoList.getOrElse(Nil)
+        val vars: List[String] = params.getOrElse(Nil) ++ autoList.getOrElse(Nil)
         for (elem <- vars) {
           frameDescriptor.addFrameSlot(
             elem, null, FrameSlotKind.Illegal
           )
         }
-        val body: BcFunctionBodyNode = new BcFunctionBodyNode(new BcBlockNode(statements.toArray))
-        val rootNode = new BcRootNode(bcLanguage, frameDescriptor, body, id)
+
+        // in a function, the arguments are read by using the BcReadArgumentNode
+        // so for each arguments, we create an BcAssignmentNode
+        val statements: List[BcStatementNode] =
+        params.getOrElse(List()).zipWithIndex.map { case (param, idx) =>
+          val readArg: BcReadArgumentNode = new BcReadArgumentNode(idx)
+          mkAssignmentNode(param, readArg, Some(new BcDoubleLiteralNode(BcBigNumber.valueOf(idx))))
+        } ++ body
+
+        val bodyNode: BcFunctionBodyNode = new BcFunctionBodyNode(new BcBlockNode(statements.toArray))
+        val rootNode = new BcRootNode(bcLanguage, frameDescriptor, bodyNode, id)
         functions += (id -> Truffle.getRuntime.createCallTarget(rootNode))
         null
     }
