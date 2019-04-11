@@ -1,5 +1,6 @@
 package ch.snipy.bc.node;
 
+import ch.snipy.bc.node.controlflow.BcFunctionBodyNode;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -25,8 +26,10 @@ public class BcRootNode extends RootNode {
 
     @Override
     public Object execute(VirtualFrame frame) {
+        if (bodyNode instanceof BcFunctionBodyNode)
+            return ((BcFunctionBodyNode) bodyNode).executeGeneric(frame);
         bodyNode.executeVoid(frame);
-        return true; // fixme what to return when we just have statement ???
+        return "";
     }
 
 }
