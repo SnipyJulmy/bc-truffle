@@ -8,18 +8,19 @@ import ch.snipy.bc.node.local._
 import ch.snipy.bc.node.statement._
 import ch.snipy.bc.node.{BcExpressionNode, BcRootNode, BcStatementNode}
 import ch.snipy.bc.runtime.BcBigNumber
-import com.oracle.truffle.api.RootCallTarget
 import com.oracle.truffle.api.frame.{FrameDescriptor, FrameSlot, FrameSlotKind}
 import com.oracle.truffle.api.source.Source
+import com.oracle.truffle.api.{RootCallTarget, Truffle}
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.matching.Regex
 import scala.util.parsing.combinator.{PackratParsers, RegexParsers}
 import scala.util.parsing.input.CharSequenceReader
 
 object BCParser {
-  def parseExpr(language: BcLanguage, source: Source): BcRootNode = {
-    val parser = new BCParser(language)
+  def parseExpr(bcLanguage: BcLanguage, source: Source): BcRootNode = {
+    val parser = new BCParser(bcLanguage)
     import parser._
     assert(parser.skipWhitespace)
 
@@ -46,6 +47,8 @@ object BCParser {
         if (!dropWs(next).atEnd) {
           throw BcParserException(s"can't parse the whole string, input : ${source.getCharacters.toString}, rest : ${next.rest.source.toString}")
         }
+        // register all functions
+        bcLanguage.getContextReference.get().getFunctionRegistry.register(parser.functions.asJava)
         root
     }
   }
@@ -74,7 +77,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
       bcLanguage,
       frameDescriptor,
       new BcBlockNode(
-        statements.toArray
+        statements.filterNot(_ == null).toArray
       ),
       "main"
     )
@@ -86,7 +89,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
 
   lazy val bcStatementCase: PackratParser[BcStatementNode] = {
     // just expression as statement for the moment
-    bcIf | bcWhile | bcFor | bcBlock |
+    bcIf | bcWhile | bcFor | bcBlock | bcFunctionDefinition |
       bcBreak | bcContinue | bcReturn | bcHalt |
       bcExpr ^^ {
         case expr@(node: BcInvokeNode) if node.getIdentifier == "print" => expr
@@ -95,11 +98,6 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
         case expr: BcLocalVariableWriteNode => expr
         case expr => mkCall("print", List(expr))
       }
-    /*
-    bcIf | bcWhile | bcFor | bcBreak | bcContinue | bcReturn |
-      // bcFunctionDefinition | bcVoidFunctionDefinition | fixme
-      bcBlock | bcAutoDefinition | bcVarDefinition | bcArrayDefinition
-    */
   }
 
   lazy val bcIf: PackratParser[BcIfNode] = {
@@ -141,18 +139,31 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     new BcBlockNode(statements.toArray)
   }
 
-  lazy val bcFunctionDefinition: PackratParser[Unit] = {
-    "define" ~> bcIdentifier ~ (lp ~> parameters <~ rb ~ nl) ~ bcAutoList ~ rep(bcStatement) <~ lb ^^ {
-      case id ~ params ~ autolist ~ statements =>
+  lazy val bcFunctionDefinition: PackratParser[BcStatementNode] = {
+
+    "define" ~> "void".? ~ bcIdentifier ~
+      (lp ~> parameters.? <~ rp) ~
+      (lb ~> bcAutoList.? ~ rep(bcStatement) <~ rb) ^^ {
+      case isVoid ~ id ~ params ~ (autoList ~ statements) =>
         val frameDescriptor = new FrameDescriptor()
-        val body: BcFunctionBodyNode = ???
-        val rootNode = new BcRootNode(bcLanguage, frameDescriptor, body, id);
+        val vars : List[String] = params.getOrElse(Nil) ++ autoList.getOrElse(Nil)
+        for (elem <- vars) {
+          frameDescriptor.addFrameSlot(
+            elem, null, FrameSlotKind.Illegal
+          )
+        }
+        val body: BcFunctionBodyNode = new BcFunctionBodyNode(new BcBlockNode(statements.toArray))
+        val rootNode = new BcRootNode(bcLanguage, frameDescriptor, body, id)
+        functions += (id -> Truffle.getRuntime.createCallTarget(rootNode))
+        null
     }
   }
 
-  lazy val parameters: PackratParser[List[String]] = ???
-  lazy val bcAutoList: PackratParser[List[String]] = ???
-  lazy val bcVoidFunctionDefinition: PackratParser[Unit] = ???
+  lazy val parameters: PackratParser[List[String]] =
+    bcIdentifier ~ rep("," ~> bcIdentifier) ^^ { case x ~ xs => x :: xs }
+
+  lazy val bcAutoList: PackratParser[List[String]] =
+    "auto" ~> parameters
 
   lazy val bcAutoDefinition: PackratParser[List[String]] =
     "auto" ~> bcIdentifier ~ rep("," ~> bcIdentifier) <~ ";".? ^^ { case x ~ xs => x :: xs }
