@@ -25,7 +25,6 @@ public final class BcFunctionRegistry {
 
     public BcFunction register(String name, RootCallTarget callTarget) {
         BcFunction function = lookup(name, true);
-        assert (function != null);
         function.setCallTarget(callTarget);
         return function;
     }

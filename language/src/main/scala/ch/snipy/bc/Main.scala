@@ -9,6 +9,10 @@ object Main extends App {
          return x
        }
        id(1)
+       define id(x) {
+         return x * 2
+       }
+       id(1)
     """.stripMargin
 
   val source: Source = Source.newBuilder("bc", program, "program")

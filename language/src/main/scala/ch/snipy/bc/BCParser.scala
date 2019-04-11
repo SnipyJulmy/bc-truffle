@@ -47,8 +47,6 @@ object BCParser {
         if (!dropWs(next).atEnd) {
           throw BcParserException(s"can't parse the whole string, input : ${source.getCharacters.toString}, rest : ${next.rest.source.toString}")
         }
-        // register all functions
-        bcLanguage.getContextReference.get().getFunctionRegistry.register(parser.functions.asJava)
         root
     }
   }
@@ -60,7 +58,6 @@ object BCParser {
 
 class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers {
 
-  private var functions: mutable.Map[String, RootCallTarget] = mutable.Map()
   private val lexicalScope: LexicalScope = new LexicalScope(None)
   private val frameDescriptor: FrameDescriptor = new FrameDescriptor()
 
@@ -163,7 +160,9 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
 
         val bodyNode: BcFunctionBodyNode = new BcFunctionBodyNode(new BcBlockNode(statements.toArray))
         val rootNode = new BcRootNode(bcLanguage, frameDescriptor, bodyNode, id)
-        functions += (id -> Truffle.getRuntime.createCallTarget(rootNode))
+        bcLanguage.getContextReference.get().getFunctionRegistry.register(
+          id,
+          Truffle.getRuntime.createCallTarget(rootNode))
         null
     }
   }
