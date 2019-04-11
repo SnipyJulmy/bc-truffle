@@ -8,6 +8,7 @@ import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.nodes.Node;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @MessageResolution(receiverType = BcBigNumber.class)
 public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber> {
@@ -31,6 +32,11 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
         this.value = new BigDecimal(value);
     }
 
+    public BcBigNumber(int value) {
+        this.value = new BigDecimal(value)
+                .setScale(0, RoundingMode.UNNECESSARY);
+    }
+
     public static boolean isInstance(TruffleObject obj) {
         return obj instanceof BcBigNumber;
     }
@@ -40,6 +46,10 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
     }
 
     public static BcBigNumber valueOf(BigDecimal value) {
+        return new BcBigNumber(value);
+    }
+
+    public static BcBigNumber valueOf(int value) {
         return new BcBigNumber(value);
     }
 
