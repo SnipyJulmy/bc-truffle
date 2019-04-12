@@ -287,7 +287,6 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
 
   /* Utils regex and string */
   lazy val integer: PackratParser[Int] = "[0-9]+".r ^^ { str => str.toInt }
-  lazy val EOS = sc | nl
   lazy val nl = "\n"
   lazy val sc = ";"
 
