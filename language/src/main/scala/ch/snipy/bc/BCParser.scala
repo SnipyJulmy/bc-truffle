@@ -59,6 +59,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
 
   private val lexicalScope: LexicalScope = new LexicalScope(None)
   private val frameDescriptor: FrameDescriptor = new FrameDescriptor()
+  private val functions: mutable.Map[String, BcFunctionDefinitionNode] = mutable.Map[String, BcFunctionDefinitionNode]()
 
   // Note : in bc, "\n" represent the end of a statement, like ";"
   override protected val whiteSpace: Regex = "[ \t\f\r\n]+".r
@@ -88,7 +89,8 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     bcIf | bcWhile | bcFor | bcBlock | bcFunctionDefinition |
       bcBreak | bcContinue | bcReturn | bcHalt |
       bcExpr ^^ {
-        case expr@(node: BcInvokeNode) if node.getIdentifier == "print" => expr
+        case expr: BcInvokeNode if expr.getIdentifier == "print" => expr
+        case expr: BcInvokeNode if functions(expr.getIdentifier).isVoid => expr
         case expr: BcPreIncrementNode => expr
         case expr: BcPostIncrementNode => expr
         case expr: BcLocalVariableWriteNode => expr
@@ -161,11 +163,14 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
         val bodyNode: BcFunctionBodyNode = new BcFunctionBodyNode(new BcBlockNode(statements.toArray))
         val rootNode = new BcRootNode(bcLanguage, frameDescriptor, bodyNode, id)
 
-        new BcFunctionDefinitionNode(
+        val node = new BcFunctionDefinitionNode(
           id,
           Truffle.getRuntime.createCallTarget(rootNode),
-          bcLanguage.getContextReference.get()
+          bcLanguage.getContextReference.get(),
+          isVoid.isDefined
         )
+        functions += (id -> node)
+        node
     }
   }
 
