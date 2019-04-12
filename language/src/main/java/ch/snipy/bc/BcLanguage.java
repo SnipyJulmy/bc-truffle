@@ -18,6 +18,10 @@ import java.util.Collections;
 )
 public class BcLanguage extends TruffleLanguage<BCContext> {
 
+    public static BCContext getCurrentContext() {
+        return getCurrentContext(BcLanguage.class);
+    }
+
     @Override
     protected BCContext createContext(Env env) {
         return new BCContext(this, env, Collections.synchronizedList(new ArrayList<>()));
