@@ -8,11 +8,10 @@ import ch.snipy.bc.node.local._
 import ch.snipy.bc.node.statement._
 import ch.snipy.bc.node.{BcExpressionNode, BcRootNode, BcStatementNode}
 import ch.snipy.bc.runtime.BcBigNumber
+import com.oracle.truffle.api.Truffle
 import com.oracle.truffle.api.frame.{FrameDescriptor, FrameSlot, FrameSlotKind}
 import com.oracle.truffle.api.source.Source
-import com.oracle.truffle.api.{RootCallTarget, Truffle}
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.matching.Regex
 import scala.util.parsing.combinator.{PackratParsers, RegexParsers}
@@ -74,7 +73,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
       bcLanguage,
       frameDescriptor,
       new BcBlockNode(
-        statements.filterNot(_ == null).toArray
+        statements.toArray
       ),
       "main"
     )
@@ -136,12 +135,13 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     new BcBlockNode(statements.toArray)
   }
 
-  lazy val bcFunctionDefinition: PackratParser[BcStatementNode] = {
+  lazy val bcFunctionDefinition: PackratParser[BcFunctionDefinitionNode] = {
 
     "define" ~> "void".? ~ bcIdentifier ~
       (lp ~> parameters.? <~ rp) ~
       (lb ~> bcAutoList.? ~ rep(bcStatement) <~ rb) ^^ {
       case isVoid ~ id ~ params ~ (autoList ~ body) => // fixme void function
+
         val frameDescriptor = new FrameDescriptor()
         val vars: List[String] = params.getOrElse(Nil) ++ autoList.getOrElse(Nil)
         for (elem <- vars) {
@@ -160,10 +160,12 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
 
         val bodyNode: BcFunctionBodyNode = new BcFunctionBodyNode(new BcBlockNode(statements.toArray))
         val rootNode = new BcRootNode(bcLanguage, frameDescriptor, bodyNode, id)
-        bcLanguage.getContextReference.get().getFunctionRegistry.register(
+
+        new BcFunctionDefinitionNode(
           id,
-          Truffle.getRuntime.createCallTarget(rootNode))
-        null
+          Truffle.getRuntime.createCallTarget(rootNode),
+          bcLanguage.getContextReference.get()
+        )
     }
   }
 
