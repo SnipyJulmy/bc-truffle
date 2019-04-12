@@ -57,6 +57,10 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
         return value;
     }
 
+    public int intValue() {
+        return value.intValue();
+    }
+
     @TruffleBoundary
     public int compareTo(BcBigNumber o) {
         return value.compareTo(o.getValue());
