@@ -22,11 +22,15 @@ import java.io.PrintWriter;
 import java.util.List;
 
 public final class BCContext {
+    private static final int DEFAULT_SCALE = 0;
+
     private final BufferedReader input;
     private final PrintWriter output;
     private final Env env;
     private final TruffleLanguage language;
     private final BcFunctionRegistry functionRegistry;
+
+    private int scale = DEFAULT_SCALE;
 
     public BCContext(BcLanguage language,
                      Env env,
@@ -94,5 +98,13 @@ public final class BCContext {
 
     public BcFunctionRegistry getFunctionRegistry() {
         return functionRegistry;
+    }
+
+    public int getScale() {
+        return scale;
+    }
+
+    public void setScale(int scale) {
+        this.scale = scale;
     }
 }
