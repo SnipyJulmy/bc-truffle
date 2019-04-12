@@ -57,6 +57,7 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
         return value;
     }
 
+    // fixme check if it fits ? -> generate warning
     public int intValue() {
         return value.intValue();
     }
