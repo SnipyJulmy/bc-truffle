@@ -25,8 +25,9 @@ public final class BcIfNode extends BcStatementNode {
         try {
             if (conditionProfile.profile(conditionNode.executeBigNumber(frame).equals(BcBigNumber.TRUE)))
                 trueNode.executeVoid(frame);
-            else
-                falseNode.executeVoid(frame);
+            else {
+                if (falseNode != null) falseNode.executeVoid(frame);
+            }
         } catch (UnexpectedResultException e) {
             throw BcException.typeError(this, e.getResult());
         }
