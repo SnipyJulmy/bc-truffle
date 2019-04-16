@@ -3,6 +3,9 @@ package ch.snipy.bc.node.call;
 import ch.snipy.bc.node.BcExpressionNode;
 import ch.snipy.bc.node.expression.BcFunctionLiteralNode;
 import com.oracle.truffle.api.CompilerAsserts;
+import com.oracle.truffle.api.CompilerDirectives;
+import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
+import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 
@@ -23,6 +26,11 @@ public final class BcInvokeNode extends BcExpressionNode {
     @Override
     @ExplodeLoop
     public Object executeGeneric(VirtualFrame frame) {
+        return executeBoundary(frame.materialize());
+    }
+
+    @TruffleBoundary
+    private Object executeBoundary(MaterializedFrame frame) {
         Object function = functionNode.executeGeneric(frame);
         CompilerAsserts.compilationConstant(argumentNodes.length);
         return dispatchNode.executeDispatch(
