@@ -2,6 +2,7 @@ package ch.snipy.bc.runtime;
 
 import ch.snipy.bc.BcLanguage;
 import ch.snipy.bc.builtins.BcBuiltinNode;
+import ch.snipy.bc.builtins.BcNanoBuiltinFactory;
 import ch.snipy.bc.builtins.BcPrintlnBuiltinFactory;
 import ch.snipy.bc.node.BcExpressionNode;
 import ch.snipy.bc.node.BcRootNode;
@@ -19,6 +20,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.math.RoundingMode;
 import java.util.List;
 
 public final class BCContext {
@@ -31,6 +33,7 @@ public final class BCContext {
     private final BcFunctionRegistry functionRegistry;
 
     private int scale = DEFAULT_SCALE;
+    private RoundingMode roundingMode = RoundingMode.FLOOR;
 
     public BCContext(BcLanguage language,
                      Env env,
@@ -74,6 +77,7 @@ public final class BCContext {
 
     private void installBuiltins() {
         installBuiltin(BcPrintlnBuiltinFactory.getInstance());
+        installBuiltin(BcNanoBuiltinFactory.getInstance());
     }
 
     private void installBuiltin(NodeFactory<? extends BcBuiltinNode> factory) {
@@ -106,5 +110,9 @@ public final class BCContext {
 
     public void setScale(int scale) {
         this.scale = scale;
+    }
+
+    public RoundingMode getRoundingMode() {
+        return this.roundingMode;
     }
 }
