@@ -87,9 +87,10 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
   lazy val bcStatementCase: PackratParser[BcStatementNode] = {
     // just expression as statement for the moment
     bcIf | bcWhile | bcFor | bcBlock | bcFunctionDefinition |
-      bcBreak | bcContinue | bcReturn | bcHalt |
+      bcBreak | bcContinue | bcReturn | bcHalt | bcPrint |
       bcExpr ^^ {
         case expr: BcInvokeNode if expr.getIdentifier == "print" => expr
+        case expr: BcInvokeNode if !functions.isDefinedAt(expr.getIdentifier) => expr
         case expr: BcInvokeNode if functions(expr.getIdentifier).isVoid => expr
         case expr: BcPreIncrementNode => expr
         case expr: BcPostIncrementNode => expr
@@ -173,6 +174,14 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
         node
     }
   }
+
+  lazy val bcPrint: PackratParser[BcExpressionNode] =
+    "print" ~> printArg ~ rep("," ~> printArg) ^^ { case x ~ xs =>
+      mkCall("print", x :: xs)
+    }
+
+  lazy val printArg: PackratParser[BcExpressionNode] =
+    bcExpr | stringLiteral
 
   lazy val parameters: PackratParser[List[String]] =
     bcIdentifier ~ rep("," ~> bcIdentifier) ^^ { case x ~ xs => x :: xs }
@@ -268,7 +277,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     }
 
   lazy val bcFunctionCall: PackratParser[BcExpressionNode] =
-    bcIdentifier ~ (lp ~> bcArgs <~ rp) ^^ { case id ~ args => mkCall(id, args) }
+    bcIdentifier ~ (lp ~> bcArgs.? <~ rp) ^^ { case id ~ args => mkCall(id, args.getOrElse(Nil)) }
 
   lazy val bcArgs: PackratParser[List[BcExpressionNode]] =
     bcArg ~ rep("," ~> bcArg) ^^ { case x ~ xs => x :: xs }
