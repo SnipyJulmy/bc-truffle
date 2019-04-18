@@ -20,6 +20,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.List;
 
@@ -32,8 +33,10 @@ public final class BCContext {
     private final TruffleLanguage language;
     private final BcFunctionRegistry functionRegistry;
 
+    // for arithmetic operation
     private int scale = DEFAULT_SCALE;
     private RoundingMode roundingMode = RoundingMode.FLOOR;
+    private MathContext mathContext = new MathContext(DEFAULT_SCALE);
 
     public BCContext(BcLanguage language,
                      Env env,
@@ -108,8 +111,13 @@ public final class BCContext {
         return scale;
     }
 
+    public MathContext getMathContext() {
+        return mathContext;
+    }
+
     public void setScale(int scale) {
         this.scale = scale;
+        this.mathContext = new MathContext(scale);
     }
 
     public RoundingMode getRoundingMode() {
