@@ -1,5 +1,6 @@
 package ch.snipy.bc.runtime;
 
+import ch.obermuhlner.math.big.BigDecimalMath;
 import ch.snipy.bc.BcLanguage;
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.interop.InteropLibrary;
@@ -9,24 +10,34 @@ import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 
 @ExportLibrary(InteropLibrary.class)
 public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber> {
 
+    // Some usefull constant
     public static final BcBigNumber ZERO = new BcBigNumber(BigDecimal.ZERO);
     public static final BcBigNumber ONE = new BcBigNumber(BigDecimal.ONE);
     public static final BcBigNumber FALSE = ZERO;
     public static final BcBigNumber TRUE = ONE;
 
+    public static final BigDecimal PI = new BigDecimal(Math.PI);
+    public static final BigDecimal E = new BigDecimal(Math.E);
+
+
     private final BigDecimal value;
 
-    private int getScale() {
+    private static int getScale() {
         return BcLanguage.getCurrentContext().getScale();
     }
 
-    private RoundingMode getRoundingMode() {
+    private static RoundingMode getRoundingMode() {
         return BcLanguage.getCurrentContext().getRoundingMode();
+    }
+
+    private static MathContext getMathContext() {
+        return BcLanguage.getCurrentContext().getMathContext();
     }
 
     @TruffleBoundary
@@ -72,6 +83,11 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
 
     @TruffleBoundary
     public static BcBigNumber valueOf(int value) {
+        return new BcBigNumber(value);
+    }
+
+    @TruffleBoundary
+    public static BcBigNumber valueOf(double value) {
         return new BcBigNumber(value);
     }
 
@@ -248,4 +264,31 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
             throw UnsupportedMessageException.create();
         }
     }
+
+    @TruffleBoundary
+    public BcBigNumber sin() {
+        return valueOf(BigDecimalMath.sin(this.value, getMathContext()));
+    }
+
+    @TruffleBoundary
+    public BcBigNumber cos() {
+        return valueOf(BigDecimalMath.cos(this.value, getMathContext()));
+    }
+
+    @TruffleBoundary
+    public BcBigNumber atan() {
+        return valueOf(BigDecimalMath.atan(this.value, getMathContext()));
+    }
+
+    @TruffleBoundary
+    public BcBigNumber ln() {
+        return valueOf(BigDecimalMath.log(this.value, getMathContext()));
+    }
+
+    @TruffleBoundary
+    public BcBigNumber exp() {
+        return valueOf(BigDecimalMath.exp(this.value, getMathContext()));
+    }
+
+    // TODO bessel function of order n
 }
