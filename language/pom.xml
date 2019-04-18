@@ -12,6 +12,13 @@
         <graalvm.version>1.0.0-rc15</graalvm.version>
     </properties>
     <dependencies>
+        <!-- Big Math -->
+        <dependency>
+            <groupId>ch.obermuhlner</groupId>
+            <artifactId>big-math</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+
         <!-- Scala -->
         <dependency>
             <groupId>org.scala-lang</groupId>
