@@ -3,13 +3,10 @@ package ch.snipy.bc.node.call;
 import ch.snipy.bc.node.BcExpressionNode;
 import ch.snipy.bc.node.expression.BcFunctionLiteralNode;
 import com.oracle.truffle.api.CompilerAsserts;
-import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
-
-import java.util.Arrays;
 
 public final class BcInvokeNode extends BcExpressionNode {
 
@@ -33,9 +30,14 @@ public final class BcInvokeNode extends BcExpressionNode {
     private Object executeBoundary(MaterializedFrame frame) {
         Object function = functionNode.executeGeneric(frame);
         CompilerAsserts.compilationConstant(argumentNodes.length);
+
+        Object[] args = new Object[argumentNodes.length];
+        for (int i = 0; i < argumentNodes.length; i++) {
+            args[i] = argumentNodes[i].executeGeneric(frame);
+        }
         return dispatchNode.executeDispatch(
                 function,
-                Arrays.stream(argumentNodes).map(n -> n.executeGeneric(frame)).toArray()
+                args
         );
     }
 
