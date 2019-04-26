@@ -14,7 +14,7 @@ import java.util.Collections;
         id = "bc",
         name = "bc",
         version = "0.1",
-        mimeType = "application/x-bc"
+        defaultMimeType = "application/x-bc"
 )
 public class BcLanguage extends TruffleLanguage<BCContext> {
 
