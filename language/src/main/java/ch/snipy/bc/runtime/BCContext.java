@@ -28,7 +28,7 @@ import java.math.RoundingMode;
 import java.util.List;
 
 public final class BCContext {
-    private static final int DEFAULT_SCALE = 0;
+    private static final int DEFAULT_SCALE = 20;
 
     private final BufferedReader input;
     private final PrintWriter output;
@@ -39,7 +39,7 @@ public final class BCContext {
     // for arithmetic operation
     private int scale = DEFAULT_SCALE;
     private RoundingMode roundingMode = RoundingMode.FLOOR;
-    private MathContext mathContext = new MathContext(DEFAULT_SCALE);
+    private MathContext mathContext = new MathContext(DEFAULT_SCALE == 0 ? 1 : DEFAULT_SCALE);
 
     public BCContext(BcLanguage language,
                      Env env,
@@ -123,7 +123,7 @@ public final class BCContext {
 
     public void setScale(int scale) {
         this.scale = scale;
-        this.mathContext = new MathContext(scale);
+        this.mathContext = new MathContext(scale == 0 ? 1 : scale);
     }
 
     public RoundingMode getRoundingMode() {
