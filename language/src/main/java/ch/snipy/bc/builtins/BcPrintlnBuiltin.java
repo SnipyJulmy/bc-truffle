@@ -6,10 +6,15 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 import java.io.PrintWriter;
-import java.math.BigDecimal;
+import java.util.Arrays;
 
 @NodeInfo(shortName = "print")
 public abstract class BcPrintlnBuiltin extends BcBuiltinNode {
+
+    @TruffleBoundary
+    private static void doPrint(PrintWriter out, Object[] value) {
+        out.println(Arrays.toString(value));
+    }
 
     @TruffleBoundary
     private static void doPrint(PrintWriter out, Object value) {
@@ -27,13 +32,19 @@ public abstract class BcPrintlnBuiltin extends BcBuiltinNode {
     }
 
     @Specialization
-    public String print(String value) {
+    public Object[] print(Object[] args) {
+        doPrint(getContext().getOutput(), args);
+        return args;
+    }
+
+    @Specialization
+    public BcBigNumber print(BcBigNumber value) {
         doPrint(getContext().getOutput(), value);
         return value;
     }
 
     @Specialization
-    public BcBigNumber print(BcBigNumber value) {
+    public String print(String value) {
         doPrint(getContext().getOutput(), value);
         return value;
     }
