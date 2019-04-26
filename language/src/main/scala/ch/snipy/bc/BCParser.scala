@@ -90,7 +90,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
       bcBreak | bcContinue | bcReturn | bcHalt | bcPrint |
       bcExpr ^^ {
         case expr: BcInvokeNode if expr.getIdentifier == "print" => expr
-        case expr: BcInvokeNode if !functions.isDefinedAt(expr.getIdentifier) => expr
+        case expr: BcInvokeNode if !functions.isDefinedAt(expr.getIdentifier) => mkCall("print", List(expr))
         case expr: BcInvokeNode if functions(expr.getIdentifier).isVoid => expr
         case expr: BcPreIncrementNode => expr
         case expr: BcPostIncrementNode => expr
