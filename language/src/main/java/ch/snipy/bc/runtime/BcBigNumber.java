@@ -49,22 +49,22 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
 
     @TruffleBoundary
     public BcBigNumber(BigDecimal value) {
-        this.value = scales(value);
+        this.value = value;
     }
 
     @TruffleBoundary
     public BcBigNumber(String value) {
-        this.value = scales(new BigDecimal(value));
+        this.value = new BigDecimal(value);
     }
 
     @TruffleBoundary
     public BcBigNumber(double value) {
-        this.value = scales(new BigDecimal(value));
+        this.value = new BigDecimal(value);
     }
 
     @TruffleBoundary
     public BcBigNumber(int value) {
-        this.value = scales(new BigDecimal(value));
+        this.value = new BigDecimal(value);
     }
 
     public static boolean isInstance(TruffleObject obj) {
