@@ -15,8 +15,8 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 @GenerateNodeFactory
 public abstract class BcBuiltinNode extends BcExpressionNode {
 
-    public final BCContext getContext() {
-        return getRootNode().getLanguage(BcLanguage.class).getContextReference().get();
+    final BCContext getContext() {
+        return BcLanguage.getCurrentContext();
     }
 
     @Override
@@ -36,6 +36,16 @@ public abstract class BcBuiltinNode extends BcExpressionNode {
     @Override
     public BcBigNumber executeBigNumber(VirtualFrame frame) throws UnexpectedResultException {
         return super.executeBigNumber(frame);
+    }
+
+    @Override
+    public String executeString(VirtualFrame frame) throws UnexpectedResultException {
+        return super.executeString(frame);
+    }
+
+    @Override
+    public Object[] executeObjectArray(VirtualFrame frame) throws UnexpectedResultException {
+        return super.executeObjectArray(frame);
     }
 
     protected abstract Object execute(VirtualFrame frame);
