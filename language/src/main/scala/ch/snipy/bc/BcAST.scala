@@ -1,10 +1,15 @@
 package ch.snipy.bc
 
+import scala.language.postfixOps
+
 object BcAST {
 
   type Identifier = String
 
-  case class Program(statements: List[Statement])
+  case class Program(statements: List[Statement]) {
+    override def toString: String =
+      statements.map(_.toString).mkString("\n")
+  }
 
   sealed trait Statement
   case class Block(statements: List[Statement]) extends Statement
@@ -50,8 +55,4 @@ object BcAST {
   case class VarAccess(identifier: Identifier, index: Option[Expr]) extends Expr
   case class ParExpr(expr: Expr) extends Expr
   case class FunctionCall(identifier: Identifier, args: List[Expr]) extends Expr
-
-  case object One extends NumberLiteral(java.math.BigDecimal.ONE)
-  case object NegOne extends NumberLiteral(java.math.BigDecimal.ONE.negate())
-  case object Zero extends NumberLiteral(java.math.BigDecimal.ZERO)
 }
