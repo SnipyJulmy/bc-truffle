@@ -11,23 +11,9 @@ import scala.util.parsing.input.CharSequenceReader
 object BCParser {
 
   def parse(bcLanguage: BcLanguage, source: Source): BcRootNode = {
+
     val parser = new BCParser
     import parser._
-
-    parser.parse(
-      program,
-      new PackratReader[Char](new CharSequenceReader(
-        sanitize(source.getCharacters.toString)
-      ))
-    ) match {
-      case e: NoSuccess =>
-        throw new IllegalArgumentException(s"can't parse ${source.getCharacters.toString}... error : ${e.msg}")
-      case Success(prog: Program, next) =>
-        if (!dropWs(next).atEnd) {
-          throw BcParserException(s"can't parse the whole string, input : ${source.getCharacters.toString}, rest : ${next.rest.source.toString}")
-        }
-        BcAstBuilder.mkRootNode(bcLanguage, prog)
-    }
 
     def sanitize(input: String): String = input
 
@@ -41,6 +27,23 @@ object BCParser {
           input
       }
     }
+
+    val node = parser.parse(
+      program,
+      new PackratReader[Char](new CharSequenceReader(
+        sanitize(source.getCharacters.toString)
+      ))
+    ) match {
+      case e: NoSuccess =>
+        throw new IllegalArgumentException(s"can't parse ${source.getCharacters.toString}... error : ${e.msg}")
+      case Success(prog: Program, next) =>
+        if (!dropWs(next).atEnd) {
+          throw BcParserException(s"can't parse the whole string, input : ${source.getCharacters.toString}, rest : ${next.rest.source.toString}")
+        }
+        println(prog)
+        BcAstBuilder.mkRootNode(bcLanguage, prog)
+    }
+    node
   }
 }
 
@@ -181,10 +184,10 @@ class BCParser extends RegexParsers with PackratParsers {
       bcIncDecExpr
 
   lazy val bcIncDecExpr: PackratParser[Expr] =
-    "++" ~> bcVarAccess ^^ { expr => PreIncrement(expr, One) } |
-      "--" ~> bcVarAccess ^^ { expr => PreIncrement(expr, NegOne) } |
-      bcVarAccess <~ "++" ^^ { expr => PostIncrement(expr, One) } |
-      bcVarAccess <~ "--" ^^ { expr => PostIncrement(expr, NegOne) } |
+    "++" ~> bcVarAccess ^^ { expr => PreIncrement(expr, 1.0) } |
+      "--" ~> bcVarAccess ^^ { expr => PreIncrement(expr, -1.0) } |
+      bcVarAccess <~ "++" ^^ { expr => PostIncrement(expr, 1.0) } |
+      bcVarAccess <~ "--" ^^ { expr => PostIncrement(expr, -1.0) } |
       bcNegExpr
 
   lazy val bcNegExpr: PackratParser[Expr] =
