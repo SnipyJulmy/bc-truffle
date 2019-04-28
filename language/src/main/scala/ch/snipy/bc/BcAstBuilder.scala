@@ -89,9 +89,9 @@ object BcAstBuilder {
         val varDecl: List[BcExpressionNode] =
           params.getOrElse(Nil).zipWithIndex.map { case (param, idx) =>
             val readArg = new BcReadArgumentNode(idx)
-            mkAssignmentNode(param, readArg, None)
+            mkAssignmentNode(param, readArg, None)(newContext)
           }
-        val bodyStatements: List[BcStatementNode] = body.statements map process
+        val bodyStatements: List[BcStatementNode] = body.statements.map(s => process(s)(newContext))
         val statements = (varDecl ++ bodyStatements) toArray
         val rootNode: BcRootNode = new BcRootNode(
           context.bcLanguage,
