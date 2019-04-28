@@ -143,7 +143,7 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     "define" ~> "void".? ~ bcIdentifier ~
       (lp ~> parameters.? <~ rp) ~
       (lb ~> bcAutoList.? ~ rep(bcStatement) <~ rb) ^^ {
-      case isVoid ~ id ~ params ~ (autoList ~ body) => // fixme void function
+      case isVoid ~ id ~ params ~ (autoList ~ body) =>
 
         val frameDescriptor = new FrameDescriptor()
         val vars: List[String] = params.getOrElse(Nil) ++ autoList.getOrElse(Nil)
@@ -322,7 +322,6 @@ class BCParser(bcLanguage: BcLanguage) extends RegexParsers with PackratParsers 
     BcLocalVariableWriteNodeGen.create(value, slot)
   }
 
-  // TODO : read variable from a specified
   private def mkReadVariable(identifier: String,
                              index: Option[BcExpressionNode] = None,
                              frameDescriptor: FrameDescriptor = globalFrameDescriptor): BcExpressionNode = {
