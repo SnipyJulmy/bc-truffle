@@ -29,6 +29,6 @@ public final class BcFunctionBodyNode extends BcExpressionNode {
             return e.result();
         }
         nullTaken.enter();
-        return ZERO;
+        return "";
     }
 }
