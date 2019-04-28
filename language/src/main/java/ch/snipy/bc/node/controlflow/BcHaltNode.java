@@ -8,6 +8,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 public final class BcHaltNode extends BcStatementNode {
     @Override
     public void executeVoid(VirtualFrame frame) {
+        System.exit(0); // fixme : is here the right place to do it ?
         throw BcHaltException.SINGLETON;
     }
 }
