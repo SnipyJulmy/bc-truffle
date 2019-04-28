@@ -34,9 +34,9 @@ object BcAST {
   case class GreaterOrEqual(left: Expr, right: Expr) extends Expr
   case class Equal(left: Expr, right: Expr) extends Expr
   case class NotEqual(left: Expr, right: Expr) extends Expr
-  case class Assignment(identifier: VarAccess, expr: Expr) extends Expr
-  case class PostIncrement(identifier: VarAccess, modifier: NumberLiteral) extends Expr
-  case class PreIncrement(identifier: VarAccess, modifier: NumberLiteral) extends Expr
+  case class Assignment(varAccess: VarAccess, expr: Expr) extends Expr
+  case class PostIncrement(varAccess: VarAccess, modifier: Double) extends Expr
+  case class PreIncrement(varAccess: VarAccess, modifier: Double) extends Expr
   case class NumberLiteral(value: java.math.BigDecimal) extends Expr
   case class StringLiteral(value: String) extends Expr
   case class Add(left: Expr, right: Expr) extends Expr
