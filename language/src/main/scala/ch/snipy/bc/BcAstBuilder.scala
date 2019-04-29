@@ -107,6 +107,9 @@ object BcAstBuilder {
         )
       case ExprStatement(expr) => expr match {
         case FunctionCall("print", args) => mkPrint(args.map(process))
+        case FunctionCall(identifier, args)
+          if context.bcLanguage.getContextReference.get().getFunctionRegistry.contains(identifier) =>
+          mkCall(identifier, args map process)
         case FunctionCall(identifier, args) if !context.functions.isDefinedAt(identifier) => mkPrint(args.map(process))
         case FunctionCall(identifier, _) if context.functions(identifier).isVoid => process(expr)
         case _: Assignment => process(expr)
@@ -144,7 +147,7 @@ object BcAstBuilder {
     case Mod(left, right) => BcModNodeGen.create(process(left), process(right))
     case Neg(e) => BcNegNodeGen.create(process(e))
     case Not(e) => BcNotNodeGen.create(process(e))
-    case VarAccess(identifier, index) => mkReadVariable(identifier, index map process)
+    case VarAccess(identifier, index) => mkReadVariable(identifier, index = index map process)
     case ParExpr(e) => new BcParExpressionNode(process(e))
     case FunctionCall(identifier, args) => mkCall(identifier, args map process)
   }
@@ -156,7 +159,7 @@ object BcAstBuilder {
                               (implicit context: BcParserContext): BcExpressionNode = {
     val slot: FrameSlot = context.frameDescriptor.findOrAddFrameSlot(
       identifier,
-      index.orNull,
+      if (index.isDefined) index.get.executeBigNumber(null).intValue() else null,
       FrameSlotKind.Illegal
     )
     BcLocalVariableWriteNodeGen.create(value, slot)
@@ -167,7 +170,7 @@ object BcAstBuilder {
                             (implicit context: BcParserContext): BcExpressionNode = {
     val slot: FrameSlot = context.frameDescriptor.findOrAddFrameSlot(
       identifier,
-      index.orNull,
+      if (index.isDefined) index.get.executeBigNumber(null).intValue() else null,
       FrameSlotKind.Illegal
     )
     BcLocalVariableReadNodeGen.create(slot)

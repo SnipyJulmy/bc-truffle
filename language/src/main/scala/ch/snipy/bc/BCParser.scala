@@ -119,13 +119,13 @@ class BCParser extends RegexParsers with PackratParsers {
     bcExpr | stringLiteral
 
   lazy val parameters: PackratParser[List[Identifier]] =
-    bcIdentifier ~ rep("," ~> bcIdentifier) ^^ { case x ~ xs => x :: xs }
+    bcVarDecl ~ rep("," ~> bcVarDecl) ^^ { case x ~ xs => x :: xs }
 
   lazy val bcAutoList: PackratParser[List[Identifier]] =
     "auto" ~> parameters
 
-  lazy val bcAutoDefinition: PackratParser[List[Identifier]] =
-    "auto" ~> bcIdentifier ~ rep("," ~> bcIdentifier) <~ ";".? ^^ { case x ~ xs => x :: xs }
+  lazy val bcVarDecl : PackratParser[Identifier] =
+    bcIdentifier <~ ("[" ~ "]").?
 
   // There are only identifier/array and index on the LHS
   lazy val bcAssignment: PackratParser[Assignment] =
