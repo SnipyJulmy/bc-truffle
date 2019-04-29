@@ -23,6 +23,10 @@ public final class BcFunctionRegistry {
         return result;
     }
 
+    public boolean contains(String name) {
+        return functionsObject.functions.containsKey(name);
+    }
+
     public BcFunction register(String name, RootCallTarget callTarget) {
         BcFunction function = lookup(name, true);
         function.setCallTarget(callTarget);
