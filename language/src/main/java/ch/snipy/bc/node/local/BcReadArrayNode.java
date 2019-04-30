@@ -1,31 +1,35 @@
 package ch.snipy.bc.node.local;
 
 import ch.snipy.bc.node.BcExpressionNode;
-import ch.snipy.bc.runtime.BcUndefinedNameException;
+import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.dsl.NodeChild;
+import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.interop.InteropLibrary;
-import com.oracle.truffle.api.interop.InvalidArrayIndexException;
-import com.oracle.truffle.api.interop.UnsupportedMessageException;
-import com.oracle.truffle.api.library.CachedLibrary;
-import com.oracle.truffle.api.nodes.NodeInfo;
+import com.oracle.truffle.api.frame.FrameSlot;
+import com.oracle.truffle.api.frame.VirtualFrame;
 
-@NodeInfo(shortName = "[]")
-@NodeChild("identifierNode")
-@NodeChild("indexNode")
+import java.util.Map;
+
+@NodeChild(value = "index", type = BcExpressionNode.class)
+@NodeField(name = "slot", type = FrameSlot.class)
 public abstract class BcReadArrayNode extends BcExpressionNode {
 
-    static final int LIBRARY_LIMIT = 3;
+    protected abstract FrameSlot getSlot();
 
-    @Specialization(guards = "arrays.hasArrayElements(identifier)", limit = "LIBRARY_LIMIT")
-    protected Object readArray(Object identifier, Object index,
-                               @CachedLibrary("identifier") InteropLibrary arrays,
-                               @CachedLibrary("index") InteropLibrary numbers) {
-        try {
-            return arrays.readArrayElement(identifier, numbers.asLong(index));
-        } catch (UnsupportedMessageException | InvalidArrayIndexException e) {
-            throw BcUndefinedNameException.undefinedIndex(this, index);
-        }
+    @Specialization
+    public Object readObject(VirtualFrame frame, BcBigNumber index) {
+        Object mapValue = frame.getValue(getSlot());
+        if (mapValue == null) return 0;
+        Map<Object, Object> map = (Map<Object, Object>) mapValue;
+        return map.getOrDefault(index, 0);
     }
 
+    @Specialization
+    public Object readObject(VirtualFrame frame, BcExpressionNode index) {
+        Object mapValue = frame.getValue(getSlot());
+        if (mapValue == null) return 0;
+        Object idx = (BcBigNumber) index.executeGeneric(frame);
+        Map<Object, Object> map = (Map<Object, Object>) mapValue;
+        return map.getOrDefault(idx, 0);
+    }
 }

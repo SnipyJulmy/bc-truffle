@@ -1,33 +1,65 @@
 package ch.snipy.bc.node.local;
 
 import ch.snipy.bc.node.BcExpressionNode;
-import ch.snipy.bc.runtime.BcUndefinedNameException;
+import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.dsl.NodeChild;
+import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.interop.InteropLibrary;
-import com.oracle.truffle.api.interop.InvalidArrayIndexException;
-import com.oracle.truffle.api.interop.UnsupportedMessageException;
-import com.oracle.truffle.api.interop.UnsupportedTypeException;
-import com.oracle.truffle.api.library.CachedLibrary;
-import com.oracle.truffle.api.nodes.NodeInfo;
+import com.oracle.truffle.api.frame.FrameSlot;
+import com.oracle.truffle.api.frame.VirtualFrame;
 
-@NodeInfo(shortName = "[]=")
-@NodeChild("identifierNode")
-@NodeChild("indexNode")
-@NodeChild("valueNode")
+import java.util.HashMap;
+import java.util.Map;
+
+@NodeChild(value = "index", type = BcExpressionNode.class)
+@NodeChild(value = "expr", type = BcExpressionNode.class)
+@NodeField(name = "slot", type = FrameSlot.class)
 public abstract class BcWriteArrayNode extends BcExpressionNode {
 
-    static final int LIBRARY_LIMIT = 3;
+    protected abstract FrameSlot getSlot();
 
-    @Specialization(guards = "arrays.hasArrayElements(identifier)", limit = "LIBRARY_LIMIT")
-    protected Object readArray(Object identifier, Object index, Object value,
-                               @CachedLibrary("identifier") InteropLibrary arrays,
-                               @CachedLibrary("index") InteropLibrary numbers) {
-        try {
-            arrays.writeArrayElement(identifier, numbers.asLong(index), value);
-        } catch (UnsupportedMessageException | UnsupportedTypeException | InvalidArrayIndexException e) {
-            throw BcUndefinedNameException.undefinedIndex(this, index);
+    // TODO : getOrCreateMap
+
+    @Specialization
+    public Object writeObject(VirtualFrame frame, BcBigNumber index, BcBigNumber expr) {
+        Object mapValue = frame.getValue(getSlot());
+        if (mapValue == null) {
+            Map<Object, Object> map = new HashMap<>();
+            frame.setObject(getSlot(), map);
+            mapValue = frame.getValue(getSlot());
+            assert mapValue != null;
         }
-        return value;
+        Map<Object, Object> map = (Map<Object, Object>) mapValue;
+        map.put(index, expr);
+        return expr;
+    }
+
+    @Specialization
+    public Object writeObject(VirtualFrame frame, BcBigNumber index, BcExpressionNode expr) {
+        Object mapValue = frame.getValue(getSlot());
+        if (mapValue == null) {
+            Map<Object, Object> map = new HashMap<>();
+            frame.setObject(getSlot(), map);
+            mapValue = frame.getValue(getSlot());
+            assert mapValue != null;
+        }
+        Map<Object, Object> map = (Map<Object, Object>) mapValue;
+        map.put(index, expr);
+        return expr;
+    }
+
+    @Specialization
+    public Object writeObject(VirtualFrame frame, BcExpressionNode index, BcExpressionNode expr) {
+        Object mapValue = frame.getValue(getSlot());
+        if (mapValue == null) {
+            Map<Object, Object> map = new HashMap<>();
+            frame.setObject(getSlot(), map);
+            mapValue = frame.getValue(getSlot());
+            assert mapValue != null;
+        }
+        Object idx = index.executeGeneric(frame);
+        Map<Object, Object> map = (Map<Object, Object>) mapValue;
+        map.put(idx, expr);
+        return expr;
     }
 }
