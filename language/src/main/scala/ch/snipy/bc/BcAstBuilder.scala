@@ -111,7 +111,7 @@ object BcAstBuilder {
         case FunctionCall(identifier, args)
           if context.bcLanguage.getContextReference.get().getFunctionRegistry.contains(identifier) =>
           mkCall(identifier, args map process)
-        case FunctionCall(identifier, args) if !context.functions.isDefinedAt(identifier) => mkPrint(List(process(expr)))
+        case FunctionCall(identifier, _) if !context.functions.isDefinedAt(identifier) => mkPrint(List(process(expr)))
         case FunctionCall(identifier, _) if context.functions(identifier).isVoid => process(expr)
         case _: Assignment => process(expr)
         case _: PreIncrement => process(expr)
@@ -222,7 +222,8 @@ object BcAstBuilder {
     BcPostIncrementNodeGen.create(slot, modifier)
   }
 
-  private def mkPrint(args: List[BcExpressionNode])(implicit context: BcParserContext): BcExpressionNode = args match {
+  private def mkPrint(args: List[BcExpressionNode])
+                     (implicit context: BcParserContext): BcExpressionNode = args match {
     case Nil => mkCall("print", List())
     case x :: Nil => mkCall("print", List(x))
     case x1 :: x2 :: xs =>
