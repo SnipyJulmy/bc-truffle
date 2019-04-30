@@ -15,6 +15,6 @@ public abstract class BcNanoBuiltin extends BcBuiltinNode {
 
     @TruffleBoundary
     private void getPrintln() {
-        System.out.println(System.nanoTime());
+        getContext().getOutput().println(System.nanoTime());
     }
 }
