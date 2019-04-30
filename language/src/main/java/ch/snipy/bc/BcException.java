@@ -20,7 +20,11 @@ public class BcException extends RuntimeException implements TruffleException {
 
     public static BcException typeError(Node op, Object... values) {
         StringBuilder builder = new StringBuilder();
-        // TODO
+        builder.append("type error : ");
+        builder.append(op.getClass().toString());
+        builder.append(" ");
+        for (Object value : values)
+            builder.append(value).append(" ");
         return new BcException(builder.toString(), op);
     }
 
