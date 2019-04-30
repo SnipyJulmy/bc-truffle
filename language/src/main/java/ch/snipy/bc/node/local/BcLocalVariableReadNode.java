@@ -13,6 +13,8 @@ public abstract class BcLocalVariableReadNode extends BcExpressionNode {
 
     @Specialization
     public Object readObject(VirtualFrame frame) {
-        return frame.getValue(getSlot());
+        Object res = frame.getValue(getSlot());
+        if (res == null) return 0;
+        return res;
     }
 }
