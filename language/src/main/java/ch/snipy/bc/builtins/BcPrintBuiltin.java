@@ -9,26 +9,26 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 
 @NodeInfo(shortName = "print")
-public abstract class BcPrintlnBuiltin extends BcBuiltinNode {
+public abstract class BcPrintBuiltin extends BcBuiltinNode {
 
     @TruffleBoundary
     private static void doPrint(PrintWriter out, Object[] value) {
-        out.println(Arrays.toString(value));
+        out.print(Arrays.toString(value));
     }
 
     @TruffleBoundary
     private static void doPrint(PrintWriter out, Object value) {
-        out.println(value);
+        out.print(value);
     }
 
     @TruffleBoundary
     private static void doPrint(PrintWriter out, BcBigNumber value) {
-        out.println(value);
+        out.print(value);
     }
 
     @TruffleBoundary
     private static void doPrint(PrintWriter out, String value) {
-        out.println(value);
+        out.print(value);
     }
 
     @Specialization
