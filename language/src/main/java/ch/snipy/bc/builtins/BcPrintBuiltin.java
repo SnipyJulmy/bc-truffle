@@ -14,21 +14,26 @@ public abstract class BcPrintBuiltin extends BcBuiltinNode {
     @TruffleBoundary
     private static void doPrint(PrintWriter out, Object[] value) {
         out.print(Arrays.toString(value));
+        out.flush();
     }
 
     @TruffleBoundary
     private static void doPrint(PrintWriter out, Object value) {
         out.print(value);
+        out.flush();
     }
 
     @TruffleBoundary
     private static void doPrint(PrintWriter out, BcBigNumber value) {
         out.print(value);
+        out.flush();
     }
 
     @TruffleBoundary
     private static void doPrint(PrintWriter out, String value) {
-        out.print(value);
+        String res = value.replaceAll("\\\\n", "\n");
+        out.print(res);
+        out.flush();
     }
 
     @Specialization
