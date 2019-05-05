@@ -25,7 +25,6 @@ public abstract class BcLocalVariableWriteNode extends BcExpressionNode {
         if (getSlot().getIdentifier().equals("scale")) {
             BcLanguage.getCurrentContext().setScale(number.intValue());
         }
-
         if (frame.getFrameDescriptor().getSlots().contains(getSlot())) {
             frame.getFrameDescriptor().setFrameSlotKind(getSlot(), FrameSlotKind.Object);
             frame.setObject(getSlot(), number);
