@@ -17,6 +17,8 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.TruffleLanguage.Env;
 import com.oracle.truffle.api.dsl.NodeFactory;
 import com.oracle.truffle.api.frame.FrameDescriptor;
+import com.oracle.truffle.api.frame.MaterializedFrame;
+import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
@@ -36,6 +38,9 @@ public final class BCContext {
     private final TruffleLanguage language;
     private final BcFunctionRegistry functionRegistry;
 
+    private final FrameDescriptor globalFrameDescriptor;
+    private final MaterializedFrame globalFrame;
+
     // for arithmetic operation
     private int scale = DEFAULT_SCALE;
     private RoundingMode roundingMode = RoundingMode.FLOOR;
@@ -49,7 +54,18 @@ public final class BCContext {
         this.output = new PrintWriter(env.out(), true);
         this.language = language;
         this.functionRegistry = new BcFunctionRegistry(language);
+
+        this.globalFrameDescriptor = new FrameDescriptor();
+        this.globalFrame = initGlobalFrame();
         installBuiltins();
+    }
+
+    private MaterializedFrame initGlobalFrame() {
+        VirtualFrame frame = Truffle.getRuntime().createMaterializedFrame(
+                null,
+                this.globalFrameDescriptor
+        );
+        return frame.materialize();
     }
 
     public static Object fromForeignValue(Object o) {
@@ -128,5 +144,9 @@ public final class BCContext {
 
     public RoundingMode getRoundingMode() {
         return this.roundingMode;
+    }
+
+    public MaterializedFrame getGlobalFrame() {
+        return globalFrame;
     }
 }
