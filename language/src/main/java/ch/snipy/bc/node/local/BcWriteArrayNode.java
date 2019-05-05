@@ -6,6 +6,7 @@ import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlot;
+import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 import java.util.HashMap;
@@ -14,11 +15,12 @@ import java.util.Map;
 @NodeChild(value = "index", type = BcExpressionNode.class)
 @NodeChild(value = "expr", type = BcExpressionNode.class)
 @NodeField(name = "slot", type = FrameSlot.class)
+@NodeField(name = "globalFrame", type = MaterializedFrame.class)
 public abstract class BcWriteArrayNode extends BcExpressionNode {
 
     protected abstract FrameSlot getSlot();
 
-    // TODO : getOrCreateMap
+    protected abstract MaterializedFrame getGlobalFrame();
 
     @Specialization
     public Object writeObject(VirtualFrame frame, BcBigNumber index, BcBigNumber expr) {
