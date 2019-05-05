@@ -197,11 +197,16 @@ object BcAstBuilder {
                             (implicit context: BcParserContext): BcExpressionNode = index match {
     case Some(idx) =>
       val id = s"$identifier[]"
-      val slot = context.frameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
+      val slot = {
+        val tmpSlot = context.bcContext.getGlobalFrame.getFrameDescriptor.findFrameSlot(id)
+        if (tmpSlot == null)
+          context.frameDescriptor.findFrameSlot(id)
+        else
+          tmpSlot
+      }
       BcReadArrayNodeGen.create(idx, slot, context.bcContext.getGlobalFrame)
     case None =>
       val id = s"$identifier"
-
       val slot = {
         val tmpSlot = context.bcContext.getGlobalFrame.getFrameDescriptor.findFrameSlot(id)
         if (tmpSlot == null)
