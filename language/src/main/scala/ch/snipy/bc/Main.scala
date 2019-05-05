@@ -20,35 +20,6 @@ object Main extends App {
       |nanotime()
     """.stripMargin
 
-  val langtonAnt =
-    """
-      |define l(w, h, x, y) {
-      |    auto a[], d, i, x[], y[]
-      |
-      |    x[1] = 1
-      |    x[3] = -1
-      |    y[0] = -1
-      |    y[2] = 1
-      |
-      |    while (1) {
-      |        i = y * w + x
-      |        if (a[i] == 0) d += 1
-      |        if (a[i] == 1) d -= 1
-      |        if (d < 0) d = 3
-      |        if (d > 3) d = 0
-      |        x += x[d]
-      |        y += y[d]
-      |        a[i] = 1 - a[i]
-      |        if (x < 0) break
-      |        if (x == w) break
-      |        if (y < 0) break
-      |        if (y == h) break
-      |    }
-      |
-      |    o()
-      |}
-    """.stripMargin
-
   val bigNumber =
     """
        nanotime()
@@ -95,6 +66,11 @@ object Main extends App {
       |	randseed = (randseed * 1103515245 + 12345) % 2147483648
       |	return randseed
       |}
+      |rand(); rand(); rand();
+      |rand(); rand(); rand();
+      |rand(); rand(); rand();
+      |rand(); rand(); rand();
+      |rand(); rand(); rand();
       |rand(); rand(); rand();
     """.stripMargin
 
@@ -225,7 +201,7 @@ object Main extends App {
       get(3)
     """.stripMargin
 
-  val source: Source = Source.newBuilder("bc", scopeTest, "scope")
+  val source: Source = Source.newBuilder("bc", lunhTest, "scope")
     .build()
 
   val context = Context.newBuilder("bc")

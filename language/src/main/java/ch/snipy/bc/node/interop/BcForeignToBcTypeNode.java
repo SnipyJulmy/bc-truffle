@@ -1,7 +1,7 @@
 package ch.snipy.bc.node.interop;
 
 import ch.snipy.bc.node.BcTypes;
-import ch.snipy.bc.runtime.BCContext;
+import ch.snipy.bc.runtime.BcContext;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.dsl.TypeSystemReference;
@@ -21,7 +21,7 @@ public abstract class BcForeignToBcTypeNode extends Node {
 
     @Specialization
     protected static Object fromNumber(Number value) {
-        return BCContext.fromForeignValue(value);
+        return BcContext.fromForeignValue(value);
     }
 
     @Specialization
@@ -48,7 +48,7 @@ public abstract class BcForeignToBcTypeNode extends Node {
     @Specialization(guards = "isBoxedPrimitive(value)")
     public Object unbox(TruffleObject value) {
         Object unboxed = doUnbox(value);
-        return BCContext.fromForeignValue(unboxed);
+        return BcContext.fromForeignValue(unboxed);
     }
 
     @Specialization(guards = "!isBoxedPrimitive(value)")

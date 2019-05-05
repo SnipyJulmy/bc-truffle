@@ -29,7 +29,7 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.List;
 
-public final class BCContext {
+public final class BcContext {
     private static final int DEFAULT_SCALE = 20;
 
     private final BufferedReader input;
@@ -46,7 +46,7 @@ public final class BCContext {
     private RoundingMode roundingMode = RoundingMode.FLOOR;
     private MathContext mathContext = new MathContext(DEFAULT_SCALE == 0 ? 1 : DEFAULT_SCALE);
 
-    public BCContext(BcLanguage language,
+    public BcContext(BcLanguage language,
                      Env env,
                      List<NodeFactory<? extends BcBuiltinNode>> builtins) { // TODO : builtins
         this.env = env;
@@ -79,7 +79,7 @@ public final class BCContext {
         else if (o instanceof Character) return String.valueOf(o);
         else if (o instanceof Number) return fromForeignNumber(o);
         else if (o instanceof TruffleObject) return o;
-        else if (o instanceof BCContext) return o;
+        else if (o instanceof BcContext) return o;
         CompilerDirectives.transferToInterpreter();
         throw new IllegalStateException(o + " is not a Truffle value");
     }

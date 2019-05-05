@@ -8,7 +8,7 @@ import ch.snipy.bc.node.expression.literal.{BcDoubleLiteralNode, BcStringLiteral
 import ch.snipy.bc.node.local._
 import ch.snipy.bc.node.statement.{BcBlockNode, BcFunctionDefinitionNode}
 import ch.snipy.bc.node.{BcExpressionNode, BcRootNode, BcStatementNode}
-import ch.snipy.bc.runtime.{BCContext, BcBigNumber}
+import ch.snipy.bc.runtime.{BcContext, BcBigNumber}
 import com.oracle.truffle.api.Truffle
 import com.oracle.truffle.api.frame.{FrameDescriptor, FrameSlot, FrameSlotKind}
 
@@ -17,7 +17,7 @@ import scala.language.postfixOps
 
 case class BcParserContext(name: String,
                            bcLanguage: BcLanguage,
-                           bcContext: BCContext,
+                           bcContext: BcContext,
                            frameDescriptor: FrameDescriptor,
                            functions: mutable.Map[Identifier, FunctionDef])
 

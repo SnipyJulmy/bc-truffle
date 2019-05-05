@@ -3,7 +3,7 @@ package ch.snipy.bc.builtins;
 import ch.snipy.bc.BcException;
 import ch.snipy.bc.BcLanguage;
 import ch.snipy.bc.node.BcExpressionNode;
-import ch.snipy.bc.runtime.BCContext;
+import ch.snipy.bc.runtime.BcContext;
 import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.dsl.GenerateNodeFactory;
 import com.oracle.truffle.api.dsl.NodeChild;
@@ -15,7 +15,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 @GenerateNodeFactory
 public abstract class BcBuiltinNode extends BcExpressionNode {
 
-    final BCContext getContext() {
+    final BcContext getContext() {
         return BcLanguage.getCurrentContext();
     }
 

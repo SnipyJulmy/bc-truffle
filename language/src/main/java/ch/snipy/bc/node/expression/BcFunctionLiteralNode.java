@@ -2,7 +2,7 @@ package ch.snipy.bc.node.expression;
 
 import ch.snipy.bc.BcLanguage;
 import ch.snipy.bc.node.BcExpressionNode;
-import ch.snipy.bc.runtime.BCContext;
+import ch.snipy.bc.runtime.BcContext;
 import ch.snipy.bc.runtime.BcFunction;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage.ContextReference;
@@ -17,7 +17,7 @@ public final class BcFunctionLiteralNode extends BcExpressionNode {
     @CompilationFinal
     private BcFunction cachedFunction;
 
-    private final ContextReference<BCContext> reference;
+    private final ContextReference<BcContext> reference;
 
     public BcFunctionLiteralNode(BcLanguage language, String identifier) {
         this.identifier = identifier;

@@ -1,6 +1,6 @@
 package ch.snipy.bc;
 
-import ch.snipy.bc.runtime.BCContext;
+import ch.snipy.bc.runtime.BcContext;
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -16,15 +16,15 @@ import java.util.Collections;
         version = "0.1",
         characterMimeTypes = "application/x-bc"
 )
-public class BcLanguage extends TruffleLanguage<BCContext> {
+public class BcLanguage extends TruffleLanguage<BcContext> {
 
-    public static BCContext getCurrentContext() {
+    public static BcContext getCurrentContext() {
         return getCurrentContext(BcLanguage.class);
     }
 
     @Override
-    protected BCContext createContext(Env env) {
-        return new BCContext(this, env, Collections.synchronizedList(new ArrayList<>()));
+    protected BcContext createContext(Env env) {
+        return new BcContext(this, env, Collections.synchronizedList(new ArrayList<>()));
     }
 
     @Override

@@ -20,7 +20,7 @@ public class BcFunctionMessageResolution extends Node {
         public Object access(BcFunction function, Object[] args) {
             return dispatchNode.executeDispatch(
                     function,
-                    Arrays.stream(args).map(BCContext::fromForeignValue).toArray()
+                    Arrays.stream(args).map(BcContext::fromForeignValue).toArray()
             );
         }
     }
