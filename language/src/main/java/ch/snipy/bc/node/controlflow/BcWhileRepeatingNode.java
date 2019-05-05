@@ -26,7 +26,6 @@ public final class BcWhileRepeatingNode extends Node implements RepeatingNode {
     public boolean executeRepeating(VirtualFrame frame) {
         if (!evaluateCondition(frame))
             return false;
-
         try {
             bodyNode.executeVoid(frame);
             return true;
@@ -35,7 +34,7 @@ public final class BcWhileRepeatingNode extends Node implements RepeatingNode {
             return true;
         } catch (BcBreakException e) {
             breakTaken.enter();
-            return true;
+            return false;
         }
     }
 
