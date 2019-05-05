@@ -71,7 +71,7 @@ public final class BcContext {
 
     private static void addGlobalDefinition(VirtualFrame frame) {
         FrameDescriptor frameDescriptor = frame.getFrameDescriptor();
-        frame.setObject(frameDescriptor.addFrameSlot("scale"), DEFAULT_SCALE);
+        frame.setObject(frameDescriptor.addFrameSlot("scale"), BcBigNumber.valueOf(DEFAULT_SCALE));
     }
 
     public static Object fromForeignValue(Object o) {
