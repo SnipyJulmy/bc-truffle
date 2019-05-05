@@ -9,7 +9,7 @@
     <version>0.1</version>
     <packaging>jar</packaging>
     <properties>
-        <graalvm.version>1.0.0-rc15</graalvm.version>
+        <graalvm.version>1.0.0-rc16</graalvm.version>
     </properties>
     <dependencies>
         <!-- Big Math -->
