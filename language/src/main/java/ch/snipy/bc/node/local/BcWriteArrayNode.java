@@ -24,44 +24,79 @@ public abstract class BcWriteArrayNode extends BcExpressionNode {
 
     @Specialization
     public Object writeObject(VirtualFrame frame, BcBigNumber index, BcBigNumber expr) {
-        Object mapValue = frame.getValue(getSlot());
-        if (mapValue == null) {
-            Map<Object, Object> map = new HashMap<>();
-            frame.setObject(getSlot(), map);
-            mapValue = frame.getValue(getSlot());
-            assert mapValue != null;
+        Object res;
+        if (getGlobalFrame().getFrameDescriptor().getSlots().contains(getSlot())) {
+            res = getGlobalFrame().getValue(getSlot());
+            if (res == null) {
+                Map<Object, Object> map = new HashMap<>();
+                getGlobalFrame().setObject(getSlot(), map);
+                res = getGlobalFrame().getValue(getSlot());
+            }
+            assert res != null;
+        } else {
+            assert frame.getFrameDescriptor().getSlots().contains(getSlot());
+            res = frame.getValue(getSlot());
+            if (res == null) {
+                Map<Object, Object> map = new HashMap<>();
+                getGlobalFrame().setObject(getSlot(), map);
+                res = frame.getValue(getSlot());
+            }
+            assert res != null;
         }
-        Map<Object, Object> map = (Map<Object, Object>) mapValue;
+        Map<Object, Object> map = (Map<Object, Object>) res;
         map.put(index, expr);
         return expr;
     }
 
     @Specialization
     public Object writeObject(VirtualFrame frame, BcBigNumber index, BcExpressionNode expr) {
-        Object mapValue = frame.getValue(getSlot());
-        if (mapValue == null) {
-            Map<Object, Object> map = new HashMap<>();
-            frame.setObject(getSlot(), map);
-            mapValue = frame.getValue(getSlot());
-            assert mapValue != null;
+        Object res;
+        if (getGlobalFrame().getFrameDescriptor().getSlots().contains(getSlot())) {
+            res = getGlobalFrame().getValue(getSlot());
+            if (res == null) {
+                Map<Object, Object> map = new HashMap<>();
+                getGlobalFrame().setObject(getSlot(), map);
+                res = frame.getValue(getSlot());
+            }
+            assert res != null;
+        } else {
+            assert frame.getFrameDescriptor().getSlots().contains(getSlot());
+            res = frame.getValue(getSlot());
+            if (res == null) {
+                Map<Object, Object> map = new HashMap<>();
+                getGlobalFrame().setObject(getSlot(), map);
+                res = frame.getValue(getSlot());
+            }
+            assert res != null;
         }
-        Map<Object, Object> map = (Map<Object, Object>) mapValue;
+        Map<Object, Object> map = (Map<Object, Object>) res;
         map.put(index, expr);
         return expr;
     }
 
     @Specialization
     public Object writeObject(VirtualFrame frame, BcExpressionNode index, BcExpressionNode expr) {
-        Object mapValue = frame.getValue(getSlot());
-        if (mapValue == null) {
-            Map<Object, Object> map = new HashMap<>();
-            frame.setObject(getSlot(), map);
-            mapValue = frame.getValue(getSlot());
-            assert mapValue != null;
+        Object res;
+        if (getGlobalFrame().getFrameDescriptor().getSlots().contains(getSlot())) {
+            res = getGlobalFrame().getValue(getSlot());
+            if (res == null) {
+                Map<Object, Object> map = new HashMap<>();
+                getGlobalFrame().setObject(getSlot(), map);
+                res = frame.getValue(getSlot());
+            }
+            assert res != null;
+        } else {
+            assert frame.getFrameDescriptor().getSlots().contains(getSlot());
+            res = frame.getValue(getSlot());
+            if (res == null) {
+                Map<Object, Object> map = new HashMap<>();
+                getGlobalFrame().setObject(getSlot(), map);
+                res = frame.getValue(getSlot());
+            }
+            assert res != null;
         }
-        Object idx = index.executeGeneric(frame);
-        Map<Object, Object> map = (Map<Object, Object>) mapValue;
-        map.put(idx, expr);
+        Map<Object, Object> map = (Map<Object, Object>) res;
+        map.put(index, expr);
         return expr;
     }
 }

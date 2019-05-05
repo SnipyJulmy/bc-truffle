@@ -22,18 +22,13 @@ public abstract class BcReadArrayNode extends BcExpressionNode {
 
     @Specialization
     public Object readObject(VirtualFrame frame, BcBigNumber index) {
-        Object mapValue = frame.getValue(getSlot());
-        if (mapValue == null) return 0;
-        Map<Object, Object> map = (Map<Object, Object>) mapValue;
+        Object res;
+        if (frame.getFrameDescriptor().getSlots().contains(getSlot()))
+            res = frame.getValue(getSlot());
+        else
+            res = getGlobalFrame().getValue(getSlot());
+        if (res == null) return 0;
+        Map<Object, Object> map = (Map<Object, Object>) res;
         return map.getOrDefault(index, 0);
-    }
-
-    @Specialization
-    public Object readObject(VirtualFrame frame, BcExpressionNode index) {
-        Object mapValue = frame.getValue(getSlot());
-        if (mapValue == null) return 0;
-        Object idx = (BcBigNumber) index.executeGeneric(frame);
-        Map<Object, Object> map = (Map<Object, Object>) mapValue;
-        return map.getOrDefault(idx, 0);
     }
 }
