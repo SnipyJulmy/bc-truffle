@@ -8,7 +8,7 @@ import ch.snipy.bc.node.expression.literal.{BcDoubleLiteralNode, BcStringLiteral
 import ch.snipy.bc.node.local._
 import ch.snipy.bc.node.statement.{BcBlockNode, BcFunctionDefinitionNode}
 import ch.snipy.bc.node.{BcExpressionNode, BcRootNode, BcStatementNode}
-import ch.snipy.bc.runtime.BcBigNumber
+import ch.snipy.bc.runtime.{BCContext, BcBigNumber}
 import com.oracle.truffle.api.Truffle
 import com.oracle.truffle.api.frame.{FrameDescriptor, FrameSlot, FrameSlotKind}
 
@@ -16,24 +16,26 @@ import scala.collection.mutable
 import scala.language.postfixOps
 
 case class BcParserContext(name: String,
-                           frameDescriptor: FrameDescriptor,
                            bcLanguage: BcLanguage,
-                           functions: mutable.Map[Identifier, FunctionDef],
-                           lexicalScope: mutable.Map[Identifier, FrameSlot],
-                           parent: Option[BcParserContext])
+                           bcContext: BCContext,
+                           frameDescriptor: FrameDescriptor,
+                           functions: mutable.Map[Identifier, FunctionDef])
 
 
 object BcAstBuilder {
 
   def mkRootNode(language: BcLanguage, ast: Program): BcRootNode = {
+    val name = "global"
+
     implicit val context: BcParserContext = BcParserContext(
-      "global",
-      new FrameDescriptor(),
-      language,
-      mutable.Map(),
-      mutable.Map(),
-      None
+      name = name,
+      bcLanguage = language,
+      bcContext = language.getContextReference.get(),
+      frameDescriptor = new FrameDescriptor(),
+      functions = mutable.Map()
     )
+
+    // visit the whole AST
     process(ast)
   }
 
@@ -87,14 +89,13 @@ object BcAstBuilder {
           process(thenNode)
         )
       case FunctionDef(identifier, isVoid, params, auto, body) =>
-        implicit val newContext: BcParserContext = context.copy(
-          frameDescriptor = context.frameDescriptor.copy(),
-          parent = Some(context)
-        )
+        implicit val newContext: BcParserContext = context
         val vars: List[String] = params.getOrElse(Nil) ++ auto.getOrElse(Nil)
-        for (elem <- vars)
-          newContext.lexicalScope +=
-            (elem -> newContext.frameDescriptor.findOrAddFrameSlot(elem, null, FrameSlotKind.Illegal))
+        for (varIdentifier <- vars) {
+          newContext.frameDescriptor.findOrAddFrameSlot(
+            varIdentifier,
+            FrameSlotKind.Illegal)
+        }
 
         val varDecl: List[BcExpressionNode] =
           params.getOrElse(Nil).zipWithIndex.map { case (param, idx) =>
@@ -103,6 +104,7 @@ object BcAstBuilder {
           }
         val bodyStatements: List[BcStatementNode] = body.statements.map(s => process(s)(newContext))
         val statements = (varDecl ++ bodyStatements) toArray
+
         val rootNode: BcRootNode = new BcRootNode(
           newContext.bcLanguage,
           newContext.frameDescriptor,
@@ -173,34 +175,41 @@ object BcAstBuilder {
                                index: Option[BcExpressionNode] = None)
                               (implicit context: BcParserContext): BcExpressionNode = index match {
     case Some(idx) =>
-      val slot: FrameSlot = context.frameDescriptor.findOrAddFrameSlot(
-        s"$identifier[]",
-        FrameSlotKind.Illegal
-      )
-      BcWriteArrayNodeGen.create(idx, value, slot)
+      val id = s"$identifier[]"
+      val slot =
+        if (context.name == "global")
+          context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
+        else
+          context.frameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
+      BcWriteArrayNodeGen.create(idx, value, slot, context.bcContext.getGlobalFrame)
     case None =>
-      val slot: FrameSlot = context.frameDescriptor.findOrAddFrameSlot(
-        identifier,
-        FrameSlotKind.Illegal
-      )
-      BcLocalVariableWriteNodeGen.create(value, slot)
+      val id = s"$identifier"
+      val slot =
+        if (context.name == "global")
+          context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
+        else
+          context.frameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
+      BcLocalVariableWriteNodeGen.create(value, slot, context.bcContext.getGlobalFrame)
   }
 
   private def mkReadVariable(identifier: String,
                              index: Option[BcExpressionNode] = None)
                             (implicit context: BcParserContext): BcExpressionNode = index match {
     case Some(idx) =>
-      val slot = context.frameDescriptor.findOrAddFrameSlot(
-        s"$identifier[]",
-        FrameSlotKind.Illegal
-      )
-      BcReadArrayNodeGen.create(idx, slot)
+      val id = s"$identifier[]"
+      val slot = context.frameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
+      BcReadArrayNodeGen.create(idx, slot, context.bcContext.getGlobalFrame)
     case None =>
-      val slot: FrameSlot = context.frameDescriptor.findOrAddFrameSlot(
-        identifier,
-        FrameSlotKind.Illegal
-      )
-      BcLocalVariableReadNodeGen.create(slot)
+      val id = s"$identifier"
+
+      val slot = {
+        val tmpSlot = context.bcContext.getGlobalFrame.getFrameDescriptor.findFrameSlot(id)
+        if (tmpSlot == null)
+          context.frameDescriptor.findFrameSlot(id)
+        else
+          tmpSlot
+      }
+      BcLocalVariableReadNodeGen.create(slot, context.bcContext.getGlobalFrame)
   }
 
   private def mkCall(identifier: String, args: List[BcExpressionNode])
