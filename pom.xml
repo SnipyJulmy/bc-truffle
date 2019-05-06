@@ -14,7 +14,7 @@
     <modules>
         <module>language</module>
         <module>component</module>
-        <!-- <module>launcher</module> -->
-        <!-- <module>native</module> -->
+        <module>launcher</module>
+        <module>bc-native</module>
     </modules>
 </project>

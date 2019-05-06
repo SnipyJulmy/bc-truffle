@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.0.0-rc15"
+VERSION="1.0.0-rc16"
 MAIN_CLASS="ch.snipy.bc.launcher.BcMain"
 SCRIPT_HOME="$(cd "$(dirname "$0")" && pwd -P)"
 
@@ -8,6 +8,7 @@ SCRIPT_HOME="$(cd "$(dirname "$0")" && pwd -P)"
 # Locations of the language and launcher jars as well as the java command are
 # different if I'm running from the repository or as a component in GraalVM
 #######################################################################
+echo $SCRIPT_HOME
 GRAALVM_VERSION=$(grep "GRAALVM_VERSION" "$SCRIPT_HOME/../release" 2> /dev/null)
 if [[ "$GRAALVM_VERSION" != "" ]]; then
     LANGUAGE_PATH=""
@@ -19,8 +20,8 @@ if [[ "$GRAALVM_VERSION" != "" ]]; then
         exit 1
     fi
 else
-    LANGUAGE_PATH="$SCRIPT_HOME/language/target/bc-truffle-0.1.jar"
-    LAUNCHER_PATH="$SCRIPT_HOME/launcher/target/launcher-0.1.jar"
+    LANGUAGE_PATH="$SCRIPT_HOME/language/target/bc-truffle-0.1-jar-with-dependencies.jar"
+    LAUNCHER_PATH="$SCRIPT_HOME/launcher/target/bc-launcher.jar"
     # Check the GraalVM version in JAVA_HOME
     if [[ "$JAVA_HOME" != "" ]]; then
         GRAALVM_VERSION=$(grep "GRAALVM_VERSION" "$JAVA_HOME"/release)
