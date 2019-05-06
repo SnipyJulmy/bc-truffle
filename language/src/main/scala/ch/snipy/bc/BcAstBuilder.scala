@@ -181,7 +181,7 @@ object BcAstBuilder {
           context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
         else
           context.frameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
-      BcWriteArrayNodeGen.create(idx, value, slot, context.bcContext.getGlobalFrame)
+      BcWriteArrayNodeGen.create(idx, value, context.bcContext.getGlobalFrame, slot)
     case None =>
       val id = s"$identifier"
       val slot =
@@ -214,7 +214,7 @@ object BcAstBuilder {
         else
           tmpSlot
       }
-      BcLocalVariableReadNodeGen.create(slot, context.bcContext.getGlobalFrame)
+      BcLocalVariableReadNodeGen.create(context.bcContext.getGlobalFrame, slot)
   }
 
   private def mkCall(identifier: String, args: List[BcExpressionNode])
@@ -237,7 +237,7 @@ object BcAstBuilder {
       case null => context.frameDescriptor.findFrameSlot(id)
       case s => s
     }
-    BcPreIncrementNodeGen.create(slot, modifier)
+    BcPreIncrementNodeGen.create(context.bcContext.getGlobalFrame, slot, modifier)
   }
 
   private def mkPostIncrementNode(identifier: String,
@@ -252,7 +252,7 @@ object BcAstBuilder {
       case null => context.frameDescriptor.findFrameSlot(id)
       case s => s
     }
-    BcPostIncrementNodeGen.create(slot, modifier)
+    BcPostIncrementNodeGen.create(context.bcContext.getGlobalFrame, slot, modifier)
   }
 
   private def mkPrint(args: List[BcExpressionNode], addNewLine: Boolean = false)
