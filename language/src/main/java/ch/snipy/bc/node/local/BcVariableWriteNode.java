@@ -28,9 +28,12 @@ public abstract class BcVariableWriteNode extends BcExpressionNode {
         if (frame.getFrameDescriptor().getSlots().contains(getSlot())) {
             frame.getFrameDescriptor().setFrameSlotKind(getSlot(), FrameSlotKind.Object);
             frame.setObject(getSlot(), number);
-        } else {
+        } else if (getGlobalFrame().getFrameDescriptor().getSlots().contains(getSlot())) {
             getGlobalFrame().getFrameDescriptor().setFrameSlotKind(getSlot(), FrameSlotKind.Object);
             getGlobalFrame().setObject(getSlot(), number);
+        } else {
+            frame.getFrameDescriptor().findOrAddFrameSlot(getSlot().getIdentifier(), FrameSlotKind.Object);
+            frame.setObject(getSlot(), number);
         }
         return number;
     }

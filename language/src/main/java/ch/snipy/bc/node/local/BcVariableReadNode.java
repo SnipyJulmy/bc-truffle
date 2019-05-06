@@ -13,13 +13,21 @@ public abstract class BcVariableReadNode extends BcReadNode {
     protected abstract FrameSlot getSlot();
 
     @Specialization
-    public Object readObject(VirtualFrame frame) {
+    public Object readObject(VirtualFrame localFrame) {
         Object res;
-        if (frame.getFrameDescriptor().getSlots().contains(getSlot()))
-            res = frame.getValue(getSlot());
-        else if (getGlobalFrame().getFrameDescriptor().getSlots().contains(getSlot()))
+        if (localFrame.getFrameDescriptor().getSlots().contains(getSlot())) {
+            res = localFrame.getValue(getSlot());
+            if (res == null) {
+                localFrame.setObject(getSlot(), BcBigNumber.ZERO);
+                res = BcBigNumber.ZERO;
+            }
+        } else if (getGlobalFrame().getFrameDescriptor().getSlots().contains(getSlot())) {
             res = getGlobalFrame().getValue(getSlot());
-        else
+            if (res == null) {
+                getGlobalFrame().setObject(getSlot(), BcBigNumber.ZERO);
+                res = BcBigNumber.ZERO;
+            }
+        } else
             res = BcBigNumber.ZERO;
         return res;
     }
