@@ -21,7 +21,7 @@ object BCParser {
       if (input.atEnd)
         input
       else {
-        if (parser.whiteSpace.pattern.matcher(input.first.toString).matches())
+        if ("[ \t\f\r\n]+".r.pattern.matcher(input.first.toString).matches())
           dropWs(input.rest)
         else
           input
@@ -125,7 +125,12 @@ class BCParser extends RegexParsers with PackratParsers {
     "auto" ~> parameters
 
   lazy val bcVarDecl: PackratParser[Identifier] =
-    bcIdentifier <~ ("[" ~ "]").?
+    bcIdentifier ~ ("[" ~ "]").? ^^ { case id ~ bracket =>
+      bracket match {
+        case Some(_) => s"$id[]"
+        case None => s"$id"
+      }
+    }
 
   // There are only identifier/array and index on the LHS
   lazy val bcAssignment: PackratParser[Assignment] =
@@ -210,7 +215,8 @@ class BCParser extends RegexParsers with PackratParsers {
   lazy val bcArgs: PackratParser[List[Expr]] =
     bcArg ~ rep("," ~> bcArg) ^^ { case x ~ xs => x :: xs }
 
-  lazy val bcArg: PackratParser[Expr] = bcExpr
+  lazy val bcArg: PackratParser[Expr] =
+    bcIdentifier <~ "[" ~ "]" ^^ { id => ArrayExpr(id) } | bcExpr
 
   lazy val bcPrimaryExpr: PackratParser[Expr] =
     numberLiteral | stringLiteral | bcParExpr

@@ -55,4 +55,5 @@ object BcAST {
   case class VarAccess(identifier: Identifier, index: Option[Expr]) extends Expr
   case class ParExpr(expr: Expr) extends Expr
   case class FunctionCall(identifier: Identifier, args: List[Expr]) extends Expr
+  case class ArrayExpr(identifier: Identifier) extends Expr
 }
