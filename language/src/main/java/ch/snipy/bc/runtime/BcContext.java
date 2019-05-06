@@ -5,9 +5,7 @@ import ch.snipy.bc.builtins.BcBuiltinNode;
 import ch.snipy.bc.builtins.BcLengthBuiltinFactory;
 import ch.snipy.bc.builtins.BcNanoBuiltinFactory;
 import ch.snipy.bc.builtins.BcPrintBuiltinFactory;
-import ch.snipy.bc.builtins.mathlib.BcAtanBuiltinFactory;
-import ch.snipy.bc.builtins.mathlib.BcCosBuiltinFactory;
-import ch.snipy.bc.builtins.mathlib.BcSinBuiltinFactory;
+import ch.snipy.bc.builtins.mathlib.*;
 import ch.snipy.bc.node.BcExpressionNode;
 import ch.snipy.bc.node.BcRootNode;
 import ch.snipy.bc.node.local.BcReadArgumentNode;
@@ -111,6 +109,8 @@ public final class BcContext {
         installBuiltin(BcAtanBuiltinFactory.getInstance());
         installBuiltin(BcSinBuiltinFactory.getInstance());
         installBuiltin(BcLengthBuiltinFactory.getInstance());
+        installBuiltin(BcExpBuiltinFactory.getInstance());
+        installBuiltin(BcLnBuiltinFactory.getInstance());
     }
 
     private void installBuiltin(NodeFactory<? extends BcBuiltinNode> factory) {
