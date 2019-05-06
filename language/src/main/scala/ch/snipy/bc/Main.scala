@@ -87,11 +87,10 @@ object Main extends App {
           }
           return(1)
       }
-      for(i=1;i<10;i++) {
-        nanotime()
-        if(p(i)) a = i
-        nanotime()
+      for(j=1;j<100000;j++) {
+        if(p(j)) a = j
       }
+      halt
     """.stripMargin
 
   val lunhTest =
@@ -210,18 +209,46 @@ object Main extends App {
       |r(9,2,10)
     """.stripMargin
 
-  val test =
+  val dotProduct =
     """
+      |define d(a[], b[], n) {
+      |    auto d, i
+      |
+      |    for (i = 0; i < n; i++) {
+      |        d += a[i] * b[i]
+      |    }
+      |    return(d)
+      |}
+      |
+      |a[0] = 1
+      |a[1] = 3
+      |a[2] = -5
+      |b[0] = 4
+      |b[1] = -2
+      |b[2] = -1
+      |d(a[], b[], 3)
     """.stripMargin
 
   val arrayTest =
     """
-      for(i=0;i<100;i++)
-        a = a + i
-      a
+       a[0] = 0
+       a[1] = 1
+       a[2] = 2
+       a[3] = 3
+       define get(b[],idx) {
+         return b[idx]
+       }
+       a[0]
+       a[1]
+       a[2]
+       a[3]
+       get(a[],0)
+       get(a[],1)
+       get(a[],2)
+       get(a[],3)
     """.stripMargin
 
-  val source: Source = Source.newBuilder("bc", arrayTest, "scope")
+  val source: Source = Source.newBuilder("bc", dotProduct, "scope")
     .build()
 
   val context = Context.newBuilder("bc")
