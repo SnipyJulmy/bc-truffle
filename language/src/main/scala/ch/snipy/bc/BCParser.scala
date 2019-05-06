@@ -15,7 +15,11 @@ object BCParser {
     val parser = new BCParser
     import parser._
 
-    def sanitize(input: String): String = input
+    def sanitize(input: String): String = {
+      input
+        .replaceAll("//.*|/\\*((.|\\n)(?!=*/))+\\*/", "")
+        .replaceAll("\\\\\n", "")
+    }
 
     def dropWs(input: parser.Input): parser.Input = {
       if (input.atEnd)
