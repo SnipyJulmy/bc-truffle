@@ -216,14 +216,12 @@ object Main extends App {
 
   val arrayTest =
     """
-      for(i=0;i<100000;i++)
-        a[i] = i
-
-      for(i=0;i<100000;i++)
-        a[i]
+      for(i=0;i<100;i++)
+        a = a + i
+      a
     """.stripMargin
 
-  val source: Source = Source.newBuilder("bc", test, "scope")
+  val source: Source = Source.newBuilder("bc", arrayTest, "scope")
     .build()
 
   val context = Context.newBuilder("bc")
