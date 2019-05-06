@@ -164,7 +164,7 @@ class BCParser extends RegexParsers with PackratParsers {
       bcRelationalOpExpr ~ ("<=" ~> bcAssignmentOpExpr) ^^ { case l ~ r => LessOrEqual(l, r) } |
       bcRelationalOpExpr ~ (">=" ~> bcAssignmentOpExpr) ^^ { case l ~ r => GreaterOrEqual(l, r) } |
       bcRelationalOpExpr ~ ("<" ~> bcAssignmentOpExpr) ^^ { case l ~ r => Less(l, r) } |
-      bcRelationalOpExpr ~ (">" ~> bcAssignmentOpExpr) ^^ { case l ~ r => GreaterOrEqual(l, r) } |
+      bcRelationalOpExpr ~ (">" ~> bcAssignmentOpExpr) ^^ { case l ~ r => Greater(l, r) } |
       bcAssignmentOpExpr
 
   lazy val bcAssignmentOpExpr: PackratParser[Expr] =
