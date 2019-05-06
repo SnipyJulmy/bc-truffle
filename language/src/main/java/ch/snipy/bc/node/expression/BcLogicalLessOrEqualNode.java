@@ -16,15 +16,9 @@ public abstract class BcLogicalLessOrEqualNode extends BcBinaryNode {
     @Specialization
     protected BcBigNumber lessOrEqual(BcBigNumber left, BcBigNumber right) {
         int res = left.compareTo(right);
-        switch (res) {
-            case 0:
-            case -1:
-                return TRUE;
-            case 1:
-                return FALSE;
-        }
-        assert false; // should never happen
-        return null;
+        if (res == 0 || res < 0)
+            return TRUE;
+        return FALSE;
     }
 
     @Fallback
