@@ -4,7 +4,7 @@ COMPONENT_DIR="component_temp_dir"
 LANGUAGE_PATH="$COMPONENT_DIR/jre/languages/bc"
 INCLUDE_SLNATIVE="FALSE"
 
-if [[ -f ./native/bcnative ]]; then
+if [[ -f ../native/bcnative ]]; then
     INCLUDE_SLNATIVE="TRUE"
 fi
 
