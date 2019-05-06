@@ -7,7 +7,6 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.ExplodeLoop;
 
 @NodeField(name = "slot", type = FrameSlot.class)
 @NodeField(name = "globalFrame", type = MaterializedFrame.class)
@@ -26,13 +25,5 @@ public abstract class BcLocalVariableReadNode extends BcExpressionNode {
             res = getGlobalFrame().getValue(getSlot());
         if (res == null) return BcBigNumber.valueOf(0);
         return res;
-    }
-
-    @ExplodeLoop
-    private VirtualFrame getFrame(VirtualFrame frame) {
-        while (!frame.getFrameDescriptor().getSlots().contains(getSlot())) {
-            frame = (VirtualFrame) frame.getArguments()[0];
-        }
-        return frame;
     }
 }
