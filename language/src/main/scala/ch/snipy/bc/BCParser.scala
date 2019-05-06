@@ -40,7 +40,7 @@ object BCParser {
         if (!dropWs(next).atEnd) {
           throw BcParserException(s"can't parse the whole string, input : ${source.getCharacters.toString}, rest : ${next.rest.source.toString}")
         }
-        println(prog)
+        //println(prog)
         BcAstBuilder.mkRootNode(bcLanguage, prog)
     }
     node
@@ -124,7 +124,7 @@ class BCParser extends RegexParsers with PackratParsers {
   lazy val bcAutoList: PackratParser[List[Identifier]] =
     "auto" ~> parameters
 
-  lazy val bcVarDecl : PackratParser[Identifier] =
+  lazy val bcVarDecl: PackratParser[Identifier] =
     bcIdentifier <~ ("[" ~ "]").?
 
   // There are only identifier/array and index on the LHS

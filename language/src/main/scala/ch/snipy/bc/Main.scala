@@ -177,6 +177,43 @@ object Main extends App {
        print "a"
     """
 
+
+  val root =
+    """
+      |define r(a, n, d) {
+      |    auto e, o, x, y, z
+      |
+      |    if (n == 0) return(1)
+      |    if (a == 0) return(0)
+      |
+      |    o = scale
+      |    scale = d
+      |    e = 1 / 10 ^ d
+      |
+      |    if (n < 0) {
+      |        n = -n
+      |        a = 1 / a
+      |    }
+      |
+      |    x = 1
+      |    while (1) {
+      |        y = ((n - 1) * x + a / x ^ (n - 1)) / n
+      |        z = x - y
+      |        if (z < 0) z = -z
+      |        if (z < e) break
+      |        x = y
+      |    }
+      |    scale = o
+      |    return(y)
+      |}
+      |
+      |r(9,2,10)
+    """.stripMargin
+
+  val test =
+    """
+    """.stripMargin
+
   val arrayTest =
     """
       for(i=0;i<100000;i++)
@@ -186,22 +223,7 @@ object Main extends App {
         a[i]
     """.stripMargin
 
-  val scopeTest =
-    """
-      a = 4
-      a[0] = 0
-      a[1] = 1
-      a[2] = 2
-      define get(idx) {
-        return a[idx]
-      }
-      get(0)
-      get(1)
-      get(2)
-      get(3)
-    """.stripMargin
-
-  val source: Source = Source.newBuilder("bc", lunhTest, "scope")
+  val source: Source = Source.newBuilder("bc", test, "scope")
     .build()
 
   val context = Context.newBuilder("bc")

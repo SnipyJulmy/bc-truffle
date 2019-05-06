@@ -1,19 +1,14 @@
 package ch.snipy.bc.launcher;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
 
-// TODO
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+
 public final class BcMain {
 
     private static final String Bc = "bc";
@@ -59,13 +54,7 @@ public final class BcMain {
 
         try {
             Value result = context.eval(source);
-            if (context.getBindings(Bc).getMember("main") == null) {
-                err.println("No function main() defined in Bc source file.");
-                return 1;
-            }
-            if (!result.isNull()) {
-                out.println(result.toString());
-            }
+            System.out.println(result);
             return 0;
         } catch (PolyglotException ex) {
             if (ex.isInternalError()) {
