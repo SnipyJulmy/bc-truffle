@@ -3,13 +3,11 @@ package ch.snipy.bc.node.local;
 import ch.snipy.bc.BcLanguage;
 import ch.snipy.bc.node.BcExpressionNode;
 import ch.snipy.bc.runtime.BcBigNumber;
+import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.FrameSlotKind;
-import com.oracle.truffle.api.frame.MaterializedFrame;
-import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.frame.*;
 
 @NodeChild(value = "expr", type = BcExpressionNode.class)
 @NodeField(name = "slot", type = FrameSlot.class)
@@ -25,14 +23,14 @@ public abstract class BcVariableWriteNode extends BcExpressionNode {
         if (getSlot().getIdentifier().equals("scale")) {
             BcLanguage.getCurrentContext().setScale(number.intValue());
         }
-        if (frame.getFrameDescriptor().getSlots().contains(getSlot())) {
+        if (contains(frame.getFrameDescriptor(), getSlot())) {
             frame.getFrameDescriptor().setFrameSlotKind(getSlot(), FrameSlotKind.Object);
             frame.setObject(getSlot(), number);
-        } else if (getGlobalFrame().getFrameDescriptor().getSlots().contains(getSlot())) {
+        } else if (contains(getGlobalFrame().getFrameDescriptor(), getSlot())) {
             getGlobalFrame().getFrameDescriptor().setFrameSlotKind(getSlot(), FrameSlotKind.Object);
             getGlobalFrame().setObject(getSlot(), number);
         } else {
-            frame.getFrameDescriptor().findOrAddFrameSlot(getSlot().getIdentifier(), FrameSlotKind.Object);
+            createFrameSlot(frame.getFrameDescriptor(), getSlot());
             frame.setObject(getSlot(), number);
         }
         return number;
@@ -49,5 +47,15 @@ public abstract class BcVariableWriteNode extends BcExpressionNode {
             getGlobalFrame().setObject(getSlot(), exprValue);
         }
         return exprValue;
+    }
+
+    @TruffleBoundary
+    private boolean contains(FrameDescriptor frameDescriptor, FrameSlot slot) {
+        return frameDescriptor.getSlots().contains(slot);
+    }
+
+    @TruffleBoundary
+    private void createFrameSlot(FrameDescriptor frameDescriptor, FrameSlot slot) {
+        frameDescriptor.findOrAddFrameSlot(slot.getIdentifier(), FrameSlotKind.Object);
     }
 }

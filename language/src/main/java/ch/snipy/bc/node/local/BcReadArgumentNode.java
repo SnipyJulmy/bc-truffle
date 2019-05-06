@@ -4,6 +4,8 @@ import ch.snipy.bc.node.BcExpressionNode;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.profiles.BranchProfile;
 
+import static ch.snipy.bc.runtime.BcBigNumber.ZERO;
+
 public class BcReadArgumentNode extends BcExpressionNode {
 
     private final int index;
@@ -20,7 +22,7 @@ public class BcReadArgumentNode extends BcExpressionNode {
             return args[index];
         else {
             outOfBoundsTaken.enter();
-            return 0; // fixme is 0 the null getValue for bc ???
+            return ZERO;
         }
     }
 }
