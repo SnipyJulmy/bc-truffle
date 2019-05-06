@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
-sudo gu uninstall ch.snipy.bc &&
-sudo gu -L install component/bc-component.jar
+sudo gu uninstall bc &&
+cd ./component/ &&
+sudo gu install -L ./bc-component.jar &&
+cd ..
