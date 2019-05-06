@@ -17,9 +17,10 @@ public abstract class BcVariableReadNode extends BcReadNode {
         Object res;
         if (frame.getFrameDescriptor().getSlots().contains(getSlot()))
             res = frame.getValue(getSlot());
-        else
+        else if (getGlobalFrame().getFrameDescriptor().getSlots().contains(getSlot()))
             res = getGlobalFrame().getValue(getSlot());
-        if (res == null) return BcBigNumber.valueOf(0);
+        else
+            res = BcBigNumber.ZERO;
         return res;
     }
 }
