@@ -8,9 +8,9 @@ import ch.snipy.bc.node.expression.literal.{BcDoubleLiteralNode, BcStringLiteral
 import ch.snipy.bc.node.local._
 import ch.snipy.bc.node.statement.{BcBlockNode, BcFunctionDefinitionNode}
 import ch.snipy.bc.node.{BcExpressionNode, BcRootNode, BcStatementNode}
-import ch.snipy.bc.runtime.{BcContext, BcBigNumber}
+import ch.snipy.bc.runtime.{BcBigNumber, BcContext}
 import com.oracle.truffle.api.Truffle
-import com.oracle.truffle.api.frame.{FrameDescriptor, FrameSlot, FrameSlotKind}
+import com.oracle.truffle.api.frame.{FrameDescriptor, FrameSlotKind}
 
 import scala.collection.mutable
 import scala.language.postfixOps
@@ -225,25 +225,33 @@ object BcAstBuilder {
     )
   }
 
-  private def mkPreIncrementNode(identifier: String, modifier: Double,
+  private def mkPreIncrementNode(identifier: String,
+                                 modifier: Double,
                                  index: Option[BcExpressionNode] = None)
                                 (implicit context: BcParserContext): BcExpressionNode = {
-    val slot: FrameSlot = context.frameDescriptor.findOrAddFrameSlot(
-      identifier,
-      index.orNull,
-      FrameSlotKind.Illegal
-    )
+    val id = index match {
+      case Some(value) => s"$identifier[]"
+      case None => s"$identifier"
+    }
+    val slot = context.bcContext.getGlobalFrame.getFrameDescriptor.findFrameSlot(id) match {
+      case null => context.frameDescriptor.findFrameSlot(id)
+      case s => s
+    }
     BcPreIncrementNodeGen.create(slot, modifier)
   }
 
-  private def mkPostIncrementNode(identifier: String, modifier: Double,
+  private def mkPostIncrementNode(identifier: String,
+                                  modifier: Double,
                                   index: Option[BcExpressionNode] = None)
                                  (implicit context: BcParserContext): BcExpressionNode = {
-    val slot: FrameSlot = context.frameDescriptor.findOrAddFrameSlot(
-      identifier,
-      index.orNull,
-      FrameSlotKind.Illegal
-    )
+    val id = index match {
+      case Some(value) => s"$identifier[]"
+      case None => s"$identifier"
+    }
+    val slot = context.bcContext.getGlobalFrame.getFrameDescriptor.findFrameSlot(id) match {
+      case null => context.frameDescriptor.findFrameSlot(id)
+      case s => s
+    }
     BcPostIncrementNodeGen.create(slot, modifier)
   }
 
