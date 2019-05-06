@@ -2,6 +2,7 @@ package ch.snipy.bc.runtime;
 
 import ch.snipy.bc.BcLanguage;
 import ch.snipy.bc.builtins.BcBuiltinNode;
+import ch.snipy.bc.builtins.BcLengthBuiltinFactory;
 import ch.snipy.bc.builtins.BcNanoBuiltinFactory;
 import ch.snipy.bc.builtins.BcPrintBuiltinFactory;
 import ch.snipy.bc.builtins.mathlib.BcAtanBuiltinFactory;
@@ -109,6 +110,7 @@ public final class BcContext {
         installBuiltin(BcCosBuiltinFactory.getInstance());
         installBuiltin(BcAtanBuiltinFactory.getInstance());
         installBuiltin(BcSinBuiltinFactory.getInstance());
+        installBuiltin(BcLengthBuiltinFactory.getInstance());
     }
 
     private void installBuiltin(NodeFactory<? extends BcBuiltinNode> factory) {
