@@ -15,6 +15,6 @@
         <module>language</module>
         <module>component</module>
         <module>launcher</module>
-        <module>bc-native</module>
+        <module>native</module>
     </modules>
 </project>
