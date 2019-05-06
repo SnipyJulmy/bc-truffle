@@ -189,7 +189,7 @@ object BcAstBuilder {
           context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
         else
           context.frameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
-      BcLocalVariableWriteNodeGen.create(value, slot, context.bcContext.getGlobalFrame)
+      BcVariableWriteNodeGen.create(value, slot, context.bcContext.getGlobalFrame)
   }
 
   private def mkReadVariable(identifier: String,
@@ -214,7 +214,7 @@ object BcAstBuilder {
         else
           tmpSlot
       }
-      BcLocalVariableReadNodeGen.create(context.bcContext.getGlobalFrame, slot)
+      BcVariableReadNodeGen.create(context.bcContext.getGlobalFrame, slot)
   }
 
   private def mkCall(identifier: String, args: List[BcExpressionNode])
@@ -245,7 +245,7 @@ object BcAstBuilder {
                                   index: Option[BcExpressionNode] = None)
                                  (implicit context: BcParserContext): BcExpressionNode = {
     val id = index match {
-      case Some(value) => s"$identifier[]"
+      case _: Some[_] => s"$identifier[]"
       case None => s"$identifier"
     }
     val slot = context.bcContext.getGlobalFrame.getFrameDescriptor.findFrameSlot(id) match {
