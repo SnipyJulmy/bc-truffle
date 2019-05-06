@@ -290,5 +290,8 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
         return valueOf(BigDecimalMath.exp(this.value, getMathContext()));
     }
 
-    // TODO bessel function of order n
+    @TruffleBoundary
+    public BcBigNumber length() {
+        return valueOf(value.precision());
+    }
 }
