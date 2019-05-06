@@ -1,6 +1,6 @@
 package ch.snipy.bc.node.expression;
 
-import ch.snipy.bc.node.BcExpressionNode;
+import ch.snipy.bc.node.BcReadNode;
 import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -13,18 +13,25 @@ import static ch.snipy.bc.runtime.BcBigNumber.ZERO;
 
 @NodeField(name = "slot", type = FrameSlot.class)
 @NodeField(name = "modifier", type = double.class)
-public abstract class BcPreIncrementNode extends BcExpressionNode {
+public abstract class BcPreIncrementNode extends BcReadNode {
 
     protected abstract FrameSlot getSlot();
 
     protected abstract double getModifier();
 
-    // TODO search in the upper context
     @SuppressWarnings("Duplicates")
     @Specialization
-    public BcBigNumber doBcBigNumber(VirtualFrame frame) {
-        BcBigNumber value = (BcBigNumber) FrameUtil.getObjectSafe(frame, getSlot());
-        if (value == null) {
+    public BcBigNumber doBcBigNumber(VirtualFrame localFrame) {
+        BcBigNumber value;
+        VirtualFrame frame;
+        if (localFrame.getFrameDescriptor().getSlots().contains(getSlot())) {
+            frame = localFrame;
+            value = (BcBigNumber) FrameUtil.getObjectSafe(localFrame, getSlot());
+        } else if (getGlobalFrame().getFrameDescriptor().getSlots().contains(getSlot())) {
+            frame = getGlobalFrame();
+            value = (BcBigNumber) FrameUtil.getObjectSafe(getGlobalFrame(), getSlot());
+        } else {
+            frame = localFrame;
             value = ZERO;
         }
         BcBigNumber newValue = value.add(getModifier() > 0.0 ? ONE : ONE.negate());
