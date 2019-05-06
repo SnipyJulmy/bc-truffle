@@ -14,7 +14,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 @NodeChild(value = "expr", type = BcExpressionNode.class)
 @NodeField(name = "slot", type = FrameSlot.class)
 @NodeField(name = "globalFrame", type = MaterializedFrame.class)
-public abstract class BcLocalVariableWriteNode extends BcExpressionNode {
+public abstract class BcVariableWriteNode extends BcExpressionNode {
 
     protected abstract FrameSlot getSlot();
 

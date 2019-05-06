@@ -8,7 +8,7 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 @NodeField(name = "slot", type = FrameSlot.class)
-public abstract class BcLocalVariableReadNode extends BcReadNode {
+public abstract class BcVariableReadNode extends BcReadNode {
 
     protected abstract FrameSlot getSlot();
 
