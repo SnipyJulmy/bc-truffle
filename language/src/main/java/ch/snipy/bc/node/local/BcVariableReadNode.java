@@ -17,7 +17,7 @@ public abstract class BcVariableReadNode extends BcReadNode {
 
     @Specialization
     public Object readObject(VirtualFrame localFrame) {
-        if (getSlot() == null) BcException.typeError(this, "slot is null");
+        if (getSlot() == null) throw BcException.typeError(this, "slot is null");
         Object res;
         if (getRootNode().getName().equals("main")) {
             if (contains(localFrame.getFrameDescriptor(), getSlot())) {
@@ -48,7 +48,7 @@ public abstract class BcVariableReadNode extends BcReadNode {
                     res = BcBigNumber.ZERO;
             } else {
                 res = null;
-                BcException.typeError(this, "unknow variable " + getSlot().getIdentifier());
+                throw BcException.typeError(this, "unknow variable " + getSlot().getIdentifier());
             }
         }
         return res;
