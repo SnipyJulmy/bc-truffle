@@ -1,5 +1,6 @@
 package ch.snipy.bc.node.local;
 
+import ch.snipy.bc.BcException;
 import ch.snipy.bc.node.BcReadNode;
 import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
@@ -16,21 +17,40 @@ public abstract class BcVariableReadNode extends BcReadNode {
 
     @Specialization
     public Object readObject(VirtualFrame localFrame) {
+        if (getSlot() == null) BcException.typeError(this, "slot is null");
         Object res;
-        if (contains(localFrame.getFrameDescriptor(), getSlot())) {
-            res = localFrame.getValue(getSlot());
-            if (res == null) {
-                localFrame.setObject(getSlot(), BcBigNumber.ZERO);
+        if (getRootNode().getName().equals("main")) {
+            if (contains(localFrame.getFrameDescriptor(), getSlot())) {
+                res = localFrame.getValue(getSlot());
+                if (res == null) {
+                    localFrame.setObject(getSlot(), BcBigNumber.ZERO);
+                    res = BcBigNumber.ZERO;
+                }
+            } else if (contains(getGlobalFrame().getFrameDescriptor(), getSlot())) {
+                res = getGlobalFrame().getValue(getSlot());
+                if (res == null) {
+                    getGlobalFrame().setObject(getSlot(), BcBigNumber.ZERO);
+                    res = BcBigNumber.ZERO;
+                }
+            } else {
                 res = BcBigNumber.ZERO;
             }
-        } else if (contains(getGlobalFrame().getFrameDescriptor(), getSlot())) {
-            res = getGlobalFrame().getValue(getSlot());
-            if (res == null) {
-                getGlobalFrame().setObject(getSlot(), BcBigNumber.ZERO);
-                res = BcBigNumber.ZERO;
+        } else { // inside a function
+            if (contains(localFrame.getFrameDescriptor(), getSlot())) {
+                res = localFrame.getValue(getSlot());
+                if (res == null) {
+                    localFrame.setObject(getSlot(), BcBigNumber.ZERO);
+                    res = BcBigNumber.ZERO;
+                }
+            } else if (contains(getGlobalFrame().getFrameDescriptor(), getSlot())) {
+                res = getGlobalFrame().getValue(getSlot());
+                if (res == null)
+                    res = BcBigNumber.ZERO;
+            } else {
+                res = null;
+                BcException.typeError(this, "unknow variable " + getSlot().getIdentifier());
             }
-        } else
-            res = BcBigNumber.ZERO;
+        }
         return res;
     }
 
