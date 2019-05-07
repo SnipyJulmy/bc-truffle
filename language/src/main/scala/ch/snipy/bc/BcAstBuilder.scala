@@ -89,7 +89,10 @@ object BcAstBuilder {
           process(thenNode)
         )
       case FunctionDef(identifier, isVoid, params, auto, body) =>
-        implicit val newContext: BcParserContext = context.copy(name = identifier)
+        implicit val newContext: BcParserContext = context.copy(
+          name = identifier,
+          frameDescriptor = new FrameDescriptor()
+        )
         val vars: List[String] = params.getOrElse(Nil) ++ auto.getOrElse(Nil)
         for (varIdentifier <- vars) {
           newContext.frameDescriptor.findOrAddFrameSlot(
@@ -187,8 +190,13 @@ object BcAstBuilder {
       val slot =
         if (context.name == "global")
           context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
-        else
-          context.frameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
+        else {
+          if (context.bcContext.getGlobalFrameDescriptor.getIdentifiers.contains(id)) {
+            context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
+          } else {
+            context.frameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
+          }
+        }
       BcVariableWriteNodeGen.create(value, slot, context.bcContext.getGlobalFrame)
   }
 
@@ -223,8 +231,13 @@ object BcAstBuilder {
       val slot = {
         if (context.name == "global")
           context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
-        else
-          context.frameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
+        else {
+          context.frameDescriptor.findFrameSlot(id) match {
+            case null => /* need to find from the globalFrame */
+              context.bcContext.getGlobalFrame.getFrameDescriptor.findFrameSlot(id)
+            case s => s
+          }
+        }
       }
       assert(slot != null)
       BcVariableReadNodeGen.create(context.bcContext.getGlobalFrame, slot)

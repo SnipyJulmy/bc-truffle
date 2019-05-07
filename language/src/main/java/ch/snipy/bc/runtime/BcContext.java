@@ -15,6 +15,7 @@ import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.TruffleLanguage.Env;
 import com.oracle.truffle.api.dsl.NodeFactory;
+import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -156,5 +157,9 @@ public final class BcContext {
 
     public MaterializedFrame getGlobalFrame() {
         return globalFrame;
+    }
+
+    public FrameDescriptor getGlobalFrameDescriptor() {
+        return globalFrameDescriptor;
     }
 }
