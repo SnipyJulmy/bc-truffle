@@ -14,7 +14,7 @@ object Main extends App {
       |
       |for (n=0; n<9; n++) {
       |  for (m=0; m<4; m++) {
-      |    print("A(" + m + "," + n + ") = " + ack(m,n))
+      |    print("A(" + m + "," + n + ") = " + ack(m,n) + "\n")
       |  }
       |}
       |nanotime()
@@ -87,10 +87,83 @@ object Main extends App {
           }
           return(1)
       }
-      for(j=1;j<100000;j++) {
-        if(p(j)) a = j
+      for(j=1;j<1000;j++) {
+        if(p(j)) j
       }
       halt
+    """.stripMargin
+
+  val millerRabin =
+    """
+      |seed = 1   /* seed of the random number generator */
+      |scale = 0
+      |
+      |/* Random number from 0 to 32767. */
+      |define rand() {
+      |  /* Cheap formula (from POSIX) for random numbers of low quality. */
+      |  seed = (seed * 1103515245 + 12345) % 4294967296
+      |  return ((seed / 65536) % 32768)
+      |}
+      |
+      |/* Random number in range [from, to]. */
+      |define rangerand(from, to) {
+      |  auto b, h, i, m, n, r
+      |
+      |  m = to - from + 1
+      |  h = length(m) / 2 + 1  /* want h iterations of rand() % 100 */
+      |  b = 100 ^ h % m        /* want n >= b */
+      |  while (1) {
+      |    n = 0                /* pick n in range [b, 100 ^ h) */
+      |    for (i = h; i > 0; i--) {
+      |      r = rand()
+      |      while (r < 68) { r = rand(); }  /* loop if the modulo bias */
+      |      n = (n * 100) + (r % 100)       /* append 2 digits to n */
+      |    }
+      |    if (n >= b) { break; }  /* break unless the modulo bias */
+      |  }
+      |  return (from + (n % m))
+      |}
+      |
+      |
+      |
+      |/* n is probably prime? */
+      |define millerrabintest(n, k) {
+      |  auto d, r, a, x, s
+      |
+      |  if (n <= 3) { return (1); }
+      |  if ((n % 2) == 0) { return (0); }
+      |
+      |  /* find s and d so that d * 2^s = n - 1 */
+      |  d = n - 1
+      |  s = 0
+      |  while((d % 2) == 0) {
+      |     d /= 2
+      |     s += 1
+      |  }
+      |
+      |  while (k-- > 0) {
+      |    a = rangerand(2, n - 2)
+      |    x = (a ^ d) % n
+      |    if (x != 1) {
+      |      for (r = 0; r < s; r++) {
+      |        if (x == (n - 1)) { break; }
+      |        x = (x * x) % n
+      |      }
+      |      if (x != (n - 1)) {
+      |        return (0)
+      |      }
+      |    }
+      |  }
+      |  return (1)
+      |}
+      |
+      |for (idx = 1; idx < 7; idx++) {
+      |  if (millerrabintest(idx, 10) == 1) {
+      |    idx
+      |  }
+      |}
+      |
+      |halt
     """.stripMargin
 
   val lunhTest =
@@ -248,7 +321,69 @@ object Main extends App {
        get(a[],3)
     """.stripMargin
 
-  val source: Source = Source.newBuilder("bc", dotProduct, "scope")
+  val commentTest =
+  """
+    /* Hello World ! */
+    print "Hello World !\n"
+
+    a = \
+    3
+
+    b \
+    = \
+    2
+    b
+  """.stripMargin
+
+  val longTime =
+    """
+      |define longtimefunction(n) {
+      |  auto a,res,max
+      |  res = 0
+      |  max = 10 ^ n
+      |  for(a = 0; a < max; a++) res += a
+      |  return res
+      |}
+      |longtimefunction(9)
+      |halt
+    """.stripMargin
+
+  val test =
+    """
+       define f(a,b) {
+         auto n
+         n = 10
+         return n
+       }
+
+       define g() {
+         return n
+       }
+
+       f() == 10
+
+       define f() {
+         return n
+       }
+
+       f() == 0
+       g() == 0
+       n == 0
+    """.stripMargin
+
+  val rand =
+    """
+      |seed = 1   /* seed of the random number generator */
+      |
+      |/* Random number from 0 to 32767. */
+      |define rand() {
+      |  /* Cheap formula (from POSIX) for random numbers of low quality. */
+      |  seed = (seed * 1103515245 + 12345) % 4294967296
+      |  return ((seed / 65536) % 32768)
+      |}
+    """.stripMargin
+
+  val source: Source = Source.newBuilder("bc", ackermann, "scope")
     .build()
 
   val context = Context.newBuilder("bc")

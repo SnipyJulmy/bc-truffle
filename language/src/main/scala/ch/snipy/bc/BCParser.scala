@@ -44,7 +44,7 @@ object BCParser {
         if (!dropWs(next).atEnd) {
           throw BcParserException(s"can't parse the whole string, input : ${source.getCharacters.toString}, rest : ${next.rest.source.toString}")
         }
-        println(prog)
+        // println(prog) // TODO : add an option to print the first AST
         BcAstBuilder.mkRootNode(bcLanguage, prog)
     }
     node
