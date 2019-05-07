@@ -89,7 +89,7 @@ object BcAstBuilder {
           process(thenNode)
         )
       case FunctionDef(identifier, isVoid, params, auto, body) =>
-        implicit val newContext: BcParserContext = context
+        implicit val newContext: BcParserContext = context.copy(name = identifier)
         val vars: List[String] = params.getOrElse(Nil) ++ auto.getOrElse(Nil)
         for (varIdentifier <- vars) {
           newContext.frameDescriptor.findOrAddFrameSlot(
@@ -99,12 +99,7 @@ object BcAstBuilder {
 
         val varDecl: List[BcExpressionNode] =
           params.getOrElse(Nil).zipWithIndex.map { case (param, idx) =>
-            if (param.contains("[]"))
-              mkAssignmentNode(param, new BcReadArgumentNode(idx), None)(newContext)
-            else {
-              val readArg = new BcReadArgumentNode(idx)
-              mkAssignmentNode(param, readArg, None)(newContext)
-            }
+            mkAssignmentNode(param, new BcReadArgumentNode(idx), None)(newContext)
           }
         val bodyStatements: List[BcStatementNode] = body.statements.map(s => process(s)(newContext))
         val statements = (varDecl ++ bodyStatements) toArray
