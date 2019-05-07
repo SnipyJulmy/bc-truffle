@@ -35,4 +35,8 @@ public class BcRootNode extends RootNode {
         return "";
     }
 
+    @Override
+    public String getName() {
+        return name;
+    }
 }
