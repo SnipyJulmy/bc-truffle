@@ -13,6 +13,9 @@ public abstract class BcExpressionNode extends BcStatementNode {
     // execute this when no specialization is possible --> most possible generalization
     public abstract Object executeGeneric(VirtualFrame frame);
 
+    // return the boolean representation of the node
+    public abstract boolean executeBoolean(VirtualFrame frame);
+
     // the return getValue is not needed
     @Override
     public void executeVoid(VirtualFrame frame) {
