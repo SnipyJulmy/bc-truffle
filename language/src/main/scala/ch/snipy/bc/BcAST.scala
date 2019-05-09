@@ -42,8 +42,6 @@ object BcAST {
   case class Assignment(varAccess: VarAccess, expr: Expr) extends Expr
   case class PostIncrement(varAccess: VarAccess, modifier: Double) extends Expr
   case class PreIncrement(varAccess: VarAccess, modifier: Double) extends Expr
-  case class NumberLiteral(value: java.math.BigDecimal) extends Expr
-  case class StringLiteral(value: String) extends Expr
   case class Add(left: Expr, right: Expr) extends Expr
   case class Sub(left: Expr, right: Expr) extends Expr
   case class Div(left: Expr, right: Expr) extends Expr
@@ -56,4 +54,10 @@ object BcAST {
   case class ParExpr(expr: Expr) extends Expr
   case class FunctionCall(identifier: Identifier, args: List[Expr]) extends Expr
   case class ArrayExpr(identifier: Identifier) extends Expr
+
+  // Literals
+  case class LongLiteral(value: Long) extends Expr
+  case class DoubleLiteral(value: Double) extends Expr
+  case class BigNumberLiteral(value: java.math.BigDecimal) extends Expr
+  case class StringLiteral(value: String) extends Expr
 }

@@ -4,7 +4,7 @@ import ch.snipy.bc.BcAST._
 import ch.snipy.bc.node.call.BcInvokeNode
 import ch.snipy.bc.node.controlflow._
 import ch.snipy.bc.node.expression._
-import ch.snipy.bc.node.expression.literal.{BcDoubleLiteralNode, BcStringLiteralNode}
+import ch.snipy.bc.node.expression.literal.{BcBigNumberLiteralNode, BcDoubleLiteralNode, BcLongLiteralNode, BcStringLiteralNode}
 import ch.snipy.bc.node.local._
 import ch.snipy.bc.node.statement.{BcBlockNode, BcFunctionDefinitionNode}
 import ch.snipy.bc.node.{BcExpressionNode, BcRootNode, BcStatementNode}
@@ -156,8 +156,6 @@ object BcAstBuilder {
       mkPostIncrementNode(id, modifier, index map process)
     case PreIncrement(VarAccess(id, index), modifier) =>
       mkPreIncrementNode(id, modifier, index map process)
-    case NumberLiteral(value) => new BcDoubleLiteralNode(new BcBigNumber(value))
-    case StringLiteral(value) => new BcStringLiteralNode(value)
     case Add(left, right) => BcAddNodeGen.create(process(left), process(right))
     case Sub(left, right) => BcSubNodeGen.create(process(left), process(right))
     case Div(left, right) => BcDivNodeGen.create(process(left), process(right))
@@ -170,6 +168,10 @@ object BcAstBuilder {
     case ParExpr(e) => new BcParExpressionNode(process(e))
     case FunctionCall(identifier, args) => mkCall(identifier, args map process)
     case ArrayExpr(identifier) => mkReadArray(identifier)
+    case LongLiteral(value) => new BcLongLiteralNode(value)
+    case DoubleLiteral(value) => new BcDoubleLiteralNode(value)
+    case BigNumberLiteral(value) => new BcBigNumberLiteralNode(new BcBigNumber(value))
+    case StringLiteral(value) => new BcStringLiteralNode(value)
   }
 
 
