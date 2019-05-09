@@ -6,22 +6,17 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 @NodeInfo(shortName = "const")
-public class BcLongLiteralNode extends BcExpressionNode {
+public class BcDoubleLiteralNode extends BcExpressionNode {
 
-    private final long value;
+    private final double value;
 
-    public BcLongLiteralNode(long value) {
+    public BcDoubleLiteralNode(double value) {
         this.value = value;
     }
 
     @Override
-    public long executeLong(VirtualFrame frame) throws UnexpectedResultException {
-        return value;
-    }
-
-    @Override
     public double executeDouble(VirtualFrame frame) throws UnexpectedResultException {
-        return (double) value;
+        return super.executeDouble(frame);
     }
 
     @Override
