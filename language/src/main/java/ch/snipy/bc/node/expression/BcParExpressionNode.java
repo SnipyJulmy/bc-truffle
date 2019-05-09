@@ -1,7 +1,6 @@
 package ch.snipy.bc.node.expression;
 
 import ch.snipy.bc.node.BcExpressionNode;
-import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
@@ -19,8 +18,8 @@ public class BcParExpressionNode extends BcExpressionNode {
     }
 
     @Override
-    public BcBigNumber executeBigNumber(VirtualFrame frame) throws UnexpectedResultException {
-        return expression.executeBigNumber(frame);
+    public long executeLong(VirtualFrame frame) throws UnexpectedResultException {
+        return expression.executeLong(frame);
     }
 
     @Override
@@ -28,8 +27,4 @@ public class BcParExpressionNode extends BcExpressionNode {
         return expression.executeString(frame);
     }
 
-    @Override
-    public Object[] executeObjectArray(VirtualFrame frame) throws UnexpectedResultException {
-        return expression.executeObjectArray(frame);
-    }
 }

@@ -10,9 +10,7 @@ import com.oracle.truffle.api.dsl.TypeSystem;
 
 @TypeSystem({
         long.class,
-        BcBigNumber.class,
-        String.class,
-        Object[].class
+        String.class
 })
 public abstract class BcTypes {
 
