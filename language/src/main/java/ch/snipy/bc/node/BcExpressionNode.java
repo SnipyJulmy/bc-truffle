@@ -6,24 +6,25 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
-@NodeInfo(description = "Base class for any expression ch.snipy.node")
+@NodeInfo(description = "Base class for any expression node")
 @TypeSystemReference(BcTypes.class)
 public abstract class BcExpressionNode extends BcStatementNode {
 
     // execute this when no specialization is possible --> most possible generalization
     public abstract Object executeGeneric(VirtualFrame frame);
 
-    // return the boolean representation of the node
-    public abstract boolean executeBoolean(VirtualFrame frame);
-
-    // the return getValue is not needed
     @Override
     public void executeVoid(VirtualFrame frame) {
+        // the return value is not needed
         executeGeneric(frame);
     }
 
     public long executeLong(VirtualFrame frame) throws UnexpectedResultException {
         return BcTypesGen.expectLong(executeGeneric(frame));
+    }
+
+    public double executeDouble(VirtualFrame frame) throws UnexpectedResultException {
+        return BcTypesGen.expectDouble(executeGeneric(frame));
     }
 
     public String executeString(VirtualFrame frame) throws UnexpectedResultException {

@@ -10,6 +10,7 @@ import com.oracle.truffle.api.dsl.TypeSystem;
 
 @TypeSystem({
         long.class,
+        double.class,
         String.class
 })
 public abstract class BcTypes {
@@ -25,12 +26,21 @@ public abstract class BcTypes {
         return BcNull.SINGLETON;
     }
 
-    /*
-        Implicit casting of long value to BigNumber
-     */
+    @ImplicitCast
+    @TruffleBoundary
+    public static long castLong(boolean value) {
+        return value ? 1 : 0;
+    }
+
     @ImplicitCast
     @TruffleBoundary
     public static BcBigNumber castBigNumber(long value) {
+        return BcBigNumber.valueOf(value);
+    }
+
+    @ImplicitCast
+    @TruffleBoundary
+    public static BcBigNumber castBigNumber(double value) {
         return BcBigNumber.valueOf(value);
     }
 }
