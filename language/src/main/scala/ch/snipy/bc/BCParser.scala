@@ -4,6 +4,7 @@ import ch.snipy.bc.BcAST._
 import ch.snipy.bc.node.BcRootNode
 import com.oracle.truffle.api.source.Source
 
+import scala.util.Try
 import scala.util.matching.Regex
 import scala.util.parsing.combinator.{PackratParsers, RegexParsers}
 import scala.util.parsing.input.CharSequenceReader
@@ -223,17 +224,27 @@ class BCParser extends RegexParsers with PackratParsers {
     bcIdentifier <~ "[" ~ "]" ^^ { id => ArrayExpr(id) } | bcExpr
 
   lazy val bcPrimaryExpr: PackratParser[Expr] =
-    numberLiteral | stringLiteral | bcParExpr
+    longLiteral | bigNumberLiteral | stringLiteral | bcParExpr
 
   lazy val bcParExpr: PackratParser[ParExpr] =
     lp ~> bcExpr <~ rp ^^ { expr => ParExpr(expr) }
 
+  // parse a long value, if the toLong value fails, return it inside a big decimal
+  lazy val longLiteral: PackratParser[Expr] =
+    "-?\\d{1,19}".r ^^ { strValue =>
+      Try(strValue.toLong) match {
+        case util.Failure(_) => BigNumberLiteral(new java.math.BigDecimal(strValue))
+        case util.Success(value) => LongLiteral(value)
+      }
+    }
+
+  lazy val bigNumberLiteral: PackratParser[BigNumberLiteral] =
+    "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)(E[0-9]+)?".r ^^ { strValue =>
+      BigNumberLiteral(new java.math.BigDecimal(strValue))
+    }
+
   lazy val stringLiteral: PackratParser[StringLiteral] =
     "\"" ~> """(?:[^"\\]|\\.)*""".r <~ "\"" ^^ StringLiteral
-
-  lazy val numberLiteral: PackratParser[NumberLiteral] = {
-    "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)(E[0-9]+)?".r ^^ { value => NumberLiteral(new java.math.BigDecimal(value)) }
-  }
 
   /* Utils regex and string */
   lazy val bcIdentifier: PackratParser[Identifier] = "[a-z]+".r ^^ { str => str } // POSIX bc
