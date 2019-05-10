@@ -202,7 +202,6 @@ object BcAstBuilder {
       BcVariableWriteNodeGen.create(value, slot, context.bcContext.getGlobalFrame)
   }
 
-  // TODO
   private def mkReadArray(identifier: Identifier)(implicit context: BcParserContext): BcExpressionNode = {
     val id = s"$identifier[]"
     val slot = {
