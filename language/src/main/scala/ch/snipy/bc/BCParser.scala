@@ -45,7 +45,7 @@ object BCParser {
         if (!dropWs(next).atEnd) {
           throw BcParserException(s"can't parse the whole string, input : ${source.getCharacters.toString}, rest : ${next.rest.source.toString}")
         }
-        // println(prog) // TODO : add an option to print the first AST
+        println(prog) // TODO : add an option to print the first AST
         BcAstBuilder.mkRootNode(bcLanguage, prog)
     }
     node
@@ -224,10 +224,18 @@ class BCParser extends RegexParsers with PackratParsers {
     bcIdentifier <~ "[" ~ "]" ^^ { id => ArrayExpr(id) } | bcExpr
 
   lazy val bcPrimaryExpr: PackratParser[Expr] =
-    longLiteral | bigNumberLiteral | stringLiteral | bcParExpr
+    numberLiteral | stringLiteral | bcParExpr
 
   lazy val bcParExpr: PackratParser[ParExpr] =
     lp ~> bcExpr <~ rp ^^ { expr => ParExpr(expr) }
+
+  lazy val numberLiteral: PackratParser[Expr] =
+    "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)(E[0-9]+)?".r ^^ { strValue =>
+      Try(strValue.toLong) match {
+        case util.Failure(_) => BigNumberLiteral(new java.math.BigDecimal(strValue))
+        case util.Success(value) => LongLiteral(value)
+      }
+    }
 
   // parse a long value, if the toLong value fails, return it inside a big decimal
   lazy val longLiteral: PackratParser[Expr] =
