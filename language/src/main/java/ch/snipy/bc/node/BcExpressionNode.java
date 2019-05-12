@@ -19,6 +19,10 @@ public abstract class BcExpressionNode extends BcStatementNode {
         executeGeneric(frame);
     }
 
+    public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException {
+        return BcTypesGen.expectBoolean(executeGeneric(frame));
+    }
+
     public long executeLong(VirtualFrame frame) throws UnexpectedResultException {
         return BcTypesGen.expectLong(executeGeneric(frame));
     }
