@@ -9,6 +9,7 @@ import com.oracle.truffle.api.dsl.TypeCheck;
 import com.oracle.truffle.api.dsl.TypeSystem;
 
 @TypeSystem({
+        boolean.class,
         long.class,
         double.class,
         String.class
@@ -31,6 +32,25 @@ public abstract class BcTypes {
     public static long castLong(boolean value) {
         return value ? 1 : 0;
     }
+
+    @ImplicitCast
+    @TruffleBoundary
+    public static double castDouble(boolean value) {
+        return value ? 1.0 : 0.0;
+    }
+
+    @ImplicitCast
+    @TruffleBoundary
+    public static BcBigNumber castBigNumber(boolean value) {
+        return value ? BcBigNumber.TRUE : BcBigNumber.FALSE;
+    }
+
+    @ImplicitCast
+    @TruffleBoundary
+    public static double castDouble(long value) {
+        return (double) value;
+    }
+
 
     @ImplicitCast
     @TruffleBoundary
