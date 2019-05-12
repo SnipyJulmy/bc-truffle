@@ -221,9 +221,9 @@ object BcAstBuilder {
       val id = s"$identifier[]"
       val slot = {
         if (context.name == "global")
-          context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
+          context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id)
         else
-          context.frameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
+          context.frameDescriptor.findOrAddFrameSlot(id)
       }
       assert(slot != null)
       BcReadArrayNodeGen.create(idx, slot, context.bcContext.getGlobalFrame)
@@ -231,7 +231,7 @@ object BcAstBuilder {
       val id = s"$identifier"
       val slot = {
         if (context.name == "global")
-          context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
+          context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id)
         else {
           context.frameDescriptor.findFrameSlot(id) match {
             case null => /* need to find from the globalFrame */
