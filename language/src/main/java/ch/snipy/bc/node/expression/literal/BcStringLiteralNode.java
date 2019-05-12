@@ -3,8 +3,10 @@ package ch.snipy.bc.node.expression.literal;
 import ch.snipy.bc.node.BcExpressionNode;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
-import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
+/**
+ * Constant literal for a String value
+ */
 @NodeInfo(shortName = "const")
 public class BcStringLiteralNode extends BcExpressionNode {
     private final String value;
@@ -14,7 +16,7 @@ public class BcStringLiteralNode extends BcExpressionNode {
     }
 
     @Override
-    public String executeString(VirtualFrame frame) throws UnexpectedResultException {
+    public String executeString(VirtualFrame frame) {
         return value;
     }
 

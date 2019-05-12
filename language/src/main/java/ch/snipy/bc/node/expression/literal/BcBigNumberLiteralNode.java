@@ -5,6 +5,9 @@ import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+/**
+ *  Constant literal for a Big decimal number
+ */
 @NodeInfo(shortName = "const")
 public final class BcBigNumberLiteralNode extends BcExpressionNode {
 
@@ -12,6 +15,11 @@ public final class BcBigNumberLiteralNode extends BcExpressionNode {
 
     public BcBigNumberLiteralNode(BcBigNumber value) {
         this.value = value;
+    }
+
+    @Override
+    public boolean executeBoolean(VirtualFrame frame) {
+        return !value.equals(BcBigNumber.FALSE);
     }
 
     @Override

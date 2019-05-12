@@ -5,6 +5,9 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
+/**
+ *  Constant literal for a long literal
+ */
 @NodeInfo(shortName = "const")
 public class BcLongLiteralNode extends BcExpressionNode {
 
@@ -15,17 +18,22 @@ public class BcLongLiteralNode extends BcExpressionNode {
     }
 
     @Override
-    public long executeLong(VirtualFrame frame) throws UnexpectedResultException {
+    public boolean executeBoolean(VirtualFrame frame) {
+        return value != 0L;
+    }
+
+    @Override
+    public long executeLong(VirtualFrame frame) {
         return value;
     }
 
     @Override
-    public double executeDouble(VirtualFrame frame) throws UnexpectedResultException {
+    public double executeDouble(VirtualFrame frame) {
         return (double) value;
     }
 
     @Override
-    public String executeString(VirtualFrame frame) throws UnexpectedResultException {
+    public String executeString(VirtualFrame frame) {
         return "" + value;
     }
 
