@@ -5,10 +5,8 @@ import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.frame.FrameDescriptor;
-import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.FrameUtil;
-import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.frame.*;
+import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 import static ch.snipy.bc.runtime.BcBigNumber.ONE;
 
@@ -19,6 +17,16 @@ public abstract class BcPostIncrementNode extends BcReadNode {
     protected abstract long getModifier();
 
     protected abstract FrameSlot getSlot();
+
+    @Override
+    public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException {
+        Object res = postIncrement(frame);
+        if (res instanceof Boolean) return (boolean) res;
+        if (res instanceof Long) return ((long) res) != 0;
+        if (res instanceof Double) return ((double) res) != 0.0;
+        if (res instanceof BcBigNumber) return ((BcBigNumber) res).booleanValue();
+        return super.executeBoolean(frame);
+    }
 
     @SuppressWarnings("Duplicates")
     @Specialization
@@ -51,12 +59,12 @@ public abstract class BcPostIncrementNode extends BcReadNode {
     }
 
     private VirtualFrame getCorrectFrame(VirtualFrame localFrame) {
-        if (isIn(localFrame)) return localFrame;
+        if (isIn(localFrame.materialize())) return localFrame;
         else if (isIn(getGlobalFrame())) return getGlobalFrame();
         else return null;
     }
 
-    private boolean isIn(VirtualFrame frame) {
+    private boolean isIn(MaterializedFrame frame) {
         return contains(frame.getFrameDescriptor(), getSlot());
     }
 

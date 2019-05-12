@@ -2,11 +2,13 @@ package ch.snipy.bc.node.call;
 
 import ch.snipy.bc.node.BcExpressionNode;
 import ch.snipy.bc.node.expression.BcFunctionLiteralNode;
+import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.CompilerAsserts;
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
+import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 public final class BcInvokeNode extends BcExpressionNode {
 
@@ -18,6 +20,17 @@ public final class BcInvokeNode extends BcExpressionNode {
         this.functionNode = functionNode;
         this.argumentNodes = argumentsNode;
         this.dispatchNode = BcDispatchNodeGen.create();
+    }
+
+    @Override
+    @ExplodeLoop
+    public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException {
+        Object res = executeBoundary(frame.materialize());
+        if (res instanceof Boolean) return (boolean) res;
+        if (res instanceof Long) return ((long) res) != 0;
+        if (res instanceof Double) return ((double) res) != 0.0;
+        if (res instanceof BcBigNumber) return ((BcBigNumber) res).booleanValue();
+        return super.executeBoolean(frame);
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameUtil;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 import static ch.snipy.bc.runtime.BcBigNumber.ONE;
 
@@ -19,6 +20,16 @@ public abstract class BcPreIncrementNode extends BcReadNode {
     protected abstract long getModifier();
 
     protected abstract FrameSlot getSlot();
+
+    @Override
+    public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException {
+        Object res = preIncrement(frame);
+        if (res instanceof Boolean) return (boolean) res;
+        if (res instanceof Long) return ((long) res) != 0;
+        if (res instanceof Double) return ((double) res) != 0.0;
+        if (res instanceof BcBigNumber) return ((BcBigNumber) res).booleanValue();
+        return super.executeBoolean(frame);
+    }
 
     @Specialization
     protected Object preIncrement(VirtualFrame localFrame) {
