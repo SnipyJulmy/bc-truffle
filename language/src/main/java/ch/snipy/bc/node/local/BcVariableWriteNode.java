@@ -106,12 +106,12 @@ public abstract class BcVariableWriteNode extends BcExpressionNode {
     }
 
     private VirtualFrame getCorrectFrame(VirtualFrame localFrame) {
-        if (isIn(localFrame)) return localFrame;
-        else if (isIn(getGlobalFrame())) return getGlobalFrame();
+        if (isIn(localFrame.materialize(), getSlot())) return localFrame;
+        else if (isIn(getGlobalFrame(), getSlot())) return getGlobalFrame();
         else return null;
     }
 
-    private boolean isIn(VirtualFrame frame) {
-        return contains(frame.getFrameDescriptor(), getSlot());
+    private boolean isIn(MaterializedFrame frame, FrameSlot slot) {
+        return contains(frame.getFrameDescriptor(), slot);
     }
 }

@@ -8,6 +8,7 @@ import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
+import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
@@ -65,12 +66,12 @@ public abstract class BcVariableReadNode extends BcReadNode {
     }
 
     private VirtualFrame getCorrectFrame(VirtualFrame localFrame) {
-        if (isIn(localFrame)) return localFrame;
+        if (isIn(localFrame.materialize())) return localFrame;
         else if (isIn(getGlobalFrame())) return getGlobalFrame();
         else return null;
     }
 
-    private boolean isIn(VirtualFrame frame) {
+    private boolean isIn(MaterializedFrame frame) {
         return contains(frame.getFrameDescriptor(), getSlot());
     }
 }
