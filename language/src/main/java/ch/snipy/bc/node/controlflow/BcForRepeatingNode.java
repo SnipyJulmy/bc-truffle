@@ -2,7 +2,6 @@ package ch.snipy.bc.node.controlflow;
 
 import ch.snipy.bc.node.BcExpressionNode;
 import ch.snipy.bc.node.BcStatementNode;
-import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.dsl.UnsupportedSpecializationException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
@@ -48,7 +47,7 @@ public final class BcForRepeatingNode extends Node implements RepeatingNode {
 
     private boolean evaluateCondition(VirtualFrame frame) {
         try {
-            return conditionNode == null || (conditionNode.executeBigNumber(frame).equals(BcBigNumber.TRUE));
+            return conditionNode == null || (conditionNode.executeBoolean(frame));
         } catch (UnexpectedResultException e) {
             throw new UnsupportedSpecializationException(this, new Node[]{conditionNode}, e.getResult());
         }

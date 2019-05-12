@@ -3,7 +3,6 @@ package ch.snipy.bc.node.controlflow;
 import ch.snipy.bc.BcException;
 import ch.snipy.bc.node.BcExpressionNode;
 import ch.snipy.bc.node.BcStatementNode;
-import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import com.oracle.truffle.api.profiles.ConditionProfile;
@@ -23,7 +22,7 @@ public final class BcIfNode extends BcStatementNode {
     @Override
     public void executeVoid(VirtualFrame frame) {
         try {
-            if (conditionProfile.profile(conditionNode.executeBigNumber(frame).equals(BcBigNumber.TRUE)))
+            if (conditionProfile.profile(conditionNode.executeBoolean(frame)))
                 trueNode.executeVoid(frame);
             else {
                 if (falseNode != null) falseNode.executeVoid(frame);
