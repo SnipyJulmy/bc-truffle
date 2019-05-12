@@ -157,11 +157,9 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
         return valueOf(this.value.negate());
     }
 
-    // fixme : int value verification
     @TruffleBoundary
     public BcBigNumber pow(BcBigNumber right) {
-        int exponent = right.value.intValue();
-        return valueOf(this.value.pow(exponent));
+        return valueOf(BigDecimalMath.pow(this.value, right.value, getMathContext()));
     }
 
     @ExportMessage
