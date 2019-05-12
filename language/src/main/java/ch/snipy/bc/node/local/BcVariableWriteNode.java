@@ -19,21 +19,67 @@ public abstract class BcVariableWriteNode extends BcExpressionNode {
     protected abstract MaterializedFrame getGlobalFrame();
 
     @Specialization
-    public BcBigNumber writeBigNumber(VirtualFrame frame, BcBigNumber number) {
+    boolean write(VirtualFrame localFrame, boolean value) {
         if (getSlot().getIdentifier().equals("scale")) {
-            BcLanguage.getCurrentContext().setScale(number.intValue());
+            BcLanguage.getCurrentContext().setScale(value ? 1 : 0);
         }
-        if (contains(frame.getFrameDescriptor(), getSlot())) {
-            frame.getFrameDescriptor().setFrameSlotKind(getSlot(), FrameSlotKind.Object);
-            frame.setObject(getSlot(), number);
-        } else if (contains(getGlobalFrame().getFrameDescriptor(), getSlot())) {
-            getGlobalFrame().getFrameDescriptor().setFrameSlotKind(getSlot(), FrameSlotKind.Object);
-            getGlobalFrame().setObject(getSlot(), number);
+        VirtualFrame frame = getCorrectFrame(localFrame);
+        if (frame == null) {
+            createFrameSlot(localFrame.getFrameDescriptor(), getSlot());
+            localFrame.setBoolean(getSlot(), value);
         } else {
-            createFrameSlot(frame.getFrameDescriptor(), getSlot());
-            frame.setObject(getSlot(), number);
+            frame.getFrameDescriptor().setFrameSlotKind(getSlot(), FrameSlotKind.Boolean);
+            frame.setBoolean(getSlot(), value);
         }
-        return number;
+        return value;
+    }
+
+    @Specialization
+    long write(VirtualFrame localFrame, long value) {
+        if (getSlot().getIdentifier().equals("scale")) {
+            BcLanguage.getCurrentContext().setScale((int) value);
+        }
+        VirtualFrame frame = getCorrectFrame(localFrame);
+        if (frame == null) {
+            createFrameSlot(localFrame.getFrameDescriptor(), getSlot());
+            localFrame.setLong(getSlot(), value);
+        } else {
+            frame.getFrameDescriptor().setFrameSlotKind(getSlot(), FrameSlotKind.Long);
+            frame.setLong(getSlot(), value);
+        }
+        return value;
+    }
+
+    @Specialization
+    double write(VirtualFrame localFrame, double value) {
+        if (getSlot().getIdentifier().equals("scale")) {
+            BcLanguage.getCurrentContext().setScale((int) value);
+        }
+        VirtualFrame frame = getCorrectFrame(localFrame);
+        if (frame == null) {
+            createFrameSlot(localFrame.getFrameDescriptor(), getSlot());
+            localFrame.setDouble(getSlot(), value);
+        } else {
+            frame.getFrameDescriptor().setFrameSlotKind(getSlot(), FrameSlotKind.Double);
+            frame.setDouble(getSlot(), value);
+        }
+        return value;
+    }
+
+    @Specialization
+    public BcBigNumber write(VirtualFrame localFrame, BcBigNumber value) {
+        if (getSlot().getIdentifier().equals("scale")) {
+            BcLanguage.getCurrentContext().setScale(value.intValue());
+        }
+        VirtualFrame frame = getCorrectFrame(localFrame);
+        if (frame == null) {
+            createFrameSlot(localFrame.getFrameDescriptor(), getSlot());
+            localFrame.setObject(getSlot(), value);
+        } else {
+            frame.getFrameDescriptor().setFrameSlotKind(getSlot(), FrameSlotKind.Object);
+            frame.setObject(getSlot(), value);
+        }
+        return value;
     }
 
     // Generic method that write all possible type
@@ -57,5 +103,15 @@ public abstract class BcVariableWriteNode extends BcExpressionNode {
     @TruffleBoundary
     private void createFrameSlot(FrameDescriptor frameDescriptor, FrameSlot slot) {
         frameDescriptor.findOrAddFrameSlot(slot.getIdentifier(), FrameSlotKind.Object);
+    }
+
+    private VirtualFrame getCorrectFrame(VirtualFrame localFrame) {
+        if (isIn(localFrame)) return localFrame;
+        else if (isIn(getGlobalFrame())) return getGlobalFrame();
+        else return null;
+    }
+
+    private boolean isIn(VirtualFrame frame) {
+        return contains(frame.getFrameDescriptor(), getSlot());
     }
 }

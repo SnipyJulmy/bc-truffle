@@ -232,13 +232,8 @@ object BcAstBuilder {
       val slot = {
         if (context.name == "global")
           context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id)
-        else {
-          context.frameDescriptor.findFrameSlot(id) match {
-            case null => /* need to find from the globalFrame */
-              context.bcContext.getGlobalFrame.getFrameDescriptor.findFrameSlot(id)
-            case s => s
-          }
-        }
+        else
+          context.frameDescriptor.findOrAddFrameSlot(id)
       }
       assert(slot != null)
       BcVariableReadNodeGen.create(context.bcContext.getGlobalFrame, slot)
