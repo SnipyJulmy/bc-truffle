@@ -37,6 +37,12 @@ public abstract class BcPrintBuiltin extends BcBuiltinNode {
     }
 
     @Specialization
+    protected boolean print(boolean value) {
+        doPrint(getContext().getOutput(), value ? 1 : 0);
+        return value;
+    }
+
+    @Specialization
     public Object[] print(Object[] args) {
         doPrint(getContext().getOutput(), args);
         return args;
@@ -50,6 +56,10 @@ public abstract class BcPrintBuiltin extends BcBuiltinNode {
 
     @Specialization
     public String print(String value) {
+        if(value.equals("true\n"))
+            value = "1\n";
+        if(value.equals("false\n"))
+            value = "0\n";
         doPrint(getContext().getOutput(), value);
         return value;
     }
