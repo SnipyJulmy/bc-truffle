@@ -9,7 +9,22 @@ import com.oracle.truffle.api.dsl.Specialization;
 public abstract class BcNegNode extends BcUnaryNode {
 
     @Specialization
-    protected BcBigNumber doDouble(BcBigNumber value) {
+    protected boolean negate(boolean value) {
+        return !value;
+    }
+
+    @Specialization
+    protected long negate(long value) {
+        return -value;
+    }
+
+    @Specialization
+    protected double negate(double value) {
+        return -value;
+    }
+
+    @Specialization
+    protected BcBigNumber negate(BcBigNumber value) {
         return value.negate();
     }
 

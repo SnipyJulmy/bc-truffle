@@ -8,8 +8,20 @@ import com.oracle.truffle.api.dsl.Specialization;
 
 public abstract class BcSubNode extends BcBinaryNode {
 
+    // the boolean case is handle by the long case
+
+    @Specialization(rewriteOn = ArithmeticException.class)
+    protected long sub(long left, long right) {
+        return Math.subtractExact(left, right);
+    }
+
     @Specialization
-    protected BcBigNumber doDouble(BcBigNumber left, BcBigNumber right) {
+    protected double sub(double left, double right) {
+        return left - right;
+    }
+
+    @Specialization
+    protected BcBigNumber sub(BcBigNumber left, BcBigNumber right) {
         return left.subtract(right);
     }
 

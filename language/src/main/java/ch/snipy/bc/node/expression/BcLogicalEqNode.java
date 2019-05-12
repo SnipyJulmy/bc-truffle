@@ -11,13 +11,23 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 public abstract class BcLogicalEqNode extends BcBinaryNode {
 
     @Specialization
-    protected BcBigNumber equal(BcBigNumber left, BcBigNumber right) {
-        return left.equals(right) ? BcBigNumber.TRUE : BcBigNumber.FALSE;
+    protected boolean equal(long left, long right) {
+        return left == right;
     }
 
     @Specialization
-    protected BcBigNumber equal(String left, String right) {
-        return left.equals(right) ? BcBigNumber.TRUE : BcBigNumber.FALSE;
+    protected boolean equal(double left, double right) {
+        return left == right;
+    }
+
+    @Specialization
+    protected boolean equal(BcBigNumber left, BcBigNumber right) {
+        return left.equals(right);
+    }
+
+    @Specialization
+    protected boolean equal(String left, String right) {
+        return left.equals(right);
     }
 
     @Fallback

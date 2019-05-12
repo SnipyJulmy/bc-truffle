@@ -11,6 +11,21 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 public abstract class BcAndNode extends BcBinaryNode {
 
     @Specialization
+    protected boolean and(boolean left, boolean right) {
+        return left && right;
+    }
+
+    @Specialization
+    protected boolean and(long left, long right) {
+        return left == 1 && right == 1;
+    }
+
+    @Specialization
+    protected boolean and(double left, double right) {
+        return left == 1.0 && right == 1.0;
+    }
+
+    @Specialization
     protected BcBigNumber doBigNumber(BcBigNumber left, BcBigNumber right) {
         return BcBigNumber.valueOf(left.booleanValue() && right.booleanValue());
     }

@@ -7,14 +7,27 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
-import static ch.snipy.bc.runtime.BcBigNumber.valueOf;
-
 @NodeInfo(shortName = "||")
 public abstract class BcOrNode extends BcBinaryNode {
 
     @Specialization
-    protected BcBigNumber or(BcBigNumber left, BcBigNumber right) {
-        return valueOf(left.booleanValue() || right.booleanValue());
+    protected boolean or(boolean left, boolean right) {
+        return left || right;
+    }
+
+    @Specialization
+    protected boolean or(long left, long right) {
+        return (left != 0) || (right != 0);
+    }
+
+    @Specialization
+    protected boolean or(double left, double right) {
+        return (left != 0) || (right != 0);
+    }
+
+    @Specialization
+    protected boolean or(BcBigNumber left, BcBigNumber right) {
+        return left.booleanValue() || right.booleanValue();
     }
 
     @Fallback

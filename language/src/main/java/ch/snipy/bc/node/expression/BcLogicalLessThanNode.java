@@ -7,24 +7,42 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
-import static ch.snipy.bc.runtime.BcBigNumber.FALSE;
-import static ch.snipy.bc.runtime.BcBigNumber.TRUE;
-
 @NodeInfo(shortName = "<")
 public abstract class BcLogicalLessThanNode extends BcBinaryNode {
 
+    /*
+
+           +-------+--------+-----+
+           |  left |  right | leq |
+           +-------+--------+-----+
+           |   0   |   0    |  0  |
+           +-------+--------+-----+
+           |   0   |   1    |  1  |
+           +-------+--------+-----+
+           |   1   |   0    |  0  |
+           +-------+--------+-----+
+           |   1   |   1    |  0  |
+           +-------+--------+-----+
+    */
     @Specialization
-    protected BcBigNumber lessThan(BcBigNumber left, BcBigNumber right) {
+    protected boolean lessThan(boolean left, boolean right) {
+        return !left && right;
+    }
+
+    @Specialization
+    protected boolean lessThan(long left, long right) {
+        return left < right;
+    }
+
+    @Specialization
+    protected boolean lessThan(double left, double right) {
+        return left < right;
+    }
+
+    @Specialization
+    protected boolean lessThan(BcBigNumber left, BcBigNumber right) {
         int res = left.compareTo(right);
-        switch (res) {
-            case -1:
-                return TRUE;
-            case 0:
-            case 1:
-                return FALSE;
-        }
-        assert false; // should never happen
-        return null;
+        return res < 0;
     }
 
     @Fallback

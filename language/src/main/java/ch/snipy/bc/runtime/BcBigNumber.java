@@ -134,7 +134,9 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
 
     @TruffleBoundary
     public BcBigNumber divide(BcBigNumber right) {
-        return valueOf(this.value.divide(right.value, BigDecimal.ROUND_FLOOR));
+        return valueOf(
+                this.value.divide(right.value, BigDecimal.ROUND_FLOOR).setScale(getScale(), getRoundingMode())
+        );
     }
 
     @TruffleBoundary

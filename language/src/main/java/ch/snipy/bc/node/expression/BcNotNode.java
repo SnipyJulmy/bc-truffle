@@ -8,14 +8,28 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 import static ch.snipy.bc.runtime.BcBigNumber.FALSE;
-import static ch.snipy.bc.runtime.BcBigNumber.TRUE;
 
 @NodeInfo(shortName = "!")
 public abstract class BcNotNode extends BcUnaryNode {
 
     @Specialization
-    protected BcBigNumber not(BcBigNumber value) {
-        return value.equals(FALSE) ? TRUE : FALSE;
+    protected boolean not(boolean value) {
+        return !value;
+    }
+
+    @Specialization
+    protected boolean not(long value) {
+        return value == 0;
+    }
+
+    @Specialization
+    protected boolean not(double value) {
+        return value == 0.0;
+    }
+
+    @Specialization
+    protected boolean not(BcBigNumber value) {
+        return value.equals(FALSE);
     }
 
     @Fallback

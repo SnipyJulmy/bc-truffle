@@ -9,7 +9,26 @@ import com.oracle.truffle.api.dsl.Specialization;
 public abstract class BcMulNode extends BcBinaryNode {
 
     @Specialization
-    protected BcBigNumber doDouble(BcBigNumber left, BcBigNumber right) {
+    protected boolean mul(boolean left, boolean right) {
+        return left && right;
+    }
+
+    @Specialization(rewriteOn = ArithmeticException.class)
+    protected long mul(long left, long right) {
+        return Math.multiplyExact(left, right);
+    }
+
+    @Specialization(rewriteOn = ArithmeticException.class)
+    protected double mul(double left, double right) {
+        double res = left * right;
+        if (Double.isInfinite(res))
+            if (Double.isInfinite(res))
+                throw new ArithmeticException("mul result is infinite");
+        return res;
+    }
+
+    @Specialization
+    protected BcBigNumber mul(BcBigNumber left, BcBigNumber right) {
         return left.multiply(right);
     }
 
