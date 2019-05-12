@@ -4,7 +4,6 @@ import ch.snipy.bc.BcException;
 import ch.snipy.bc.BcLanguage;
 import ch.snipy.bc.node.BcExpressionNode;
 import ch.snipy.bc.runtime.BcContext;
-import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.dsl.GenerateNodeFactory;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.UnsupportedSpecializationException;
@@ -29,13 +28,18 @@ public abstract class BcBuiltinNode extends BcExpressionNode {
     }
 
     @Override
-    public void executeVoid(VirtualFrame frame) {
-        super.executeVoid(frame);
+    public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException {
+        return super.executeBoolean(frame);
     }
 
     @Override
-    public BcBigNumber executeBigNumber(VirtualFrame frame) throws UnexpectedResultException {
-        return super.executeBigNumber(frame);
+    public long executeLong(VirtualFrame frame) throws UnexpectedResultException {
+        return super.executeLong(frame);
+    }
+
+    @Override
+    public double executeDouble(VirtualFrame frame) throws UnexpectedResultException {
+        return super.executeDouble(frame);
     }
 
     @Override
@@ -44,8 +48,8 @@ public abstract class BcBuiltinNode extends BcExpressionNode {
     }
 
     @Override
-    public Object[] executeObjectArray(VirtualFrame frame) throws UnexpectedResultException {
-        return super.executeObjectArray(frame);
+    public void executeVoid(VirtualFrame frame) {
+        super.executeVoid(frame);
     }
 
     protected abstract Object execute(VirtualFrame frame);
