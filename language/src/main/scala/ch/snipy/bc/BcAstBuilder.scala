@@ -253,11 +253,11 @@ object BcAstBuilder {
   }
 
   private def mkPreIncrementNode(identifier: String,
-                                 modifier: Double,
+                                 modifier: Long,
                                  index: Option[BcExpressionNode] = None)
                                 (implicit context: BcParserContext): BcExpressionNode = {
     val id = index match {
-      case Some(value) => s"$identifier[]"
+      case some: Some[_] => s"$identifier[]"
       case None => s"$identifier"
     }
     val slot = context.bcContext.getGlobalFrame.getFrameDescriptor.findFrameSlot(id) match {
@@ -268,7 +268,7 @@ object BcAstBuilder {
   }
 
   private def mkPostIncrementNode(identifier: String,
-                                  modifier: Double,
+                                  modifier: Long,
                                   index: Option[BcExpressionNode] = None)
                                  (implicit context: BcParserContext): BcExpressionNode = {
     val id = index match {
