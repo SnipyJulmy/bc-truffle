@@ -11,34 +11,53 @@ import com.oracle.truffle.api.frame.FrameUtil;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 import static ch.snipy.bc.runtime.BcBigNumber.ONE;
-import static ch.snipy.bc.runtime.BcBigNumber.ZERO;
 
 @NodeField(name = "slot", type = FrameSlot.class)
-@NodeField(name = "modifier", type = double.class)
+@NodeField(name = "modifier", type = long.class)
 public abstract class BcPostIncrementNode extends BcReadNode {
+
+    protected abstract long getModifier();
 
     protected abstract FrameSlot getSlot();
 
-    protected abstract double getModifier();
-
     @SuppressWarnings("Duplicates")
     @Specialization
-    public BcBigNumber doBcBigNumber(VirtualFrame localFrame) {
-        BcBigNumber value;
-        VirtualFrame frame;
-        if (contains(localFrame.getFrameDescriptor(), getSlot())) {
-            frame = localFrame;
-            value = (BcBigNumber) FrameUtil.getObjectSafe(localFrame, getSlot());
-        } else if (contains(getGlobalFrame().getFrameDescriptor(), getSlot())) {
-            frame = getGlobalFrame();
-            value = (BcBigNumber) FrameUtil.getObjectSafe(getGlobalFrame(), getSlot());
+    public Object postIncrement(VirtualFrame localFrame) {
+        VirtualFrame frame = getCorrectFrame(localFrame);
+        if (frame == null) { // return 0 but set value to 1, since it is post incremented
+            localFrame.setLong(getSlot(), 1);
+            return 0;
         } else {
-            frame = localFrame;
-            value = ZERO;
+            try {
+                long value = FrameUtil.getLongSafe(frame, getSlot());
+                long newValue = value + getModifier();
+                frame.setLong(getSlot(), newValue);
+                return newValue;
+            } catch (IllegalStateException eLong) { // long failed, we try with double
+                try {
+                    double value = FrameUtil.getDoubleSafe(frame, getSlot());
+                    double newValue = value + getModifier();
+                    frame.setDouble(getSlot(), newValue);
+                    return newValue;
+                } catch (IllegalStateException eDouble) { // double failed, go for BigNumber
+                    BcBigNumber value = (BcBigNumber) FrameUtil.getObjectSafe(frame, getSlot());
+                    BcBigNumber newValue = value.add(getModifier() > 0 ? ONE : ONE.negate());
+                    frame.setObject(getSlot(), newValue);
+                    return value;
+                }
+            }
         }
-        BcBigNumber newValue = value.add(getModifier() > 0.0 ? ONE : ONE.negate());
-        frame.setObject(getSlot(), newValue);
-        return value;
+
+    }
+
+    private VirtualFrame getCorrectFrame(VirtualFrame localFrame) {
+        if (isIn(localFrame)) return localFrame;
+        else if (isIn(getGlobalFrame())) return getGlobalFrame();
+        else return null;
+    }
+
+    private boolean isIn(VirtualFrame frame) {
+        return contains(frame.getFrameDescriptor(), getSlot());
     }
 
     @TruffleBoundary
