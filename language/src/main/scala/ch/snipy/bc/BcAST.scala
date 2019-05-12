@@ -40,8 +40,8 @@ object BcAST {
   case class Equal(left: Expr, right: Expr) extends Expr
   case class NotEqual(left: Expr, right: Expr) extends Expr
   case class Assignment(varAccess: VarAccess, expr: Expr) extends Expr
-  case class PostIncrement(varAccess: VarAccess, modifier: Double) extends Expr
-  case class PreIncrement(varAccess: VarAccess, modifier: Double) extends Expr
+  case class PostIncrement(varAccess: VarAccess, modifier: Long) extends Expr
+  case class PreIncrement(varAccess: VarAccess, modifier: Long) extends Expr
   case class Add(left: Expr, right: Expr) extends Expr
   case class Sub(left: Expr, right: Expr) extends Expr
   case class Div(left: Expr, right: Expr) extends Expr
