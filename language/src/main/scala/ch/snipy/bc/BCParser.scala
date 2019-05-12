@@ -194,10 +194,10 @@ class BCParser extends RegexParsers with PackratParsers {
       bcIncDecExpr
 
   lazy val bcIncDecExpr: PackratParser[Expr] =
-    "++" ~> bcVarAccess ^^ { expr => PreIncrement(expr, 1.0) } |
-      "--" ~> bcVarAccess ^^ { expr => PreIncrement(expr, -1.0) } |
-      bcVarAccess <~ "++" ^^ { expr => PostIncrement(expr, 1.0) } |
-      bcVarAccess <~ "--" ^^ { expr => PostIncrement(expr, -1.0) } |
+    "++" ~> bcVarAccess ^^ { expr => PreIncrement(expr, 1) } |
+      "--" ~> bcVarAccess ^^ { expr => PreIncrement(expr, -1) } |
+      bcVarAccess <~ "++" ^^ { expr => PostIncrement(expr, 1) } |
+      bcVarAccess <~ "--" ^^ { expr => PostIncrement(expr, -1) } |
       bcNegExpr
 
   lazy val bcNegExpr: PackratParser[Expr] =
