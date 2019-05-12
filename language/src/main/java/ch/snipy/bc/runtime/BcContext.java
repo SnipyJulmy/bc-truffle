@@ -29,7 +29,7 @@ import java.math.RoundingMode;
 import java.util.List;
 
 public final class BcContext {
-    private static final int DEFAULT_SCALE = 20;
+    private static final int DEFAULT_SCALE = 0;
 
     private final BufferedReader input;
     private final PrintWriter output;
