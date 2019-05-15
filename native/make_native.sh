@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-if [[ $BC_BUILD_NATIVE == "false" ]]; then
+if [[ ${BC_BUILD_NATIVE} == "false" ]]; then
     echo "Skipping the native image build because BC_BUILD_NATIVE is set to false."
     exit 0
 fi
 
-if [[ $JAVA_HOME == "" ]]; then
+if [[ ${JAVA_HOME} == "" ]]; then
   export JAVA_HOME="/usr/lib/jvm/java-8-graal"
 fi
 
