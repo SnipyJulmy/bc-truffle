@@ -6,7 +6,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
-@NodeInfo(description = "Base class for any expression node")
+@NodeInfo(shortName = "expr", description = "Base class for any expression node")
 @TypeSystemReference(BcTypes.class)
 public abstract class BcExpressionNode extends BcStatementNode {
 
@@ -19,16 +19,8 @@ public abstract class BcExpressionNode extends BcStatementNode {
         executeGeneric(frame);
     }
 
-    public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException {
-        return BcTypesGen.expectBoolean(executeGeneric(frame));
-    }
-
     public long executeLong(VirtualFrame frame) throws UnexpectedResultException {
         return BcTypesGen.expectLong(executeGeneric(frame));
-    }
-
-    public double executeDouble(VirtualFrame frame) throws UnexpectedResultException {
-        return BcTypesGen.expectDouble(executeGeneric(frame));
     }
 
     public String executeString(VirtualFrame frame) throws UnexpectedResultException {
