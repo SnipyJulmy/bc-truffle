@@ -17,22 +17,6 @@ public abstract class BcVariableReadNode extends BcReadNode {
 
     protected abstract FrameSlot getSlot();
 
-    @Override
-    public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException {
-        Object res = read(frame);
-        if (res instanceof Boolean) {
-            return ((Boolean) res);
-        } else if (res instanceof Long) {
-            return ((Long) res) != 0;
-        } else if (res instanceof Double) {
-            return ((Double) res) != 0;
-        } else if (res instanceof BcBigNumber) {
-            return ((BcBigNumber) res).booleanValue();
-        } else {
-            return super.executeBoolean(frame);
-        }
-    }
-
     @Specialization
     public Object read(VirtualFrame localFrame) {
         if (getSlot() == null) throw BcException.typeError(this, "slot is null");
@@ -54,7 +38,7 @@ public abstract class BcVariableReadNode extends BcReadNode {
             if (frame == null) {
                 throw BcException.typeError(this, "unknown variable " + getSlot().getIdentifier());
             }
-            res = localFrame.getValue(getSlot());
+            res = frame.getValue(getSlot());
             if (res == null) return BcBigNumber.ZERO;
             return res;
         }

@@ -3,15 +3,19 @@ package ch.snipy.bc.node.local;
 import ch.snipy.bc.node.BcExpressionNode;
 import ch.snipy.bc.node.BcReadNode;
 import ch.snipy.bc.runtime.BcBigNumber;
+import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
+import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO rewrite the class
 @NodeChild(value = "index", type = BcExpressionNode.class)
 @NodeChild(value = "expr", type = BcExpressionNode.class)
 @NodeField(name = "slot", type = FrameSlot.class)
@@ -22,7 +26,7 @@ public abstract class BcWriteArrayNode extends BcReadNode {
     @Specialization
     public Object writeObject(VirtualFrame frame, BcBigNumber index, BcBigNumber expr) {
         Object res;
-        if (getGlobalFrame().getFrameDescriptor().getSlots().contains(getSlot())) {
+        if (contains(getGlobalFrame().getFrameDescriptor(), getSlot())) {
             res = getGlobalFrame().getValue(getSlot());
             if (res == null) {
                 Map<Object, Object> map = new HashMap<>();
@@ -35,11 +39,12 @@ public abstract class BcWriteArrayNode extends BcReadNode {
             res = frame.getValue(getSlot());
             if (res == null) {
                 Map<Object, Object> map = new HashMap<>();
-                getGlobalFrame().setObject(getSlot(), map);
+                frame.setObject(getSlot(), map);
                 res = frame.getValue(getSlot());
             }
             assert res != null;
         }
+        //noinspection unchecked
         Map<Object, Object> map = (Map<Object, Object>) res;
         map.put(index, expr);
         return expr;
@@ -66,6 +71,7 @@ public abstract class BcWriteArrayNode extends BcReadNode {
             }
             assert res != null;
         }
+        //noinspection unchecked
         Map<Object, Object> map = (Map<Object, Object>) res;
         map.put(index, expr);
         return expr;
@@ -92,8 +98,24 @@ public abstract class BcWriteArrayNode extends BcReadNode {
             }
             assert res != null;
         }
+        //noinspection unchecked
         Map<Object, Object> map = (Map<Object, Object>) res;
         map.put(index, expr);
         return expr;
+    }
+
+    @TruffleBoundary
+    private boolean contains(FrameDescriptor frameDescriptor, FrameSlot slot) {
+        return frameDescriptor.getSlots().contains(slot);
+    }
+
+    private VirtualFrame getCorrectFrame(VirtualFrame localFrame) {
+        if (isIn(localFrame.materialize())) return localFrame;
+        else if (isIn(getGlobalFrame())) return getGlobalFrame();
+        else return null;
+    }
+
+    private boolean isIn(MaterializedFrame frame) {
+        return contains(frame.getFrameDescriptor(), getSlot());
     }
 }

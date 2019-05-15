@@ -85,7 +85,7 @@ public abstract class BcVariableWriteNode extends BcExpressionNode {
     // Generic method that write all possible type
     @Specialization
     public Object writeGeneric(VirtualFrame frame, Object exprValue) {
-        if (frame.getFrameDescriptor().getSlots().contains(getSlot())) {
+        if (contains(frame.getFrameDescriptor(), getSlot())) {
             frame.getFrameDescriptor().setFrameSlotKind(getSlot(), FrameSlotKind.Object);
             frame.setObject(getSlot(), exprValue);
         } else {
