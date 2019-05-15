@@ -74,19 +74,28 @@ object Main extends App {
       |rand(); rand(); rand();
     """.stripMargin
 
+  val primes = Array(21383267l, 21382135391l,2139857l,7139777l)
+
   val primalityTest =
-    """
+    s"""
       define p(n) {
           auto i
 
           if (n < 2) return(0)
           if (n == 2) return(1)
           if (n % 2 == 0) return(0)
-          for (i = 3; i * i <= n; i += 2) {
+          for (i = 3; i <= n; i += 2) {
               if (n % i == 0) return(0)
           }
           return(1)
       }
+
+      nanotime()
+      while(1) {
+          a = p(${primes(3)})
+          nanotime()
+      }
+
       for(j=1;j<1000;j++) {
         if(p(j)) j
       }
@@ -94,7 +103,7 @@ object Main extends App {
     """.stripMargin
 
   val millerRabin =
-    """
+    s"""
       |seed = 1   /* seed of the random number generator */
       |scale = 0
       |
@@ -116,7 +125,9 @@ object Main extends App {
       |    n = 0                /* pick n in range [b, 100 ^ h) */
       |    for (i = h; i > 0; i--) {
       |      r = rand()
-      |      while (r < 68) { r = rand(); }  /* loop if the modulo bias */
+      |      while (r < 68) {
+      |        r = rand();
+      |      }
       |      n = (n * 100) + (r % 100)       /* append 2 digits to n */
       |    }
       |    if (n >= b) { break; }  /* break unless the modulo bias */
@@ -124,12 +135,9 @@ object Main extends App {
       |  return (from + (n % m))
       |}
       |
-      |
-      |
       |/* n is probably prime? */
       |define millerrabintest(n, k) {
       |  auto d, r, a, x, s
-      |
       |  if (n <= 3) { return (1); }
       |  if ((n % 2) == 0) { return (0); }
       |
@@ -157,10 +165,10 @@ object Main extends App {
       |  return (1)
       |}
       |
-      |for (idx = 1; idx < 7; idx++) {
-      |  if (millerrabintest(idx, 10) == 1) {
-      |    idx
-      |  }
+      |nanotime()
+      |while(1) {
+      |  if(millerrabintest(102667,10)) a = 1
+      |  nanotime()
       |}
       |
       |halt
@@ -322,7 +330,7 @@ object Main extends App {
     """.stripMargin
 
   val commentTest =
-  """
+    """
     /* Hello World ! */
     print "Hello World !\n"
 
@@ -348,7 +356,7 @@ object Main extends App {
       |halt
     """.stripMargin
 
-  val test =
+  val scopeTest =
     """
        define f(a,b) {
          auto n
@@ -371,19 +379,111 @@ object Main extends App {
        n == 0
     """.stripMargin
 
-  val rand =
+  val langton =
     """
-      |seed = 1   /* seed of the random number generator */
+      |define o(w,h,a[]) {
+      |    auto i, j
       |
-      |/* Random number from 0 to 32767. */
+      |    "P1 "
+      |    w
+      |    h
+      |    for (j = 0; j < h; j++) {
+      |        for (i = 0; i < w; i++) {
+      |            print (a[j * w + i] + " ")
+      |        }
+      |        print "\n"
+      |    }
+      |}
+      |
+      |define l(w, h, x, y) {
+      |    auto a[], d, i, x[], y[]
+      |
+      |    /* d represents one of the four possible directions:
+      |     *             0
+      |     *             ⇑
+      |     *           3⇐ ⇒1
+      |     *             ⇓
+      |     *             2
+      |     * The arrays x[] and y[] contain the changes to the x and y direction for
+      |     * each value of d.
+      |     */
+      |    x[1] = 1
+      |    x[3] = -1
+      |    y[0] = -1
+      |    y[2] = 1
+      |
+      |    while (1) {
+      |        i = y * w + x
+      |        if (a[i] == 0) d += 1   /* turn right if white */
+      |        if (a[i] == 1) d -= 1   /* turn left if black */
+      |        if (d < 0) d = 3
+      |        if (d > 3) d = 0
+      |        x += x[d]
+      |        y += y[d]
+      |        a[i] = 1 - a[i]         /* toggle cell colour */
+      |        if (x < 0) break
+      |        if (x == w) break
+      |        if (y < 0) break
+      |        if (y == h) break
+      |    }
+      |
+      |    o(w,h,a[])
+      |}
+      |
+      |l(100, 100, 50, 50)
+    """.stripMargin
+
+  val perfTest =
+    """
+      |l = 50000
+      |seed = 3144421321
+      |
       |define rand() {
       |  /* Cheap formula (from POSIX) for random numbers of low quality. */
       |  seed = (seed * 1103515245 + 12345) % 4294967296
       |  return ((seed / 65536) % 32768)
       |}
+      |
+      |define g(r) {
+      |  if(r % 2 == 0) return r ^ 31
+      |  if(r % 3 == 0) return r * 321213 - 3213 * 12 - 213 + 999317183
+      |  if(r % 5 == 0) return r ^ 3 ^ 3 ^ 3
+      |  if(r % 7 == 0) return -r * 123213 - 98776 + 231 ^ 45
+      |  return r
+      |}
+      |
+      |define void shellsort(t[],n) {
+      |  auto j,k,v,idx,random
+      |
+      |  random = g(rand())
+      |
+      |  for(k=1;k<n;k=1+3*k){}
+      |  for(k=k/3;k>0;k=k/3) {
+      |    for(i=k;i<n;i++) {
+      |      v = t[i]
+      |      j = i
+      |      while(j > k-1 && t[j-k] > v) {
+      |        t[j] = t[j-k]
+      |        j = j-k
+      |      }
+      |      t[j] = v
+      |    }
+      |  }
+      |}
+      |
+      |nanotime()
+      |while(1) {
+      |  for(i=0;i<l;i++) {
+      |    a[i] = rand()
+      |  }
+      |  shellsort(a[],l)
+      |  nanotime()
+      |}
+      |
+      |halt
     """.stripMargin
 
-  val source: Source = Source.newBuilder("bc", ackermann, "scope")
+  val source: Source = Source.newBuilder("bc", langton, "scope")
     .build()
 
   val context = Context.newBuilder("bc")
