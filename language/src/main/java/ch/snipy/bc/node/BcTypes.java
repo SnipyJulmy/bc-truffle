@@ -8,6 +8,7 @@ import com.oracle.truffle.api.dsl.TypeCast;
 import com.oracle.truffle.api.dsl.TypeCheck;
 import com.oracle.truffle.api.dsl.TypeSystem;
 
+@SuppressWarnings("WeakerAccess")
 @TypeSystem({
         long.class,
         String.class
