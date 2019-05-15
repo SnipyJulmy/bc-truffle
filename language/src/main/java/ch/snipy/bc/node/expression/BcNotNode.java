@@ -9,27 +9,18 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 
 import static ch.snipy.bc.runtime.BcBigNumber.FALSE;
 
+@SuppressWarnings("WeakerAccess")
 @NodeInfo(shortName = "!")
 public abstract class BcNotNode extends BcUnaryNode {
 
     @Specialization
-    protected boolean not(boolean value) {
-        return !value;
+    protected long not(long value) {
+        return value == 0 ? 1L : 0L;
     }
 
     @Specialization
-    protected boolean not(long value) {
-        return value == 0;
-    }
-
-    @Specialization
-    protected boolean not(double value) {
-        return value == 0.0;
-    }
-
-    @Specialization
-    protected boolean not(BcBigNumber value) {
-        return value.equals(FALSE);
+    protected long not(BcBigNumber value) {
+        return value.equals(FALSE) ? 1L : 0L;
     }
 
     @Fallback

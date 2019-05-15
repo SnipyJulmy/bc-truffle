@@ -7,27 +7,18 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+@SuppressWarnings("WeakerAccess")
 @NodeInfo(shortName = "||")
 public abstract class BcOrNode extends BcBinaryNode {
 
     @Specialization
-    protected boolean or(boolean left, boolean right) {
-        return left || right;
+    protected long or(long left, long right) {
+        return left != 0 || right != 0 ? 1L : 0L;
     }
 
     @Specialization
-    protected boolean or(long left, long right) {
-        return (left != 0) || (right != 0);
-    }
-
-    @Specialization
-    protected boolean or(double left, double right) {
-        return (left != 0) || (right != 0);
-    }
-
-    @Specialization
-    protected boolean or(BcBigNumber left, BcBigNumber right) {
-        return left.booleanValue() || right.booleanValue();
+    protected long or(BcBigNumber left, BcBigNumber right) {
+        return left.booleanValue() || right.booleanValue() ? 1L : 0L;
     }
 
     @Fallback

@@ -13,6 +13,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 import static ch.snipy.bc.runtime.BcBigNumber.ONE;
 
+@SuppressWarnings("WeakerAccess")
 @NodeField(name = "slot", type = FrameSlot.class)
 @NodeField(name = "modifier", type = long.class)
 public abstract class BcPreIncrementNode extends BcReadNode {
@@ -20,16 +21,6 @@ public abstract class BcPreIncrementNode extends BcReadNode {
     protected abstract long getModifier();
 
     protected abstract FrameSlot getSlot();
-
-    @Override
-    public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException {
-        Object res = preIncrement(frame);
-        if (res instanceof Boolean) return (boolean) res;
-        if (res instanceof Long) return ((long) res) != 0;
-        if (res instanceof Double) return ((double) res) != 0.0;
-        if (res instanceof BcBigNumber) return ((BcBigNumber) res).booleanValue();
-        return super.executeBoolean(frame);
-    }
 
     @Specialization
     protected Object preIncrement(VirtualFrame localFrame) {

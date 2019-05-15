@@ -4,9 +4,11 @@ import ch.snipy.bc.BcException;
 import ch.snipy.bc.BcLanguage;
 import ch.snipy.bc.node.BcBinaryNode;
 import ch.snipy.bc.runtime.BcBigNumber;
+import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 
+@SuppressWarnings("WeakerAccess")
 public abstract class BcDivNode extends BcBinaryNode {
 
     @Specialization(guards = "isScaleZero()")
@@ -15,13 +17,14 @@ public abstract class BcDivNode extends BcBinaryNode {
     }
 
     @Specialization
-    protected double div(double left, double right) {
-        return left / right;
-    }
-
-    @Specialization
+    @TruffleBoundary
     protected BcBigNumber doBigNumber(BcBigNumber left, BcBigNumber right) {
-        return left.divide(right);
+        return BcBigNumber.valueOf(
+                left.getValue().divide(
+                        right.getValue(),
+                        BcLanguage.getCurrentContext().getScale(),
+                        BcLanguage.getCurrentContext().getRoundingMode()
+                ));
     }
 
     protected boolean isScaleZero() {

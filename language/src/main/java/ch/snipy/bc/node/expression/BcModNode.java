@@ -3,18 +3,15 @@ package ch.snipy.bc.node.expression;
 import ch.snipy.bc.BcException;
 import ch.snipy.bc.node.BcBinaryNode;
 import ch.snipy.bc.runtime.BcBigNumber;
+import com.oracle.truffle.api.CompilerDirectives;
+import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+@SuppressWarnings("WeakerAccess")
 @NodeInfo(shortName = "%", description = "modulo operator")
 public abstract class BcModNode extends BcBinaryNode {
-
-    @Specialization
-    protected boolean mod(boolean left, boolean right) {
-        if (!right) throw new ArithmeticException("modulo by 0");
-        return false;
-    }
 
     @Specialization
     protected long mod(long left, long right) {
@@ -22,13 +19,9 @@ public abstract class BcModNode extends BcBinaryNode {
     }
 
     @Specialization
-    protected double mod(double left, double right) {
-        return left % right;
-    }
-
-    @Specialization
+    @TruffleBoundary
     protected BcBigNumber mod(BcBigNumber left, BcBigNumber right) {
-        return left.remainder(right);
+        return BcBigNumber.valueOf(left.getValue().remainder(right.getValue()));
     }
 
     @Fallback

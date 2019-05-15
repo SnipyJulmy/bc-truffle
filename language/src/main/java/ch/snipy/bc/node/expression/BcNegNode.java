@@ -5,13 +5,11 @@ import ch.snipy.bc.node.BcUnaryNode;
 import ch.snipy.bc.runtime.BcBigNumber;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.nodes.NodeInfo;
 
+@SuppressWarnings("WeakerAccess")
+@NodeInfo(shortName = "-")
 public abstract class BcNegNode extends BcUnaryNode {
-
-    @Specialization
-    protected boolean negate(boolean value) {
-        return !value;
-    }
 
     @Specialization
     protected long negate(long value) {
@@ -19,15 +17,9 @@ public abstract class BcNegNode extends BcUnaryNode {
     }
 
     @Specialization
-    protected double negate(double value) {
-        return -value;
-    }
-
-    @Specialization
     protected BcBigNumber negate(BcBigNumber value) {
-        return value.negate();
+        return BcBigNumber.valueOf(value.getValue().negate());
     }
-
 
     @Fallback
     protected Object typeError(Object value) {

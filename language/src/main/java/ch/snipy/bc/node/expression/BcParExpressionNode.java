@@ -18,16 +18,6 @@ public class BcParExpressionNode extends BcExpressionNode {
     }
 
     @Override
-    public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException {
-        return expression.executeBoolean(frame);
-    }
-
-    @Override
-    public double executeDouble(VirtualFrame frame) throws UnexpectedResultException {
-        return expression.executeDouble(frame);
-    }
-
-    @Override
     public Object executeGeneric(VirtualFrame frame) {
         return expression.executeGeneric(frame);
     }

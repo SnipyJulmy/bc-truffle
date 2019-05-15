@@ -10,6 +10,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 import static ch.snipy.bc.runtime.BcBigNumber.ONE;
 
+@SuppressWarnings("WeakerAccess")
 @NodeField(name = "slot", type = FrameSlot.class)
 @NodeField(name = "modifier", type = long.class)
 public abstract class BcPostIncrementNode extends BcReadNode {
@@ -18,17 +19,6 @@ public abstract class BcPostIncrementNode extends BcReadNode {
 
     protected abstract FrameSlot getSlot();
 
-    @Override
-    public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException {
-        Object res = postIncrement(frame);
-        if (res instanceof Boolean) return (boolean) res;
-        if (res instanceof Long) return ((long) res) != 0;
-        if (res instanceof Double) return ((double) res) != 0.0;
-        if (res instanceof BcBigNumber) return ((BcBigNumber) res).booleanValue();
-        return super.executeBoolean(frame);
-    }
-
-    @SuppressWarnings("Duplicates")
     @Specialization
     public Object postIncrement(VirtualFrame localFrame) {
         VirtualFrame frame = getCorrectFrame(localFrame);
@@ -51,7 +41,7 @@ public abstract class BcPostIncrementNode extends BcReadNode {
                     BcBigNumber value = (BcBigNumber) FrameUtil.getObjectSafe(frame, getSlot());
                     BcBigNumber newValue = value.add(getModifier() > 0 ? ONE : ONE.negate());
                     frame.setObject(getSlot(), newValue);
-                    return value;
+                    return newValue;
                 }
             }
         }
@@ -60,7 +50,7 @@ public abstract class BcPostIncrementNode extends BcReadNode {
 
     private VirtualFrame getCorrectFrame(VirtualFrame localFrame) {
         if (isIn(localFrame.materialize())) return localFrame;
-        else if (isIn(getGlobalFrame())) return getGlobalFrame();
+        else if (isIn(getGlobalFrame().materialize())) return getGlobalFrame();
         else return null;
     }
 
