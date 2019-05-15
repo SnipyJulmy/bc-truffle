@@ -28,25 +28,6 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
 
     private final BigDecimal value;
 
-    private static int getScale() {
-        return BcLanguage.getCurrentContext().getScale();
-    }
-
-    private static RoundingMode getRoundingMode() {
-        return BcLanguage.getCurrentContext().getRoundingMode();
-    }
-
-    private static MathContext getMathContext() {
-        return BcLanguage.getCurrentContext().getMathContext();
-    }
-
-    @TruffleBoundary
-    private BigDecimal scales(BigDecimal value) {
-        if (getScale() == 0)
-            return value.setScale(0, RoundingMode.UNNECESSARY);
-        return value.setScale(getScale(), getRoundingMode());
-    }
-
     @TruffleBoundary
     public BcBigNumber(BigDecimal value) {
         this.value = value;
@@ -65,6 +46,18 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
     @TruffleBoundary
     public BcBigNumber(int value) {
         this.value = new BigDecimal(value);
+    }
+
+    private static int getScale() {
+        return BcLanguage.getCurrentContext().getScale();
+    }
+
+    private static RoundingMode getRoundingMode() {
+        return BcLanguage.getCurrentContext().getRoundingMode();
+    }
+
+    private static MathContext getMathContext() {
+        return BcLanguage.getCurrentContext().getMathContext();
     }
 
     public static boolean isInstance(TruffleObject obj) {
@@ -89,6 +82,13 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
     @TruffleBoundary
     public static BcBigNumber valueOf(double value) {
         return new BcBigNumber(value);
+    }
+
+    @TruffleBoundary
+    private BigDecimal scales(BigDecimal value) {
+        if (getScale() == 0)
+            return value.setScale(0, RoundingMode.UNNECESSARY);
+        return value.setScale(getScale(), getRoundingMode());
     }
 
     public BigDecimal getValue() {
@@ -133,25 +133,8 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
     }
 
     @TruffleBoundary
-    public BcBigNumber divide(BcBigNumber right) {
-        return valueOf(
-                this.value.divide(right.value, BigDecimal.ROUND_FLOOR).setScale(getScale(), getRoundingMode())
-        );
-    }
-
-    @TruffleBoundary
     public BcBigNumber subtract(BcBigNumber right) {
         return valueOf(this.value.subtract(right.value));
-    }
-
-    @TruffleBoundary
-    public BcBigNumber multiply(BcBigNumber right) {
-        return valueOf(this.value.multiply(right.value));
-    }
-
-    @TruffleBoundary
-    public BcBigNumber remainder(BcBigNumber right) {
-        return valueOf(this.value.remainder(right.value));
     }
 
     @TruffleBoundary
@@ -159,9 +142,10 @@ public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber>
         return valueOf(this.value.negate());
     }
 
+    // fixme not really correct, no ?
     @TruffleBoundary
     public BcBigNumber pow(BcBigNumber right) {
-        return valueOf(BigDecimalMath.pow(this.value, right.value, getMathContext()));
+        return valueOf(this.value.pow(right.intValue()));
     }
 
     @ExportMessage
