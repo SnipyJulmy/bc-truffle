@@ -3,10 +3,12 @@ package ch.snipy.bc.node.expression;
 import ch.snipy.bc.BcException;
 import ch.snipy.bc.node.BcBinaryNode;
 import ch.snipy.bc.runtime.BcBigNumber;
+import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+@SuppressWarnings("WeakerAccess")
 @NodeInfo(shortName = "+")
 public abstract class BcAddNode extends BcBinaryNode {
 
@@ -15,20 +17,14 @@ public abstract class BcAddNode extends BcBinaryNode {
         return Math.addExact(left, right);
     }
 
-    @Specialization(rewriteOn = ArithmeticException.class)
-    protected double add(double left, double right) {
-        double res = left + right;
-        if (Double.isInfinite(res))
-            throw new ArithmeticException("add result is infinite");
-        return res;
-    }
-
     @Specialization
+    @TruffleBoundary
     protected BcBigNumber add(BcBigNumber left, BcBigNumber right) {
-        return left.add(right);
+        return BcBigNumber.valueOf(left.getValue().add(right.getValue()));
     }
 
     @Specialization(guards = "isString(left, right)")
+    @TruffleBoundary
     protected String add(Object left, Object right) {
         return left.toString() + right.toString();
     }
