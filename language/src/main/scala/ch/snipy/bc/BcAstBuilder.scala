@@ -88,7 +88,8 @@ object BcAstBuilder {
           process(end),
           process(thenNode)
         )
-      case FunctionDef(identifier, isVoid, params, auto, body) =>
+      case f@FunctionDef(identifier, isVoid, params, auto, body) =>
+        context.functions += (identifier -> f)
         implicit val newContext: BcParserContext = context.copy(
           name = identifier,
           frameDescriptor = new FrameDescriptor()
@@ -103,7 +104,10 @@ object BcAstBuilder {
         val varDecl: List[BcExpressionNode] =
           params.getOrElse(Nil).zipWithIndex.map { case (param, idx) =>
             mkAssignmentNode(param, new BcReadArgumentNode(idx), None)(newContext)
+          } ++ auto.getOrElse(Nil).map { autoId =>
+            mkAssignmentNode(autoId, new BcLongLiteralNode(0), None)(newContext)
           }
+
         val bodyStatements: List[BcStatementNode] = body.statements.map(s => process(s)(newContext))
         val statements = (varDecl ++ bodyStatements) toArray
 
@@ -223,7 +227,14 @@ object BcAstBuilder {
         if (context.name == "global")
           context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id)
         else
-          context.frameDescriptor.findOrAddFrameSlot(id)
+          context.frameDescriptor.findFrameSlot(id) match {
+            case null =>
+              context.bcContext.getGlobalFrame.getFrameDescriptor.findFrameSlot(id) match {
+                case null => context.frameDescriptor.findOrAddFrameSlot(id)
+                case s2 => s2
+              }
+            case s => s
+          }
       }
       assert(slot != null)
       BcReadArrayNodeGen.create(idx, slot, context.bcContext.getGlobalFrame)
@@ -233,7 +244,14 @@ object BcAstBuilder {
         if (context.name == "global")
           context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id)
         else
-          context.frameDescriptor.findOrAddFrameSlot(id)
+          context.frameDescriptor.findFrameSlot(id) match {
+            case null =>
+              context.bcContext.getGlobalFrame.getFrameDescriptor.findFrameSlot(id) match {
+                case null => context.frameDescriptor.findOrAddFrameSlot(id)
+                case s2 => s2
+              }
+            case s => s
+          }
       }
       assert(slot != null)
       BcVariableReadNodeGen.create(context.bcContext.getGlobalFrame, slot)
