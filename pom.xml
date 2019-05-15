@@ -13,7 +13,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>language</module>
-        <module>component</module>
         <module>launcher</module>
+        <!-- <module>native</module> -->
+        <module>component</module>
     </modules>
 </project>
