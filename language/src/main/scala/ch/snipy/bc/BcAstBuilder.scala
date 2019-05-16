@@ -4,7 +4,7 @@ import ch.snipy.bc.BcAST._
 import ch.snipy.bc.node.call.BcInvokeNode
 import ch.snipy.bc.node.controlflow._
 import ch.snipy.bc.node.expression._
-import ch.snipy.bc.node.expression.literal.{BcBigNumberLiteralNode, BcDoubleLiteralNode, BcLongLiteralNode, BcStringLiteralNode}
+import ch.snipy.bc.node.expression.literal.{BcBigNumberLiteralNode, BcLongLiteralNode, BcStringLiteralNode}
 import ch.snipy.bc.node.local._
 import ch.snipy.bc.node.statement.{BcBlockNode, BcFunctionDefinitionNode}
 import ch.snipy.bc.node.{BcExpressionNode, BcRootNode, BcStatementNode}
@@ -173,7 +173,6 @@ object BcAstBuilder {
     case FunctionCall(identifier, args) => mkCall(identifier, args map process)
     case ArrayExpr(identifier) => mkReadArray(identifier)
     case LongLiteral(value) => new BcLongLiteralNode(value)
-    case DoubleLiteral(value) => new BcDoubleLiteralNode(value)
     case BigNumberLiteral(value) => new BcBigNumberLiteralNode(new BcBigNumber(value))
     case StringLiteral(value) => new BcStringLiteralNode(value)
   }

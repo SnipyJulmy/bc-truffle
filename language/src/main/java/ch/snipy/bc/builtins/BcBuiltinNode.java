@@ -28,18 +28,8 @@ public abstract class BcBuiltinNode extends BcExpressionNode {
     }
 
     @Override
-    public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException {
-        return super.executeBoolean(frame);
-    }
-
-    @Override
     public long executeLong(VirtualFrame frame) throws UnexpectedResultException {
         return super.executeLong(frame);
-    }
-
-    @Override
-    public double executeDouble(VirtualFrame frame) throws UnexpectedResultException {
-        return super.executeDouble(frame);
     }
 
     @Override

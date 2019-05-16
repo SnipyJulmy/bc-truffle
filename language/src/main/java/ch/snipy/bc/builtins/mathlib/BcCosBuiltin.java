@@ -6,21 +6,12 @@ import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+@SuppressWarnings("WeakerAccess")
 @NodeInfo(shortName = "c")
 public abstract class BcCosBuiltin extends BcBuiltinNode {
 
     @Specialization
-    protected double cos(boolean value) {
-        return doCos(value ? 1.0 : 0.0);
-    }
-
-    @Specialization
     public double cos(long arg) {
-        return doCos(arg);
-    }
-
-    @Specialization
-    public double cos(double arg) {
         return doCos(arg);
     }
 

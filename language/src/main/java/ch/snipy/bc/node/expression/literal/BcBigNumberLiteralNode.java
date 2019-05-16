@@ -18,11 +18,6 @@ public final class BcBigNumberLiteralNode extends BcExpressionNode {
     }
 
     @Override
-    public boolean executeBoolean(VirtualFrame frame) {
-        return !value.equals(BcBigNumber.FALSE);
-    }
-
-    @Override
     public BcBigNumber executeGeneric(VirtualFrame frame) {
         return value;
     }

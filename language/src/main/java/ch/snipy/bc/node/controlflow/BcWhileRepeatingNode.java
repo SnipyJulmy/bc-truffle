@@ -9,6 +9,7 @@ import com.oracle.truffle.api.nodes.RepeatingNode;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import com.oracle.truffle.api.profiles.BranchProfile;
 
+@SuppressWarnings("WeakerAccess")
 public final class BcWhileRepeatingNode extends Node implements RepeatingNode {
 
     private final BranchProfile continueTaken = BranchProfile.create();
@@ -39,7 +40,7 @@ public final class BcWhileRepeatingNode extends Node implements RepeatingNode {
 
     private boolean evaluateCondition(VirtualFrame frame) {
         try {
-            return conditionNode.executeBoolean(frame);
+            return conditionNode.executeLong(frame) != 0L;
         } catch (UnexpectedResultException e) {
             throw new UnsupportedSpecializationException(this, new Node[]{conditionNode}, e.getResult());
         }

@@ -22,7 +22,7 @@ public final class BcIfNode extends BcStatementNode {
     @Override
     public void executeVoid(VirtualFrame frame) {
         try {
-            if (conditionProfile.profile(conditionNode.executeBoolean(frame)))
+            if (conditionProfile.profile(conditionNode.executeLong(frame) != 0L))
                 trueNode.executeVoid(frame);
             else {
                 if (falseNode != null) falseNode.executeVoid(frame);

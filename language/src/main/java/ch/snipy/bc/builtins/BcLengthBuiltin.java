@@ -9,17 +9,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 public abstract class BcLengthBuiltin extends BcBuiltinNode {
 
     @Specialization
-    protected long length(boolean value) {
-        return 1;
-    }
-
-    @Specialization
     protected long length(long value) {
-        return doLength(value);
-    }
-
-    @Specialization
-    protected long length(double value) {
         return doLength(value);
     }
 
@@ -30,11 +20,6 @@ public abstract class BcLengthBuiltin extends BcBuiltinNode {
 
     @TruffleBoundary
     private long doLength(long value) {
-        return (value + "").length() - (value < 0 ? 1 : 0);
-    }
-
-    @TruffleBoundary
-    private long doLength(double value) {
         return (value + "").length() - (value < 0 ? 1 : 0);
     }
 }

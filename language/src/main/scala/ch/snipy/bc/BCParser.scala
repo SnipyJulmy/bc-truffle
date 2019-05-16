@@ -237,15 +237,6 @@ class BCParser extends RegexParsers with PackratParsers {
       }
     }
 
-  // parse a long value, if the toLong value fails, return it inside a big decimal
-  lazy val longLiteral: PackratParser[Expr] =
-    "-?\\d{1,19}".r ^^ { strValue =>
-      Try(strValue.toLong) match {
-        case util.Failure(_) => BigNumberLiteral(new java.math.BigDecimal(strValue))
-        case util.Success(value) => LongLiteral(value)
-      }
-    }
-
   lazy val bigNumberLiteral: PackratParser[BigNumberLiteral] =
     "[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)(E[0-9]+)?".r ^^ { strValue =>
       BigNumberLiteral(new java.math.BigDecimal(strValue))

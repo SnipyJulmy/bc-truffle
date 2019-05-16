@@ -8,6 +8,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import java.io.PrintWriter;
 import java.util.Arrays;
 
+@SuppressWarnings("WeakerAccess")
 @NodeInfo(shortName = "print")
 public abstract class BcPrintBuiltin extends BcBuiltinNode {
 
@@ -56,10 +57,6 @@ public abstract class BcPrintBuiltin extends BcBuiltinNode {
 
     @Specialization
     public String print(String value) {
-        if(value.equals("true\n"))
-            value = "1\n";
-        if(value.equals("false\n"))
-            value = "0\n";
         doPrint(getContext().getOutput(), value);
         return value;
     }

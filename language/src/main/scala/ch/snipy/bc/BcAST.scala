@@ -57,7 +57,6 @@ object BcAST {
 
   // Literals
   case class LongLiteral(value: Long) extends Expr
-  case class DoubleLiteral(value: Double) extends Expr
   case class BigNumberLiteral(value: java.math.BigDecimal) extends Expr
   case class StringLiteral(value: String) extends Expr
 }

@@ -6,21 +6,12 @@ import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+@SuppressWarnings("WeakerAccess")
 @NodeInfo(shortName = "a")
 public abstract class BcAtanBuiltin extends BcBuiltinNode {
 
     @Specialization
-    protected double atan(boolean value) {
-        return doAtan(value ? 1.0 : 0.0);
-    }
-
-    @Specialization
     protected double atan(long value) {
-        return doAtan(value);
-    }
-
-    @Specialization
-    protected double atan(double value) {
         return doAtan(value);
     }
 

@@ -6,21 +6,12 @@ import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+@SuppressWarnings("ALL")
 @NodeInfo(shortName = "s")
 public abstract class BcSinBuiltin extends BcBuiltinNode {
 
     @Specialization
-    protected double sin(boolean value) {
-        return doSin(value ? 1.0 : 0.0);
-    }
-
-    @Specialization
     public double sin(long arg) {
-        return doSin(arg);
-    }
-
-    @Specialization
-    public double sin(double arg) {
         return doSin(arg);
     }
 
