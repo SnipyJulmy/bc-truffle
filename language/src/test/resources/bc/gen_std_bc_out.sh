@@ -5,6 +5,11 @@ do
     rm ${file}
 done
 
+for file in `ls | grep '\\.bcout'`
+do
+    rm ${file}
+done
+
 if [[ ${BC_PATH} == "" ]]; then
     export BC_PATH="/usr/bin/bc"
 fi

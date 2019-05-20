@@ -1,11 +1,11 @@
 import java.io.{File, FileOutputStream}
 
 import org.graalvm.polyglot.{Context, Source}
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
 
-import scala.language.reflectiveCalls
+import scala.language.{postfixOps, reflectiveCalls}
 
-class BcFileTest extends FlatSpec with Matchers {
+class BcFileTest extends FlatSpec with Matchers with BeforeAndAfter {
 
   def using[A, B <: {def close() : Unit}](closeable: B)(f: B => A): A =
     try {
@@ -20,6 +20,19 @@ class BcFileTest extends FlatSpec with Matchers {
 
   private val resourceDir = new File(getClass.getResource("/bc").getPath)
   private val bcFiles = resourceDir.listFiles().filter(f => f.isFile && f.getName.endsWith(bcStdSuffix))
+
+  before {
+    val genScript = new File(getClass.getResource("/bc/gen_std_bc_out.sh").getPath)
+    assert(genScript.exists())
+    assert(genScript.isFile)
+
+    import sys.process._
+    s"chmod +x $genScript" !!
+
+    assert(genScript.canExecute)
+
+    genScript.getAbsolutePath !!
+  }
 
   behavior of "bc-truffle"
 
