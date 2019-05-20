@@ -435,7 +435,7 @@ object Main extends App {
 
   val perfTest =
     """
-      |l = 50000
+      |l = 5000
       |seed = 3144421321
       |
       |define rand() {
@@ -483,7 +483,7 @@ object Main extends App {
       |halt
     """.stripMargin
 
-  val source: Source = Source.newBuilder("bc", langton, "scope")
+  val source: Source = Source.newBuilder("bc", perfTest, "scope")
     .build()
 
   val context = Context.newBuilder("bc")

@@ -44,7 +44,6 @@ public abstract class BcWriteArrayNode extends BcReadNode {
             }
             assert res != null;
         }
-        //noinspection unchecked
         Map<Object, Object> map = (Map<Object, Object>) res;
         map.put(index, expr);
         return expr;
@@ -71,7 +70,6 @@ public abstract class BcWriteArrayNode extends BcReadNode {
             }
             assert res != null;
         }
-        //noinspection unchecked
         Map<Object, Object> map = (Map<Object, Object>) res;
         map.put(index, expr);
         return expr;
@@ -98,7 +96,6 @@ public abstract class BcWriteArrayNode extends BcReadNode {
             }
             assert res != null;
         }
-        //noinspection unchecked
         Map<Object, Object> map = (Map<Object, Object>) res;
         map.put(index, expr);
         return expr;
