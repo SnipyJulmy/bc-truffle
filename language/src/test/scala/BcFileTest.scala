@@ -1,12 +1,22 @@
 import java.io.{File, FileOutputStream}
 
 import org.graalvm.polyglot.{Context, Source}
-import org.scalatest.FlatSpec
+import org.scalatest.{FlatSpec, Matchers}
 
-class BcFileTest extends FlatSpec {
+import scala.language.reflectiveCalls
+
+class BcFileTest extends FlatSpec with Matchers {
+
+  def using[A, B <: {def close() : Unit}](closeable: B)(f: B => A): A =
+    try {
+      f(closeable)
+    } finally {
+      closeable.close()
+    }
 
   private val bcStdSuffix = ".bc"
   private val bcTruffleSuffix = ".bcout"
+  private val outSuffix = ".out"
 
   private val resourceDir = new File(getClass.getResource("/bc").getPath)
   private val bcFiles = resourceDir.listFiles().filter(f => f.isFile && f.getName.endsWith(bcStdSuffix))
@@ -15,13 +25,14 @@ class BcFileTest extends FlatSpec {
 
   for {
     bcFile <- bcFiles
-    bcFileName = bcFile.getName
-    name = bcFileName.substring(0, bcFileName.length - bcStdSuffix.length)
-    outputFileName = s"$name$bcTruffleSuffix"
+    bcFilename = bcFile.getName
+    name = bcFilename.substring(0, bcFilename.length - bcStdSuffix.length)
+    bcTruffleOutputFilename = s"$name$bcTruffleSuffix"
+    outputFilename = s"$name$outSuffix"
   } {
-    it should s"generate the same output that standard bc for file $bcFileName" in {
+    it should s"generate the same output that standard bc for file $bcFilename" in {
       // generate the output file
-      val outputFile = s"${resourceDir.getAbsolutePath}/$outputFileName"
+      val outputFile = s"${resourceDir.getAbsolutePath}/$bcTruffleOutputFilename"
       val context = Context.newBuilder("bc")
         .in(System.in)
         .out(new FileOutputStream(outputFile))
@@ -32,6 +43,15 @@ class BcFileTest extends FlatSpec {
 
       val source = Source.newBuilder("bc", bcSourceStr, name).build()
       context.eval(source)
+
+      val bcTruffleOut = using(scala.io.Source.fromFile(s"${resourceDir.getAbsolutePath}/$bcTruffleOutputFilename")) {
+        _.mkString
+      }
+      val bcOut = using(scala.io.Source.fromFile(s"${resourceDir.getAbsolutePath}/$outputFilename")) {
+        _.mkString
+      }
+
+      bcTruffleOut shouldBe bcOut
     }
   }
 }
