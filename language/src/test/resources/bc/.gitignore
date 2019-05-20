@@ -1,2 +1,2 @@
 *.out
-./gen_std_bc_out.sh
+gen_std_bc_out.sh
