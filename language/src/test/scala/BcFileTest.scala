@@ -45,11 +45,15 @@ class BcFileTest extends FlatSpec with Matchers {
       context.eval(source)
 
       val bcTruffleOut: String = using(scala.io.Source.fromFile(s"${resourceDir.getAbsolutePath}/$bcTruffleOutputFilename")) {
-        _.getLines().mkString("")
+        _.getLines()
+          .mkString("") // remove \n to read properly potential test assertion error
+          .replaceAll("""\\""","") // normal bc add \ whem the line is to long
       }
 
       val bcOut: String = using(scala.io.Source.fromFile(s"${resourceDir.getAbsolutePath}/$outputFilename")) {
-        _.getLines().mkString("")
+        _.getLines()
+          .mkString("") // remove \n to read properly potential test assertion error
+          .replaceAll("""\\""","") // normal bc add \ whem the line is to long
       }
 
       bcTruffleOut shouldBe bcOut
