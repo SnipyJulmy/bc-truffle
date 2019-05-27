@@ -10,7 +10,7 @@ import ch.snipy.bc.node.statement.{BcBlockNode, BcFunctionDefinitionNode}
 import ch.snipy.bc.node.{BcExpressionNode, BcRootNode, BcStatementNode}
 import ch.snipy.bc.runtime.{BcBigNumber, BcContext}
 import com.oracle.truffle.api.Truffle
-import com.oracle.truffle.api.frame.{FrameDescriptor, FrameSlotKind}
+import com.oracle.truffle.api.frame.{FrameDescriptor, FrameSlotKind, MaterializedFrame}
 
 import scala.collection.mutable
 import scala.language.postfixOps
@@ -19,8 +19,9 @@ case class BcParserContext(name: String,
                            bcLanguage: BcLanguage,
                            bcContext: BcContext,
                            frameDescriptor: FrameDescriptor,
+                           globalFrameDescriptor: FrameDescriptor,
+                           globalFrameSlot: MaterializedFrame,
                            functions: mutable.Map[Identifier, FunctionDef])
-
 
 object BcAstBuilder {
 
@@ -32,6 +33,8 @@ object BcAstBuilder {
       bcLanguage = language,
       bcContext = language.getContextReference.get(),
       frameDescriptor = new FrameDescriptor(),
+      globalFrameDescriptor = language.getContextReference.get().getGlobalFrameDescriptor,
+      globalFrameSlot = language.getContextReference.get().getGlobalFrame,
       functions = mutable.Map()
     )
 
@@ -177,32 +180,37 @@ object BcAstBuilder {
     case StringLiteral(value) => new BcStringLiteralNode(value)
   }
 
-
   private def mkAssignmentNode(identifier: String,
                                value: BcExpressionNode,
                                index: Option[BcExpressionNode] = None)
-                              (implicit context: BcParserContext): BcExpressionNode = index match {
-    case Some(idx) =>
-      val id = s"$identifier[]"
-      val slot =
-        if (context.name == "global")
-          context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
-        else
-          context.frameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
-      BcWriteArrayNodeGen.create(idx, value, context.bcContext.getGlobalFrame, slot)
-    case None =>
-      val id = s"$identifier"
-      val slot =
-        if (context.name == "global")
-          context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
-        else {
-          if (context.bcContext.getGlobalFrameDescriptor.getIdentifiers.contains(id)) {
-            context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
-          } else {
-            context.frameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
+                              (implicit context: BcParserContext): BcExpressionNode = {
+
+    val id = if (index.isDefined) s"$identifier[]" else s"$identifier"
+    // now we need to find the correct slot for the assignment node
+    // Note : array are just a special kind of variable
+    val slot =
+    if (context.name == "global") {
+      // the variable don't have to be declared before, so we add it if it does not already exists
+      context.globalFrameDescriptor.findOrAddFrameSlot(id, FrameSlotKind.Illegal)
+    } else {
+      context.frameDescriptor.findFrameSlot(id) match {
+        case null =>
+          // there are no local slot for the variable $id
+          // we check if it exist in the global scope
+          context.globalFrameDescriptor.findFrameSlot(id) match {
+            case null =>
+              // the variable as no slot of any kind, so we create it locally --> fixme : check bc behavior
+              context.frameDescriptor.addFrameSlot(id)
+            case s => /* we find a global slot */ s
           }
-        }
-      BcVariableWriteNodeGen.create(value, slot, context.bcContext.getGlobalFrame)
+        case s => /* we find a local slot */ s
+      }
+    }
+    assert(slot != null)
+    if (index.isDefined)
+      BcWriteArrayNodeGen.create(index.get, value, context.globalFrameSlot, slot)
+    else
+      BcVariableWriteNodeGen.create(value, slot, context.globalFrameSlot)
   }
 
   private def mkReadArray(identifier: Identifier)(implicit context: BcParserContext): BcExpressionNode = {
@@ -219,41 +227,30 @@ object BcAstBuilder {
 
   private def mkReadVariable(identifier: String,
                              index: Option[BcExpressionNode] = None)
-                            (implicit context: BcParserContext): BcExpressionNode = index match {
-    case Some(idx) =>
-      val id = s"$identifier[]"
-      val slot = {
-        if (context.name == "global")
-          context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id)
-        else
-          context.frameDescriptor.findFrameSlot(id) match {
-            case null =>
-              context.bcContext.getGlobalFrame.getFrameDescriptor.findFrameSlot(id) match {
-                case null => context.frameDescriptor.findOrAddFrameSlot(id)
-                case s2 => s2
-              }
-            case s => s
-          }
+                            (implicit context: BcParserContext): BcExpressionNode = {
+    val id = if (index.isDefined) s"$identifier[]" else s"$identifier"
+    val slot =
+      if (context.name == "global") {
+        context.globalFrameDescriptor.findOrAddFrameSlot(id)
+      } else {
+        context.frameDescriptor.findFrameSlot(id) match {
+          case null =>
+            // there are no local slot for the variable $id
+            // we check if it exist in the global scope
+            context.globalFrameDescriptor.findFrameSlot(id) match {
+              case null =>
+                // the variable as no slot of any kind, so we create it locally --> fixme : check bc behavior
+                context.frameDescriptor.addFrameSlot(id)
+              case s => /* we find a global slot */ s
+            }
+          case s => /* we find a local slot */ s
+        }
       }
-      assert(slot != null)
-      BcReadArrayNodeGen.create(idx, slot, context.bcContext.getGlobalFrame)
-    case None =>
-      val id = s"$identifier"
-      val slot = {
-        if (context.name == "global")
-          context.bcContext.getGlobalFrame.getFrameDescriptor.findOrAddFrameSlot(id)
-        else
-          context.frameDescriptor.findFrameSlot(id) match {
-            case null =>
-              context.bcContext.getGlobalFrame.getFrameDescriptor.findFrameSlot(id) match {
-                case null => context.frameDescriptor.findOrAddFrameSlot(id)
-                case s2 => s2
-              }
-            case s => s
-          }
-      }
-      assert(slot != null)
-      BcVariableReadNodeGen.create(context.bcContext.getGlobalFrame, slot)
+    assert(slot != null)
+    if (index.isDefined)
+      BcReadArrayNodeGen.create(index.get, slot, context.globalFrameSlot)
+    else
+      BcVariableReadNodeGen.create(context.globalFrameSlot, slot)
   }
 
   private def mkCall(identifier: String, args: List[BcExpressionNode])
