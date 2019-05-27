@@ -7,7 +7,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 @SuppressWarnings("WeakerAccess")
-@NodeInfo(shortName = "a")
+@NodeInfo(shortName = "a", description = "builtin for the arctan function")
 public abstract class BcAtanBuiltin extends BcBuiltinNode {
 
     @Specialization

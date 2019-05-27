@@ -7,7 +7,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 @SuppressWarnings("WeakerAccess")
-@NodeInfo(shortName = "exp")
+@NodeInfo(shortName = "exp", description = "builtin for the exponential function")
 public abstract class BcExpBuiltin extends BcBuiltinNode {
 
     @Specialization()

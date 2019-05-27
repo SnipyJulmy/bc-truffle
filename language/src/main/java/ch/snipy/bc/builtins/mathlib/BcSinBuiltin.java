@@ -6,8 +6,8 @@ import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
-@SuppressWarnings("ALL")
-@NodeInfo(shortName = "s")
+@SuppressWarnings("WeakerAccess")
+@NodeInfo(shortName = "s", description = "builtin for the sinus function")
 public abstract class BcSinBuiltin extends BcBuiltinNode {
 
     @Specialization

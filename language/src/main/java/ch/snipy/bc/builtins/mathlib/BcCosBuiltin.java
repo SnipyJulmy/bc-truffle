@@ -7,7 +7,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 @SuppressWarnings("WeakerAccess")
-@NodeInfo(shortName = "c")
+@NodeInfo(shortName = "c", description = "builtin for the cosinus function")
 public abstract class BcCosBuiltin extends BcBuiltinNode {
 
     @Specialization

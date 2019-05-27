@@ -5,7 +5,8 @@ import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
-@NodeInfo(shortName = "length")
+@SuppressWarnings("WeakerAccess")
+@NodeInfo(shortName = "length", description = "builtin for the length function, which return the length of a number")
 public abstract class BcLengthBuiltin extends BcBuiltinNode {
 
     @Specialization
@@ -14,7 +15,7 @@ public abstract class BcLengthBuiltin extends BcBuiltinNode {
     }
 
     @Specialization
-    public BcBigNumber length(BcBigNumber arg) {
+    protected BcBigNumber length(BcBigNumber arg) {
         return arg.length();
     }
 

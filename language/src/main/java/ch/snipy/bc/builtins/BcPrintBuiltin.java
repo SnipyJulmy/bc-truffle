@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 
 @SuppressWarnings("WeakerAccess")
-@NodeInfo(shortName = "print")
+@NodeInfo(shortName = "print", description = "builtin function for printing")
 public abstract class BcPrintBuiltin extends BcBuiltinNode {
 
     @TruffleBoundary

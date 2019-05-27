@@ -7,7 +7,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 @SuppressWarnings("WeakerAccess")
-@NodeInfo(shortName = "ln")
+@NodeInfo(shortName = "ln", description = "builtin for the natural logarithm function")
 public abstract class BcLnBuiltin extends BcBuiltinNode {
 
     @Specialization

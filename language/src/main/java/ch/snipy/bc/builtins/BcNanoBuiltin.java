@@ -4,11 +4,12 @@ import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
-@NodeInfo(shortName = "nanotime")
+@SuppressWarnings("WeakerAccess")
+@NodeInfo(shortName = "nanotime", description = "builtin function to print the current nanotime")
 public abstract class BcNanoBuiltin extends BcBuiltinNode {
 
     @Specialization
-    public String printNanotime() {
+    protected String printNanotime() {
         getPrintln();
         return "";
     }
