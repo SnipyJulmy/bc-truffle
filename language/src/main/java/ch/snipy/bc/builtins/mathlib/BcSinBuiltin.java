@@ -17,7 +17,7 @@ public abstract class BcSinBuiltin extends BcBuiltinNode {
 
     @Specialization
     public BcBigNumber sin(BcBigNumber arg) {
-        return arg.cos();
+        return arg.sin();
     }
 
     @TruffleBoundary
