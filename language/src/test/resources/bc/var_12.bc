@@ -1,0 +1,18 @@
+define void f() {
+  213
+}
+f()
+define void f() {
+ 452
+}
+f()
+define void g() {
+ 452
+}
+g()
+f()
+define void f() {
+ 458732
+}
+f()
+halt

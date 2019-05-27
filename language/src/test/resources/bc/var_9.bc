@@ -1,0 +1,16 @@
+tmp = 7832
+v = 2
+tmp
+define sum(a,b) {
+  auto tmp
+  tmp = a + b
+  return tmp
+}
+tmp
+v
+tmp
+v = sum(1,2)
+tmp
+v
+tmp
+halt

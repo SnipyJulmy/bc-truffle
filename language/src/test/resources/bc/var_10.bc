@@ -1,0 +1,26 @@
+a = 421
+define f() {
+  return a
+}
+define g() {
+  auto a
+  a = 123
+  return a
+}
+define h(a) {
+  return a
+}
+define i() {
+  a = 566
+  return a
+}
+a
+f()
+a
+g()
+a
+h(983621)
+a
+i()
+a
+halt
