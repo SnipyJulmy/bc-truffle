@@ -16,7 +16,7 @@ import java.math.RoundingMode;
 @ExportLibrary(InteropLibrary.class)
 public final class BcBigNumber implements TruffleObject, Comparable<BcBigNumber> {
 
-    // Some usefull constant
+    // Some useful constant
     public static final BcBigNumber ZERO = new BcBigNumber(BigDecimal.ZERO);
     public static final BcBigNumber ONE = new BcBigNumber(BigDecimal.ONE);
     public static final BcBigNumber FALSE = ZERO;
