@@ -5,6 +5,10 @@ import ch.snipy.bc.runtime.BcContext;
 import com.oracle.truffle.api.RootCallTarget;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+/**
+ * Statement which indicate when a function is defined, so we can update it
+ * in the function registry.
+ */
 public class BcFunctionDefinitionNode extends BcStatementNode {
 
     private final String identifier;
