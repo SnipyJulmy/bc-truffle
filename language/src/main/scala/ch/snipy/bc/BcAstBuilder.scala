@@ -137,8 +137,6 @@ object BcAstBuilder {
         case FunctionCall(identifier, _) if context.functions(identifier).isVoid =>
           process(expr)
         case _: Assignment => process(expr)
-        case _: PreIncrement => process(expr)
-        case _: PostIncrement => process(expr)
         case _ =>
           val res = mkPrint(List(process(expr)), addNewLine = true) // by default, print the expression
           res

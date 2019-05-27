@@ -6,7 +6,6 @@ import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.*;
-import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 import static ch.snipy.bc.runtime.BcBigNumber.ONE;
 
@@ -30,18 +29,18 @@ public abstract class BcPostIncrementNode extends BcReadNode {
                 long value = FrameUtil.getLongSafe(frame, getSlot());
                 long newValue = value + getModifier();
                 frame.setLong(getSlot(), newValue);
-                return newValue;
+                return value;
             } catch (IllegalStateException eLong) { // long failed, we try with double
                 try {
                     double value = FrameUtil.getDoubleSafe(frame, getSlot());
                     double newValue = value + getModifier();
                     frame.setDouble(getSlot(), newValue);
-                    return newValue;
+                    return value;
                 } catch (IllegalStateException eDouble) { // double failed, go for BigNumber
                     BcBigNumber value = (BcBigNumber) FrameUtil.getObjectSafe(frame, getSlot());
                     BcBigNumber newValue = value.add(getModifier() > 0 ? ONE : ONE.negate());
                     frame.setObject(getSlot(), newValue);
-                    return newValue;
+                    return value;
                 }
             }
         }
