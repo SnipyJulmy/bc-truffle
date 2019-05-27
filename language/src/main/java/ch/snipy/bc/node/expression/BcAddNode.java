@@ -8,6 +8,10 @@ import com.oracle.truffle.api.dsl.Fallback;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+/**
+ * Node which perform the + operator on various type
+ * Comparing to posix bc, here we allow String concatenation
+ */
 @SuppressWarnings("WeakerAccess")
 @NodeInfo(shortName = "+")
 public abstract class BcAddNode extends BcBinaryNode {

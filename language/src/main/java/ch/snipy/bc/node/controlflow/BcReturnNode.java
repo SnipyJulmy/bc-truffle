@@ -18,7 +18,7 @@ public final class BcReturnNode extends BcStatementNode {
             result = valueNode.executeGeneric(frame);
         } else {
             // bc specify that if no return getValue is provide, the return getValue is 0
-            result = (double) 0;
+            result = 0;
         }
         throw new BcReturnException(result);
     }
