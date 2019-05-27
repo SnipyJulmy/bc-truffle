@@ -1,0 +1,8 @@
+define get(a[],i) {
+  return a[i];
+}
+l = 21836
+for(i=0;i<l;i++) a[i] = i
+for(i=0;i<l;i++) a[i]
+for(i=0;i<l;i++) get(a[],i)
+halt

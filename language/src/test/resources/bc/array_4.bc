@@ -1,0 +1,10 @@
+a[12] = 213
+a[12]
+define get(a[],i) {
+  return a[i];
+}
+a[12]
+get(a[],12)
+a[1]
+get(a[],1)
+halt
