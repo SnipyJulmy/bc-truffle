@@ -51,7 +51,7 @@ class BcFileTest extends FlatSpec with Matchers {
         _.mkString
       }
 
-      bcTruffleOut shouldBe bcOut
+      bcTruffleOut.replaceAll("\n","") shouldBe bcOut.replaceAll("\n","")
     }
   }
 }

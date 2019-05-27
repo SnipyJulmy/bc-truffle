@@ -1,0 +1,28 @@
+b = 12
+b
+define id(a) {
+  a
+  return a
+}
+define f(b) {
+  auto a
+  a = b
+  a
+  return b
+}
+define g(b) {
+  auto a
+  a = b
+  a
+  return a
+}
+id(12)
+f(13)
+g(14)
+id(12)
+f(13)
+g(14)
+id(56)
+f(213124)
+g(937382)
+halt

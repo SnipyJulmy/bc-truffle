@@ -1,0 +1,17 @@
+a = 1
+b = 2
+a
+b
+define void f() {
+  auto a
+  a
+  b
+  a = 3
+  a
+  b
+  b = 4
+  a
+  b
+}
+f()
+halt

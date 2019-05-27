@@ -1,0 +1,11 @@
+out = 4
+out
+define void f(a) {
+  out
+  out = a
+  out
+}
+out
+f(1)
+out
+halt
