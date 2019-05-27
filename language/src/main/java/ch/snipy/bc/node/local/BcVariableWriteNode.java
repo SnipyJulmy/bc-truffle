@@ -19,22 +19,6 @@ public abstract class BcVariableWriteNode extends BcExpressionNode {
     protected abstract MaterializedFrame getGlobalFrame();
 
     @Specialization
-    boolean write(VirtualFrame localFrame, boolean value) {
-        if (getSlot().getIdentifier().equals("scale")) {
-            BcLanguage.getCurrentContext().setScale(value ? 1 : 0);
-        }
-        VirtualFrame frame = getCorrectFrame(localFrame);
-        if (frame == null) {
-            createFrameSlot(localFrame.getFrameDescriptor(), getSlot());
-            localFrame.setBoolean(getSlot(), value);
-        } else {
-            frame.getFrameDescriptor().setFrameSlotKind(getSlot(), FrameSlotKind.Boolean);
-            frame.setBoolean(getSlot(), value);
-        }
-        return value;
-    }
-
-    @Specialization
     long write(VirtualFrame localFrame, long value) {
         if (getSlot().getIdentifier().equals("scale")) {
             BcLanguage.getCurrentContext().setScale((int) value);
@@ -46,22 +30,6 @@ public abstract class BcVariableWriteNode extends BcExpressionNode {
         } else {
             frame.getFrameDescriptor().setFrameSlotKind(getSlot(), FrameSlotKind.Long);
             frame.setLong(getSlot(), value);
-        }
-        return value;
-    }
-
-    @Specialization
-    double write(VirtualFrame localFrame, double value) {
-        if (getSlot().getIdentifier().equals("scale")) {
-            BcLanguage.getCurrentContext().setScale((int) value);
-        }
-        VirtualFrame frame = getCorrectFrame(localFrame);
-        if (frame == null) {
-            createFrameSlot(localFrame.getFrameDescriptor(), getSlot());
-            localFrame.setDouble(getSlot(), value);
-        } else {
-            frame.getFrameDescriptor().setFrameSlotKind(getSlot(), FrameSlotKind.Double);
-            frame.setDouble(getSlot(), value);
         }
         return value;
     }

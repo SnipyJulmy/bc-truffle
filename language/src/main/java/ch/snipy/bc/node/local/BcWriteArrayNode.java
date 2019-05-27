@@ -15,7 +15,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import java.util.HashMap;
 import java.util.Map;
 
-// TODO rewrite the class
 @NodeChild(value = "index", type = BcExpressionNode.class)
 @NodeChild(value = "expr", type = BcExpressionNode.class)
 @NodeField(name = "slot", type = FrameSlot.class)

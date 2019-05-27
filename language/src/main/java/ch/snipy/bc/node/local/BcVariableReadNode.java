@@ -10,7 +10,6 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 @NodeField(name = "slot", type = FrameSlot.class)
 public abstract class BcVariableReadNode extends BcReadNode {

@@ -13,6 +13,7 @@ import com.oracle.truffle.api.nodes.Node;
 
 import static ch.snipy.bc.runtime.BcBigNumber.*;
 
+@SuppressWarnings("WeakerAccess")
 @TypeSystemReference(BcTypes.class)
 public abstract class BcForeignToBcTypeNode extends Node {
 
