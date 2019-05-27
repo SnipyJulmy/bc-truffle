@@ -26,6 +26,9 @@ public abstract class BcTypes {
         return BcNull.SINGLETON;
     }
 
+    // implicit cast are here for automatically converting "lower" value to upper
+    // ones, in particularly for the specialization
+
     @ImplicitCast
     @TruffleBoundary
     public static long castLong(int value) {

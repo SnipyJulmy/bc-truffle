@@ -8,6 +8,6 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 @NodeInfo(language = "bc", description = "abstract base node for any bc statement")
 @ReportPolymorphism
 public abstract class BcStatementNode extends Node {
-    // execute the node as a statement (no return getValue)
+    // execute the node as a statement (no return value)
     public abstract void executeVoid(VirtualFrame frame);
 }
