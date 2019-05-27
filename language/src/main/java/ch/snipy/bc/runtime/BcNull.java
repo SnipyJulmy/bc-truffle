@@ -5,11 +5,11 @@ import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.library.ExportLibrary;
 import com.oracle.truffle.api.library.ExportMessage;
 
-/*
-    In bc, the null value is represented by 0.
-    For example, if we just write
-      print a
-    without declared a yet, then it will print 0.
+/**
+ * In bc, the null value is represented by 0.
+ * For example, if we just write
+ * print a
+ * without declared a yet, then it will print 0.
  */
 @ExportLibrary(InteropLibrary.class)
 @SuppressWarnings("static-method")

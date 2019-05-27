@@ -9,6 +9,7 @@ import com.oracle.truffle.api.interop.ForeignAccess;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.utilities.CyclicAssumption;
 
+// serve as a data structure for storing a function
 public final class BcFunction implements TruffleObject {
 
     private final String name;

@@ -5,6 +5,7 @@ import com.oracle.truffle.api.RootCallTarget;
 
 import java.util.*;
 
+// map to store the functions during the AST generation and execution
 public final class BcFunctionRegistry {
 
     private final BcLanguage language;

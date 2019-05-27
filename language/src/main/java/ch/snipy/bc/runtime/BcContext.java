@@ -28,6 +28,12 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.List;
 
+/**
+ * The BC context is here to save all the various object that we
+ * need during the execution. For example, it store the global frame slot and
+ * the global frame descriptor, in order to easily access them during the AST generation
+ * and during the execution.
+ */
 public final class BcContext {
     private static final int DEFAULT_SCALE = 0;
 
