@@ -1,0 +1,13 @@
+for(a=0;a<123;a++) a
+for(a=(-21);a<123;a++) a
+for(a=213;a<123;a++) a
+for(a=23;a<123;a++) a
+for(a=0;a<123;++a) a
+for(a=(-21);a<123;++a) a
+for(a=213;a<123;++a) a
+for(a=23;a<123;++a) a
+for(a=30;a>0;a--) a
+for(a=(-12);a>0;a--) a
+for(a=0;a>0;a--) a
+for(a=0;a>0;a--) a
+halt
