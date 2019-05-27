@@ -1,0 +1,39 @@
+a = 10
+while(a > 0) {
+  a
+  break;
+  a = a - 1
+}
+
+a = 10
+while(--a > 0) {
+  break;
+  a
+}
+
+a = 10
+while(a-- > 0) {
+  break;
+  a
+}
+
+a = 0
+while(a < 123) {
+  a = a + 1
+  break;
+  a
+}
+
+a = 0
+while(a++ < 123) {
+  a
+  break;
+}
+
+a = 0
+while(++a < 123) {
+  a
+  break;
+}
+
+halt

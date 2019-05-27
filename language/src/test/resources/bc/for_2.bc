@@ -1,0 +1,6 @@
+for(i=0;i<100;i++) {
+    if(i < 40) i
+    if(i > 80) break
+    i
+}
+halt

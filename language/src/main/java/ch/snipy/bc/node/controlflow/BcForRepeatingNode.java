@@ -40,6 +40,7 @@ public final class BcForRepeatingNode extends Node implements RepeatingNode {
             return true;
         } catch (BcContinueException e) {
             continueTaken.enter();
+            if (endLoopNode != null) endLoopNode.executeVoid(frame);
             return true;
         } catch (BcBreakException e) {
             breakTaken.enter();
