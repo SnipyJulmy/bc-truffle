@@ -1,0 +1,50 @@
+os:
+  - linux
+  - osx
+
+language: java
+
+jdk:
+  - oraclejdk8
+  - openjdk9
+  - openjdk11
+
+env:
+  - GRAALVM_VERSION="19.0.0"
+  - GRAALVM_VERSION="NONE" BC_BUILD_NATIVE="false"
+
+matrix:
+  exclude:
+    - env: GRAALVM_VERSION="19.0.0"
+      jdk: openjdk11
+    - jdk: openjdk9
+      os: linux
+    - jdk: oraclejdk8
+      os: osx
+
+install:
+  - |
+    cd .. && mv bc-truffle "bc truffle" && cd "bc truffle"
+    if [[ "$GRAALVM_VERSION" != "NONE" ]]; then
+      if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then DOWNLOAD_OS_NAME="darwin"; fi
+      if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then DOWNLOAD_OS_NAME="linux"; fi
+      curl -LJ "https://github.com/oracle/graal/releases/download/vm-$GRAALVM_VERSION/graalvm-ce-$DOWNLOAD_OS_NAME-amd64-$GRAALVM_VERSION.tar.gz" --output graalvm.tar.gz
+      tar -xzf graalvm.tar.gz
+      export JAVA_HOME="$(pwd)/graalvm-ce-$GRAALVM_VERSION"
+      if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export JAVA_HOME="$JAVA_HOME/Contents/Home"; fi
+      "$JAVA_HOME/bin/gu" install native-image
+    else
+      if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export JAVA_HOME=$(/usr/libexec/java_home); fi
+    fi
+script:
+  - mvn package
+  - ./bc language/src/test/resources/bc/add_1.bc
+  - if [[ "$GRAALVM_VERSION" != "NONE" ]]; then ./native/bcnative language/src/test/resources/bc/add_1.bc; fi
+  - if [[ "$GRAALVM_VERSION" != "NONE" ]]; then "$JAVA_HOME/bin/gu" install -L component/bc-component.jar ; fi
+  - if [[ "$GRAALVM_VERSION" != "NONE" ]]; then "$JAVA_HOME/bin/bc" language/src/test/resources/bc/add_1.bc; fi
+  - if [[ "$GRAALVM_VERSION" != "NONE" ]]; then "$JAVA_HOME/bin/bcnative" language/src/test/resources/bc/add_1.bc; fi
+  - if [[ "$GRAALVM_VERSION" != "NONE" ]]; then "$JAVA_HOME/bin/polyglot" --jvm --language bc --file language/src/test/resources/bc/add_1.bc; fi
+  - mvn package
+  - ./bc language/src/test/resources/bc/add_1.bc
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then shellcheck bc; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (find . -name '*.sh' | grep -v graalvm | xargs shellcheck); fi
