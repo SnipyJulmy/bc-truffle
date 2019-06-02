@@ -9,13 +9,11 @@ import scala.util.matching.Regex
 import scala.util.parsing.combinator.{PackratParsers, RegexParsers}
 import scala.util.parsing.input.CharSequenceReader
 
-object BCParser extends IBcParser {
+object BcParser {
 
-  BcLanguage.parser = this
+  def parse(bcLanguage: BcLanguage, source: Source): BcRootNode = {
 
-  override def parse(bcLanguage: BcLanguage, source: Source): BcRootNode = {
-
-    val parser = new BCParser
+    val parser = new BcParser
     import parser._
 
     def sanitize(input: String): String = {
@@ -42,19 +40,22 @@ object BCParser extends IBcParser {
       ))
     ) match {
       case e: NoSuccess =>
-        throw new IllegalArgumentException(s"can't parse ${source.getCharacters.toString}... error : ${e.msg}")
+        throw new IllegalArgumentException(s"can't mkRootNode ${source.getCharacters.toString}... error : ${e.msg}")
       case Success(prog: Program, next) =>
         if (!dropWs(next).atEnd) {
-          throw BcParserException(s"can't parse the whole string, input : ${source.getCharacters.toString}, rest : ${next.rest.source.toString}")
+          throw BcParserException(s"can't mkRootNode the whole string, input : ${source.getCharacters.toString}, rest : ${next.rest.source.toString}")
         }
-        // println(prog) // TODO : add an option to print the first AST
         BcAstBuilder.mkRootNode(bcLanguage, prog)
     }
     node
   }
 }
 
-class BCParser extends RegexParsers with PackratParsers {
+class BcParser extends RegexParsers with PackratParsers {
+
+  // Note : in bc, "\n" represent the end of a statement, like ";"
+  override protected val whiteSpace: Regex = "[ \t\f\r\n]+".r
+  override def skipWhitespace: Boolean = true
 
   /**
     * a bc program is just a sequence of statement
@@ -130,7 +131,6 @@ class BCParser extends RegexParsers with PackratParsers {
   lazy val bcLogicalOrExpr: PackratParser[Expr] =
     bcLogicalOrExpr ~ ("||" ~> bcLogicalAndExpr) ^^ { case l ~ r => Or(l, r) } |
       bcLogicalAndExpr
-
   /* Expression */
   lazy val bcLogicalAndExpr: PackratParser[Expr] =
     bcLogicalAndExpr ~ ("&&" ~> bcLogicalNotExpr) ^^ { case l ~ r => And(l, r) } |
@@ -216,8 +216,5 @@ class BCParser extends RegexParsers with PackratParsers {
   lazy val rp = ")"
   lazy val lb = "{"
   lazy val rb = "}"
-  // Note : in bc, "\n" represent the end of a statement, like ";"
-  override protected val whiteSpace: Regex = "[ \t\f\r\n]+".r
-  override def skipWhitespace: Boolean = true
 
 }

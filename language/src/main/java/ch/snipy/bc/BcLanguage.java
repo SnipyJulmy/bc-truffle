@@ -22,8 +22,6 @@ import java.util.Collections;
 )
 public class BcLanguage extends TruffleLanguage<BcContext> {
 
-    public static IBcParser parser;
-
     public static BcContext getCurrentContext() {
         return getCurrentContext(BcLanguage.class);
     }
@@ -44,7 +42,7 @@ public class BcLanguage extends TruffleLanguage<BcContext> {
     @Override
     protected CallTarget parse(ParsingRequest request) {
         Source source = request.getSource();
-        RootNode root = parser.parse(this, source);
+        RootNode root = BcParser$.MODULE$.parse(this, source);
         return Truffle.getRuntime().createCallTarget(root);
     }
 }
