@@ -2,10 +2,10 @@
 
 COMPONENT_DIR="component_temp_dir"
 LANGUAGE_PATH="$COMPONENT_DIR/jre/languages/bc"
-INCLUDE_SLNATIVE="FALSE"
+INCLUDE_BCNATIVE="FALSE"
 
 if [[ -f ../native/bcnative ]]; then
-    INCLUDE_SLNATIVE="TRUE"
+    INCLUDE_BCNATIVE="TRUE"
 fi
 
 rm -rf COMPONENT_DIR
@@ -18,7 +18,7 @@ cp ../launcher/target/bc-launcher.jar "$LANGUAGE_PATH/launcher/"
 
 mkdir -p "$LANGUAGE_PATH/bin"
 cp ../bc ${LANGUAGE_PATH}/bin/
-if [[ ${INCLUDE_SLNATIVE} = "TRUE" ]]; then
+if [[ ${INCLUDE_BCNATIVE} = "TRUE" ]]; then
     cp ../native/bcnative ${LANGUAGE_PATH}/bin/
 fi
 
