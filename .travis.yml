@@ -36,6 +36,8 @@ install:
     else
       if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export JAVA_HOME=$(/usr/libexec/java_home); fi
     fi
+
+
 script:
   - mvn package
   - ./bc language/src/test/resources/bc/add_1.bc
@@ -46,5 +48,5 @@ script:
   - if [[ "$GRAALVM_VERSION" != "NONE" ]]; then "$JAVA_HOME/bin/polyglot" --jvm --language bc --file language/src/test/resources/bc/add_1.bc; fi
   - mvn package
   - ./bc language/src/test/resources/bc/add_1.bc
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then shellcheck bc; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (find . -name '*.sh' | grep -v graalvm | xargs shellcheck); fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then shellcheck -e SC2086 bc; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (find . -name '*.sh' | grep -v graalvm | xargs shellcheck -e SC2086); fi
