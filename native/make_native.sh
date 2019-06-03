@@ -8,7 +8,8 @@ if [[ ${JAVA_HOME} == "" ]]; then
   export JAVA_HOME="/usr/lib/jvm/java-8-graal"
 fi
 
-"$JAVA_HOME"/bin/native-image --tool:truffle -H:MaxRuntimeCompileMethods=1200 \
+"$JAVA_HOME"/bin/native-image \
+    --macro:truffle --no-fallback --initialize-at-build-time \
     -cp ../language/target/bc-truffle-0.1-jar-with-dependencies.jar:../launcher/target/bc-launcher.jar \
     ch.snipy.bc.launcher.BcMain \
     bcnative
