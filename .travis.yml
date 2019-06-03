@@ -24,7 +24,7 @@ matrix:
 
 install:
   - |
-    cd .. && mv bc-truffle "bc truffle" && cd "bc truffle"
+    cd .. && mv bc-truffle "bc_truffle" && cd "bc_truffle"
     if [[ "$GRAALVM_VERSION" != "NONE" ]]; then
       if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then DOWNLOAD_OS_NAME="darwin"; fi
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then DOWNLOAD_OS_NAME="linux"; fi
