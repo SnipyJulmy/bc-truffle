@@ -9,9 +9,9 @@ import scala.util.matching.Regex
 import scala.util.parsing.combinator.{PackratParsers, RegexParsers}
 import scala.util.parsing.input.CharSequenceReader
 
-object BcParser {
+object BcParser extends IBcParser {
 
-  def parse(bcLanguage: BcLanguage, source: Source): BcRootNode = {
+  override def parse(bcLanguage: BcLanguage, source: Source): BcRootNode = {
 
     val parser = new BcParser
     import parser._

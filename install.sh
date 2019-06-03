@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 sudo gu remove bc &&
 cd ./component/ &&
-sudo gu install -L ./bc-component.jar &&
+sudo gu -L install ./bc-component.jar &&
 cd ..

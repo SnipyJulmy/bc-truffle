@@ -2,16 +2,14 @@
 
 COMPONENT_DIR="component_temp_dir"
 LANGUAGE_PATH="$COMPONENT_DIR/jre/languages/bc"
-INCLUDE_BCNATIVE="FALSE"
-
 if [[ -f ../native/bcnative ]]; then
     INCLUDE_BCNATIVE="TRUE"
 fi
 
 rm -rf COMPONENT_DIR
 
-mkdir -p "$LANGUAGE_PATH"
-cp ../language/target/bc-truffle-0.1-jar-with-dependencies.jar "$LANGUAGE_PATH"
+mkdir -p ${LANGUAGE_PATH}
+cp ../language/target/bc-truffle-0.1-jar-with-dependencies.jar ${LANGUAGE_PATH}
 
 mkdir -p "$LANGUAGE_PATH/launcher"
 cp ../launcher/target/bc-launcher.jar "$LANGUAGE_PATH/launcher/"
