@@ -37,7 +37,7 @@ install:
       if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export JAVA_HOME=$(/usr/libexec/java_home); fi
     fi
 script:
-  - ./package.sh
+  - mvn package
   - ./bc language/src/test/resources/bc/add_1.bc
   - if [[ "$GRAALVM_VERSION" != "NONE" ]]; then ./native/bcnative language/src/test/resources/bc/add_1.bc; fi
   - if [[ "$GRAALVM_VERSION" != "NONE" ]]; then "$JAVA_HOME/bin/gu" install -L component/bc-component.jar ; fi
