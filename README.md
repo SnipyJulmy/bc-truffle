@@ -1,4 +1,4 @@
-# bc-truffle
+# bc-truffle [![Build Status](https://travis-ci.org/SnipyJulmy/bc-truffle.svg?branch=master)](https://travis-ci.org/SnipyJulmy/bc-truffle)
 bc (basic calculator) is an arbitrary precision calculator language. This project aims to implement
 bc using the Truffle library in order to improve its performance.
 
