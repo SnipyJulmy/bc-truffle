@@ -9,9 +9,9 @@ import scala.util.matching.Regex
 import scala.util.parsing.combinator.{PackratParsers, RegexParsers}
 import scala.util.parsing.input.CharSequenceReader
 
-object BcParser extends IBcParser {
+object BcParser {
 
-  override def parse(bcLanguage: BcLanguage, source: Source): BcRootNode = {
+  def parse(bcLanguage: BcLanguage, source: Source): BcRootNode = {
 
     val parser = new BcParser
     import parser._
@@ -51,7 +51,9 @@ object BcParser extends IBcParser {
   }
 }
 
-class BcParser extends RegexParsers with PackratParsers {
+class BcParser extends RegexParsers with PackratParsers with IBcParser {
+
+  override def parse(language: BcLanguage, source: Source): BcRootNode = BcParser.parse(language, source)
 
   // Note : in bc, "\n" represent the end of a statement, like ";"
   override protected val whiteSpace: Regex = "[ \t\f\r\n]+".r
