@@ -40,9 +40,9 @@ install:
 
 script:
   - ./package.sh
+  - if [[ "$GRAALVM_VERSION" != "NONE" ]]; then "$JAVA_HOME/bin/gu" install -L component/bc-component.jar ; fi
   - ./bc language/src/test/resources/bc/add_1.bc
   - if [[ "$GRAALVM_VERSION" != "NONE" ]]; then ./native/bcnative language/src/test/resources/bc/add_1.bc; fi
-  - if [[ "$GRAALVM_VERSION" != "NONE" ]]; then "$JAVA_HOME/bin/gu" install -L component/bc-component.jar ; fi
   - if [[ "$GRAALVM_VERSION" != "NONE" ]]; then "$JAVA_HOME/bin/bc" language/src/test/resources/bc/add_1.bc; fi
   - if [[ "$GRAALVM_VERSION" != "NONE" ]]; then "$JAVA_HOME/bin/bcnative" language/src/test/resources/bc/add_1.bc; fi
   - if [[ "$GRAALVM_VERSION" != "NONE" ]]; then "$JAVA_HOME/bin/polyglot" --jvm --language bc --file language/src/test/resources/bc/add_1.bc; fi
